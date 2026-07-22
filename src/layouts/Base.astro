@@ -1,0 +1,31 @@
+---
+import '../styles/global.css';
+import profile from '../data/profile.json';
+import sectors from '../data/sectors.json';
+import brief from '../data/brief.json';
+const site = {
+  typedBrief: profile.typedBrief,
+  sectorCount: sectors.sectors.length,
+  radarDone: sectors.radarCenterDone,
+  apiEndpoint: brief.apiEndpoint || '/api/brief',
+  bookingsUrl: brief.bookingsUrl || ''
+};
+const { title = profile.name + ' · The Build Log' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={profile.subjectLine?.replace(/&amp;/g,'&')}>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script is:inline set:html={`window.__SITE=${JSON.stringify(site)};`}></script>
+</head>
+<body data-theme="cyan">
+  <slot />
+  <script src="../scripts/main.js"></script>
+</body>
+</html>

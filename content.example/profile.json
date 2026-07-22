@@ -1,0 +1,23 @@
+{
+ "name": "Alex Operator",
+ "domain": "example.com",
+ "typedBrief": "MISSION BRIEF // N YEARS OF BUILDING // READ ON",
+ "spanYears": "12",
+ "subjectLine": "Example Engineer \u00b7 Replace Me In src/data",
+ "firm": {
+  "name": "ExampleCo",
+  "url": "https://example.com",
+  "tag": "Replace with your firm"
+ },
+ "channels": [
+  {
+   "label": "github.com/you",
+   "url": "https://github.com/you"
+  },
+  {
+   "label": "linkedin.com/in/you",
+   "url": "https://linkedin.com/in/you"
+  }
+ ],
+ "repo": "https://github.com/you/your-site"
+}

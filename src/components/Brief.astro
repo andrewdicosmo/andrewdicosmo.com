@@ -1,0 +1,83 @@
+---
+import brief from '../data/brief.json';
+import profile from '../data/profile.json';
+const firm = profile.firm;
+---
+<section class="contact" id="contact">
+  <h2 class="sec-title">Choose Your <span>Engagement</span></h2>
+  <div class="sec-sub">ONE BRIEF · SELECT A PATH, OR BOTH, AND IT BUILDS ITSELF</div>
+
+  <div class="door-panel brief-panel" id="brief" style="margin-top:0;max-width:1100px">
+    <div class="dp-tag">Transmit · The brief</div>
+    <h3 id="brief-title">The Brief</h3>
+
+    <div class="step-lbl">01 · Path</div>
+    <div class="path-row">
+      <div class="pathcard" id="door-hire" onclick="toggleDoor('w2')" role="button" aria-pressed="false">
+        <span class="dsel" id="dsel-w2">Tap to select</span>
+        <div class="pc-tag">Path 01 · Hiring</div>
+        <h4>Hire Me</h4>
+        <p>Senior AI engineering, computer vision, and cloud security as a W2 hire. The ATS friendly resume lands in your inbox when you transmit.</p>
+      </div>
+      <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" role="button" aria-pressed="false">
+        <span class="dsel" id="dsel-c2c">Tap to select</span>
+        <div class="pc-tag">Path 02 · Consulting</div>
+        <h4>Work With Me, C2C</h4>
+        <p>You engage me, not a company. The work runs through my firm, <a href={firm.url} onclick="event.stopPropagation()" style="color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac-dim)">{firm.name.split(',')[0]}</a>: cloud, security, and AI engineering.</p>
+      </div>
+    </div>
+
+    <div class="brief-empty" id="brief-empty">Select a path above and <b>the brief builds itself</b></div>
+    <div class="cform" id="brief-form" style="display:none">
+      <div class="step-lbl" style="margin-top:2px">02 · Parameters</div>
+      <div class="fs" id="fs-w2">
+        <div class="f2" style="margin-bottom:10px">
+          <div><label>Salary range</label>
+          <select>{brief.salary.map(o => <option>{o}</option>)}</select></div>
+          <div><label>Job req · link or attach · optional</label>
+          <div class="fattach">
+            <input type="url" placeholder="LINK TO THE JOB REQ">
+            <input type="file" id="jrfile" accept=".pdf,.doc,.docx" style="display:none" onchange="jrPicked(this)">
+            <button type="button" class="fbtn" id="jrbtn" onclick="document.getElementById('jrfile').click()">Attach PDF / DOC</button>
+          </div></div>
+        </div>
+      </div>
+      <div class="fs" id="fs-c2c">
+        <div class="f2" style="margin-bottom:10px">
+          <div><label>Estimated budget</label>
+          <select>{brief.budget.map(o => <option>{o}</option>)}</select></div>
+          <div><label>Term</label>
+          <select>{brief.term.map(o => <option>{o}</option>)}</select></div>
+        </div>
+        <div style="margin-bottom:10px"><label>What kind of work · tap all that fit</label>
+        <div class="pchips">
+          {brief.chips.map(c => <button type="button" class="pchip" onclick="this.classList.toggle('on')">{c}</button>)}
+        </div></div>
+        <div style="max-width:340px"><label>Where the project stands</label>
+        <select>{brief.stage.map(o => <option>{o}</option>)}</select></div>
+      </div>
+      <div class="step-lbl">03 · Transmit</div>
+      <div class="f2">
+        <div><label>Name · required</label><input type="text" id="bname" placeholder="NAME"></div>
+        <div><label>Work email · required</label><input type="email" id="bemail" placeholder="EMAIL"></div>
+      </div>
+      <div class="f2">
+        <div><label>Company</label><input type="text" placeholder="COMPANY"></div>
+        <div><label>Your role</label><input type="text" placeholder="ROLE / TITLE"></div>
+      </div>
+      <div><label>The brief · anything the fields above did not cover</label>
+      <textarea id="bmsg" placeholder=""></textarea></div>
+      <button class="door primary" type="button" onclick="sendBrief()">Transmit · Receive the resume</button>
+      <p class="form-note">Submitting sends me the brief and sends <b>the ATS friendly resume (PDF)</b> to your email. I reply within one business day.</p>
+    </div>
+    <div class="brief-success" id="brief-done">
+      <div class="bs-code">Transmission received</div>
+      <h4>Resume Inbound</h4>
+      <p>Check your inbox. The ATS friendly resume is on its way, and I will follow up on the brief within one business day. If it does not arrive, check spam or write me directly.</p>
+      <div id="sched-wrap" style="display:none;margin-top:18px">
+        <p style="margin-bottom:12px">Your brief has <b style="color:var(--ac)">everything I need</b>. If you want to move fast, skip the email round trip and grab a time now.</p>
+        <a class="door primary" href="#" style="display:inline-block;text-decoration:none">Schedule the debrief · Pick a time</a>
+      </div>
+    </div>
+  </div>
+</section>

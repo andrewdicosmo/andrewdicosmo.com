@@ -1,0 +1,6 @@
+---
+import profile from '../data/profile.json';
+import raw from '../data/sections/GIFT.html?raw';
+const html = raw.replaceAll('{{REPO_URL}}', profile.repo);
+---
+<Fragment set:html={html} />

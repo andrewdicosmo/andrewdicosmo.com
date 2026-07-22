@@ -1,0 +1,1 @@
+Add your processed photo as src/data/assets/subject.webp (grayscale, background removed).

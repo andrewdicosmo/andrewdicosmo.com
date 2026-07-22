@@ -1,0 +1,13 @@
+{
+ "cards": [
+  {
+   "code": "CAP-01",
+   "title": "Your Capability",
+   "chips": [
+    "Skill",
+    "Skill",
+    "Skill"
+   ]
+  }
+ ]
+}

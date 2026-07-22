@@ -1,0 +1,42 @@
+{
+ "items": [
+  {
+   "type": "phase",
+   "aud": "comm",
+   "tag": "Phase 02",
+   "yrs": "2020 \u2013 NOW",
+   "title": "Current Era",
+   "sum": "Describe your current chapter here. This is example content: replace everything in src/data with your own story.",
+   "ops": [
+    {
+     "aud": "comm",
+     "code": "OP-020",
+     "audLabel": "Comm",
+     "name": "Your Flagship Project",
+     "live": true,
+     "status": "Live",
+     "body": "What you built, why it mattered, and the results. Keep claims real.",
+     "chips": [
+      "Your stack",
+      "Your metric"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "intel",
+   "yr": "2023",
+   "label": "Intel \u00b7 Industry",
+   "html": "<b>An industry event.</b> How it intersected your work."
+  },
+  {
+   "type": "phase",
+   "aud": "comm",
+   "tag": "Phase 01 \u00b7 Origin",
+   "yrs": "2014 \u2013 2020",
+   "title": "Origin Story",
+   "sum": "Where it started. The example persona exists so the template runs out of the box.",
+   "ops": []
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "salary": [
+  "Prefer to discuss",
+  "$175K to $200K",
+  "$200K to $250K",
+  "$250K plus"
+ ],
+ "budget": [
+  "Not sure yet",
+  "Under $25K",
+  "$25K to $75K",
+  "$75K to $150K",
+  "$150K plus"
+ ],
+ "term": [
+  "Not sure yet",
+  "Short term \u00b7 under 3 months",
+  "Long term \u00b7 3 months plus",
+  "Ongoing"
+ ],
+ "chips": [
+  "AI / ML engineering",
+  "Computer vision",
+  "Cloud security",
+  "Cloud architecture",
+  "Data platform",
+  "Shopify / e-commerce",
+  "Automation",
+  "Not sure yet"
+ ],
+ "stage": [
+  "Just an idea",
+  "Scoping it now",
+  "In progress, need help",
+  "Built, needs a rescue"
+ ],
+ "bookingsUrl": "",
+ "apiEndpoint": "/api/brief"
+}

@@ -1,0 +1,31 @@
+name: Deploy to Azure Static Web Apps
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # PRIVATE CONTENT INJECTION (optional):
+      # keep your real src/data in a private repo; provide CONTENT_REPO_PAT + CONTENT_REPO
+      # secrets and this step swaps the example persona for your cargo at build time.
+      - name: Inject private content
+        if: ${{ secrets.CONTENT_REPO != '' }}
+        run: |
+          git clone --depth 1 https://x-access-token:${{ secrets.CONTENT_REPO_PAT }}@github.com/${{ secrets.CONTENT_REPO }} private-content
+          rm -rf src/data && mkdir -p src/data
+          cp -r private-content/data/* src/data/
+
+      - name: Build and deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: "/"
+          api_location: "api"
+          output_location: "dist"

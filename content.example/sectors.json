@@ -1,0 +1,28 @@
+{
+ "radarCenterScanning": "SCANNING",
+ "radarCenterDone": "4 SECTORS \u00b7 12 YRS",
+ "spinSeconds": 7,
+ "resetAfterSpins": 4,
+ "sectors": [
+  {
+   "label": "SECTOR ONE",
+   "name": "Sector One",
+   "who": "Client A \u00b7 Client B"
+  },
+  {
+   "label": "SECTOR TWO",
+   "name": "Sector Two",
+   "who": "Client C"
+  },
+  {
+   "label": "SECTOR THREE",
+   "name": "Sector Three",
+   "who": "Product X"
+  },
+  {
+   "label": "SECTOR FOUR",
+   "name": "Sector Four",
+   "who": "Client D \u00b7 Client E"
+  }
+ ]
+}

@@ -1,0 +1,186 @@
+
+<section class="hero">
+  <div class="file-tab">Build Log // File 001</div>
+  <div>
+    <div class="brief-line"><span id="typed"></span><span class="cursor"></span></div>
+    <h1 class="name">Andrew<br><span>Operator</span></h1>
+    <div class="dossier-row">
+    <div class="subject">
+      <i class="k a"></i><i class="k b"></i><i class="k c"></i><i class="k d"></i>
+      <div class="ph"><img src="{{SUBJECT_SRC}}" alt="Alex Operator"><div class="tint"></div><div class="scan"></div></div>
+    </div>
+    <div class="dossier">
+      SUBJECT&nbsp;&nbsp;&nbsp;<b>Example Engineer · Replace Me</b><br>
+      CLEARANCE&nbsp;<b>TS/SCI active · CI polygraph</b><br>
+      STATUS&nbsp;&nbsp;&nbsp;&nbsp;Accepting <b>W2</b> or <b>B2B</b> missions. First to engage wins<br>
+      KNOWN FOR&nbsp;<span class="redact">building things that ship</span> and <span class="redact">pushing the limits of AI</span>
+    </div>
+    </div>
+    <div class="doors">
+      <button class="door primary">Hire me</button>
+      <button class="door">Work with my firm</button>
+    </div>
+    <div class="stamp">Declassified for hiring managers</div>
+  </div>
+
+  <!-- satellite scene -->
+  <div class="scene-wrap">
+    <div class="scene-head"><span><b>PASS 2026.07</b> · COLLECTION ACTIVE</span><span id="conf">CV MODEL · STANDBY</span></div>
+    <div class="view-modes"><span>VIEW</span>
+      <button class="vm on" data-m="eo">Optical</button>
+      <button class="vm" data-m="ndvi">NDVI</button>
+      <button class="vm" data-m="gis">Vector/GIS</button>
+    </div>
+    <svg class="scene" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg" aria-label="Satellite detection animation: mountain airbase, overhead view">
+      <defs>
+        <filter id="soft"><feGaussianBlur stdDeviation="2.5"/></filter>
+        <linearGradient id="gveg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#39FF14"/><stop offset="1" stop-color="#B8FF3C"/></linearGradient>
+        <linearGradient id="gstress" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFB800"/><stop offset="1" stop-color="#FF3B3B"/></linearGradient>
+        <radialGradient id="glintG"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+      </defs>
+      <!-- map grid -->
+      <g id="grid"></g>
+      <!-- mountains: contour ridgelines -->
+      <g class="contours">
+        <path d="M-10,95 C40,70 70,90 120,60 C90,40 40,30 -10,45 Z"/>
+        <path d="M-10,80 C30,62 60,74 100,55 C75,42 35,40 -10,52 Z"/>
+        <path d="M-10,66 C25,55 45,60 75,50 C55,44 25,46 -10,55 Z"/>
+        <path d="M430,300 C380,270 360,230 390,190 C420,205 430,240 430,300 Z"/>
+        <path d="M425,290 C390,268 375,238 398,205 C418,220 424,252 425,290 Z"/>
+        <path d="M-10,300 C20,280 50,285 70,300 Z"/>
+      </g>
+      <!-- NDVI layer (multispectral view) -->
+      <g id="Lndvi" style="display:none">
+        <path fill="url(#gveg)" opacity=".45" d="M-10,95 C40,70 70,90 120,60 C90,40 40,30 -10,45 Z"/>
+        <path fill="url(#gveg)" opacity=".45" d="M430,300 C380,270 360,230 390,190 C420,205 430,240 430,300 Z"/>
+        <path fill="url(#gveg)" opacity=".35" d="M-10,300 C20,280 50,285 70,300 Z"/>
+        <rect fill="url(#gveg)" opacity=".28" x="262" y="140" width="150" height="34" rx="8"/>
+        <rect fill="url(#gveg)" opacity=".22" x="20" y="204" width="34" height="60" rx="8"/>
+        <ellipse fill="url(#gstress)" opacity=".42" cx="219" cy="222" rx="38" ry="20"/>
+        <!-- height contours: grading at construction site -->
+        <ellipse class="hcontour" cx="219" cy="222" rx="30" ry="15"/>
+        <ellipse class="hcontour" cx="219" cy="222" rx="22" ry="10"/>
+        <ellipse class="hcontour" cx="219" cy="222" rx="13" ry="6"/>
+      </g>
+      <!-- RUNWAY (valley strip) -->
+      <rect class="runway" x="150" y="52" width="262" height="18"/>
+      <line class="rw-line" x1="162" y1="61" x2="404" y2="61"/>
+      <rect class="thresh" x="152" y="55" width="4" height="12"/>
+      <rect class="thresh" x="158" y="55" width="2" height="12"/>
+      <rect class="thresh" x="406" y="55" width="4" height="12"/>
+      <rect class="thresh" x="402" y="55" width="2" height="12"/>
+      <!-- taxiway + apron + aircraft -->
+      <path class="road" d="M340,70 L340,88"/>
+      <rect class="apron" x="312" y="86" width="60" height="46"/>
+      <g id="jetG" transform="translate(342,108) rotate(24)">
+        <path class="jet" d="M0,-14 L2.4,-4.6 L13,2.7 L13,6.4 L2.6,4.1 L1.8,10 L6.4,13.7 L-6.4,13.7 L-1.8,10 L-2.6,4.1 L-13,6.4 L-13,2.7 L-2.4,-4.6 Z"/>
+      </g>
+      <!-- BASE PERIMETER (fence) -->
+      <rect class="fence" x="48" y="108" width="235" height="150"/>
+      <!-- base structures -->
+      <g id="baseG">
+        <rect class="bldg" x="74" y="114" width="38" height="20"/>
+        <rect class="roofunit" x="80" y="119" width="6" height="6"/>
+        <rect class="roofunit" x="96" y="122" width="6" height="6"/>
+        <rect class="bldg" x="74" y="142" width="26" height="26"/>
+        <rect class="roofunit" x="80" y="148" width="5" height="5"/>
+        <circle class="dome" cx="130" cy="152" r="9"/>
+        <circle class="dome-ring" cx="130" cy="152" r="13"/>
+      </g>
+      <!-- internal road + gate road -->
+      <path class="road" d="M48,186 L283,186"/>
+      <path class="road" d="M283,186 C320,192 350,216 420,244"/>
+      <!-- VEHICLE 1 (visible, on internal road) -->
+      <g id="veh1G" transform="translate(100,186)">
+        <rect class="vehicle" x="-7" y="-3.5" width="14" height="7" rx="1.5"/>
+        <rect class="veh-cab" x="3" y="-3.5" width="4" height="7"/>
+      </g>
+      <!-- NEW CONSTRUCTION (hangar foundation + crane) -->
+      <g id="conG">
+        <rect class="found" x="196" y="206" width="46" height="32"/>
+        <rect class="bldg" x="200" y="210" width="14" height="10"/>
+        <circle class="craneBase" cx="240" cy="234" r="3.5"/>
+        <line class="craneBoom" x1="240" y1="234" x2="212" y2="246"/>
+        <circle class="craneHook" cx="212" cy="246" r="1.8"/>
+      </g>
+      <!-- VEHICLE 2 (on gate road, drawn BEFORE cloud so the cloud hides it) -->
+      <g id="veh2G" transform="translate(303,203) rotate(18)">
+        <rect class="vehicle" x="-7" y="-3.5" width="14" height="7" rx="1.5"/>
+        <rect class="veh-cab" x="3" y="-3.5" width="4" height="7"/>
+      </g>
+      <!-- cloud shadows (optical view depth) -->
+      <g id="Lshadow"><ellipse cx="312" cy="216" rx="27" ry="11" fill="#000" opacity=".26" filter="url(#soft)"/></g>
+      <g class="cloud-drift" id="LshadowDrift"><ellipse cx="52" cy="284" rx="30" ry="10" fill="#000" opacity=".22" filter="url(#soft)"/></g>
+      <!-- CLOUD over vehicle 2 -->
+      <g id="cloudTarget" class="cloud" filter="url(#soft)">
+        <ellipse cx="300" cy="202" rx="27" ry="12"/>
+        <ellipse cx="318" cy="194" rx="17" ry="10"/>
+        <ellipse cx="284" cy="196" rx="15" ry="9"/>
+      </g>
+      <g class="cloud cloud-drift" filter="url(#soft)">
+        <ellipse cx="40" cy="272" rx="30" ry="11"/>
+        <ellipse cx="62" cy="266" rx="18" ry="9"/>
+      </g>
+      <!-- brackets + tags (5 targets) -->
+      <g id="b1" class="bracket"><path d="M66,108 h10 M66,108 v10 M150,108 h-10 M150,108 v10 M66,170 h10 M66,170 v-10 M150,170 h-10 M150,170 v-10"/></g>
+      <text id="t1" class="tag" x="66" y="102">BASE STRUCTURES · 97.4%</text>
+      <g id="b2" class="bracket"><path d="M84,174 h8 M84,174 v8 M116,174 h-8 M116,174 v8 M84,200 h8 M84,200 v-8 M116,200 h-8 M116,200 v-8"/></g>
+      <text id="t2" class="tag" x="76" y="212">VEHICLE · 96.2%</text>
+      <g id="b3" class="bracket"><path d="M190,200 h10 M190,200 v10 M252,200 h-10 M252,200 v10 M190,246 h10 M190,246 v-10 M252,246 h-10 M252,246 v-10"/></g>
+      <text id="t3" class="tag" x="184" y="258">NEW CONSTRUCTION · 93.1%</text>
+      <g id="b4" class="bracket"><path d="M268,184 h10 M268,184 v10 M340,184 h-10 M340,184 v10 M268,222 h10 M268,222 v-10 M340,222 h-10 M340,222 v-10"/></g>
+      <text id="t4" class="tag" x="272" y="178">CLOUD COVER · 18%</text>
+      <g id="b4v" class="bracket partial"><path d="M290,190 h7 M290,190 v7 M318,190 h-7 M318,190 v7 M290,216 h7 M290,216 v-7 M318,216 h-7 M318,216 v-7"/></g>
+      <text id="t4v" class="tag" x="286" y="234">VEHICLE · 41% LOW CONF</text>
+      <g id="b5" class="bracket"><path d="M310,82 h10 M310,82 v10 M376,82 h-10 M376,82 v10 M310,136 h10 M310,136 v-10 M376,136 h-10 M376,136 v-10"/></g>
+      <text id="t5" class="tag" x="306" y="78">AIRCRAFT · 98.8%</text>
+      <!-- sun glint (optical view) -->
+      <g id="Lglint">
+        <circle cx="349" cy="103" r="6" fill="url(#glintG)" opacity=".85"/>
+        <path d="M349,98 l1.3,3.7 3.7,1.3 -3.7,1.3 -1.3,3.7 -1.3,-3.7 -3.7,-1.3 3.7,-1.3 Z" fill="#fff" opacity=".95"/>
+        <circle cx="96" cy="120" r="4" fill="url(#glintG)" opacity=".7"/>
+        <path d="M96,117 l.9,2.4 2.4,.9 -2.4,.9 -.9,2.4 -.9,-2.4 -2.4,-.9 2.4,-.9 Z" fill="#fff" opacity=".85"/>
+        <circle cx="131" cy="148" r="3.5" fill="url(#glintG)" opacity=".6"/>
+      </g>
+      <!-- vector / GIS layer -->
+      <g id="Lvector" style="display:none">
+        <line class="vecglow" x1="162" y1="61" x2="404" y2="61" filter="url(#soft)"/>
+        <line class="vecline" x1="162" y1="61" x2="404" y2="61"/>
+        <path class="vecglow" d="M48,186 L283,186 C320,192 350,216 420,244" filter="url(#soft)"/>
+        <path class="vecline" d="M48,186 L283,186 C320,192 350,216 420,244"/>
+        <path class="vecline" d="M340,70 L340,88"/>
+        <rect class="parcel" x="60" y="102" width="96" height="74"/>
+        <rect class="parcel" x="186" y="196" width="72" height="54"/>
+        <rect class="parcel" x="306" y="78" width="72" height="60"/>
+        <g class="gcp"><line x1="34" y1="134" x2="46" y2="134"/><line x1="40" y1="128" x2="40" y2="140"/><circle cx="40" cy="134" r="4"/><text class="hudtxt" x="26" y="148">GCP-01 41.621N</text></g>
+        <g class="gcp"><line x1="270" y1="76" x2="282" y2="76"/><line x1="276" y1="70" x2="276" y2="82"/><circle cx="276" cy="76" r="4"/><text class="hudtxt" x="248" y="92">GCP-02 41.638N</text></g>
+        <g class="gcp"><line x1="368" y1="256" x2="380" y2="256"/><line x1="374" y1="250" x2="374" y2="262"/><circle cx="374" cy="256" r="4"/><text class="hudtxt" x="340" y="270">GCP-03 41.612N</text></g>
+      </g>
+      <!-- HUD (always on) -->
+      <g id="hud">
+        <line class="ch" x1="194" y1="150" x2="226" y2="150"/>
+        <line class="ch" x1="210" y1="134" x2="210" y2="166"/>
+        <circle class="ch" cx="210" cy="150" r="10"/>
+        <rect class="hudbg" x="230" y="142" width="112" height="12"/>
+        <text class="hudtxt" id="hudll" x="234" y="151">41°37'12.4"N 87°05'24.0"W</text>
+        <rect class="hudbg" x="6" y="240" width="122" height="52"/>
+        <text class="hudtxt" id="hudSensor" x="10" y="252">SENSOR  OPTICAL · EO</text>
+        <text class="hudtxt" x="10" y="263">SUN EL  42.5°</text>
+        <text class="hudtxt" x="10" y="274">GSD     0.3 M/PX</text>
+        <text class="hudtxt" id="hudTime" x="10" y="285">2026-07-07T21:09:15Z</text>
+      </g>
+      <!-- scan beam + line -->
+      <polygon id="beam" class="beam" points="0,40 0,40 0,300 0,300"/>
+      <line id="scan" class="scanline" x1="0" y1="55" x2="0" y2="300"/>
+      <!-- satellite -->
+      <g id="sat">
+        <rect class="sat-panel" x="-16" y="-3" width="10" height="6" rx="1"/>
+        <rect class="sat-panel" x="6"  y="-3" width="10" height="6" rx="1"/>
+        <rect class="sat-body" x="-5" y="-5" width="10" height="10" rx="2"/>
+      </g>
+    </svg>
+    <div class="xlog" id="xlog"></div>
+    <div class="built"><b>Project stack:</b> PyTorch · TensorFlow · object, change &amp; new construction detection · NGA / IARPA mission areas</div>
+  </div>
+</section>
+

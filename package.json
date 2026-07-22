@@ -1,0 +1,13 @@
+{
+  "name": "mission-file-portfolio",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/use-example-content.mjs",
+    "prebuild": "node scripts/use-example-content.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": { "astro": "^4.16.0" }
+}
