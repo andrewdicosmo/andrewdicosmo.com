@@ -7,6 +7,9 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      CONTENT_REPO: ${{ secrets.CONTENT_REPO }}
+      CONTENT_REPO_PAT: ${{ secrets.CONTENT_REPO_PAT }}
     steps:
       - uses: actions/checkout@v4
 
@@ -14,11 +17,12 @@ jobs:
       # keep your real src/data in a private repo; provide CONTENT_REPO_PAT + CONTENT_REPO
       # secrets and this step swaps the example persona for your cargo at build time.
       - name: Inject private content
-        if: ${{ secrets.CONTENT_REPO != '' }}
+        if: ${{ env.CONTENT_REPO != '' }}
         run: |
-          git clone --depth 1 https://x-access-token:${{ secrets.CONTENT_REPO_PAT }}@github.com/${{ secrets.CONTENT_REPO }} private-content
-          rm -rf src/data && mkdir -p src/data
-          cp -r private-content/data/* src/data/
+          git clone --depth 1 https://x-access-token:${CONTENT_REPO_PAT}@github.com/${CONTENT_REPO} private-content
+          if [ -d src/data ]; then mv src/data /tmp/src-data-example; fi
+          mkdir -p src/data
+          cp -r private-content/data/. src/data/
 
       - name: Build and deploy
         uses: Azure/static-web-apps-deploy@v1
