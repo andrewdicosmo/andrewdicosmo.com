@@ -1,74 +1,175 @@
-# The Mission File · a portfolio engine
+# Mission File Portfolio
 
-## Quickstart
+This is the public website code for [andrewdicosmo.com](https://andrewdicosmo.com).
 
+The code is public so other people can learn from it, copy it, and make their
+own version. The personal career details, photo, and private page text are not
+stored in this public repository.
+
+## What Is Included
+
+- The page layout, styling, and browser behavior.
+- A sample profile so the site works after download.
+- A contact form and resume delivery function.
+- A GitHub Actions workflow, which is an automated GitHub build and deployment
+  process.
+
+## What Is Private
+
+The real site content lives outside this public repository in a separate private
+repository. That private content is copied into the site only when the website is
+deployed.
+
+The private content folder is:
+
+```text
+src/data/
 ```
+
+That folder is intentionally ignored by Git, the version control system used by
+GitHub. This prevents personal details from being saved in the public code
+history.
+
+## Requirements
+
+Install these before running the site:
+
+- Node.js, the JavaScript runtime used to run the project.
+- npm, the Node Package Manager that installs the project dependencies. It is
+  included with Node.js.
+
+This project currently expects Node.js version 22.
+
+## Run The Site Locally
+
+1. Download this repository, or clone it if you use Git. Cloning means making a
+   copy of the repository on your computer.
+2. Open a terminal in the project folder.
+3. Install the project dependencies:
+
+```bash
 npm install
+```
+
+4. Start the local website:
+
+```bash
 npm run dev
 ```
 
-The site boots at localhost:4321 with a demo persona so you can see everything
-running. Then: your story goes in one directory, `src/data`. Deploying takes
-one Azure secret. The license asks one thing: a visible credit linking to
-[andrewdicosmo.com](https://andrewdicosmo.com).
+5. Open the local address shown in the terminal. It is usually:
 
-This is the open source engine behind [andrewdicosmo.com](https://andrewdicosmo.com):
-a spy dossier portfolio with a satellite detection scene, a radar sector sweep,
-an expandable mission timeline with industry intel markers, an audience lens
-(Commercial / Cleared), a three palette theme switcher, and a lead qualifying
-brief form that emails an ATS resume through an Azure Function.
-
-**Steal this file.** Fork it, gut it, make it yours. One condition: keep a
-visible credit linking to andrewdicosmo.com (see LICENSE).
-
-## Engine vs cargo
-
-The repo is a machine. Your career is cargo. They never mix:
-
-```
-src/            the engine: components, styles, scripts (public)
-api/            Azure Function: stores leads, emails the resume (public)
-content.example the demo persona so the template runs out of the box (public)
-src/data/       YOUR content: json + section html + photo (GITIGNORED)
+```text
+http://localhost:4321
 ```
 
-`npm run dev` on a fresh clone auto loads the example persona into `src/data`
-so the site runs immediately. Replace those files with your own story.
+On a fresh copy, the site automatically loads the sample content from
+`content.example/` into `src/data/` so you can see it working right away.
 
-## Make it yours
+## Add Your Own Content
 
-1. `npm install && npm run dev`
-2. Edit everything in `src/data`:
-   - `profile.json` name, typed brief, firm, channels, repo url
-   - `timeline.json` ordered phases, operations, intel markers
-   - `sectors.json` radar sectors and center labels
-   - `loadout.json` capability cards
-   - `brief.json` form options (salary floor, budget bands, project chips)
-   - `sections/*.html` hero, product demos, gift, debrief markup
-   - `assets/subject.webp` your processed photo (grayscale, background removed)
-3. Deploy to Azure Static Web Apps (workflow included). Set the Function app
-   settings from `.env.example` to activate the brief pipeline: lead storage,
-   attachment upload, resume email, scheduler link.
+Edit the files in `src/data/`:
 
-## Private content injection
+- `profile.json`: name, headline, links, company information, and repository
+  link.
+- `timeline.json`: career timeline entries.
+- `sectors.json`: industry or focus-area labels.
+- `loadout.json`: capability cards.
+- `brief.json`: contact form choices and scheduling link.
+- `sections/*.html`: larger page sections.
+- `assets/subject.webp`: profile image.
 
-Keep your real `src/data` in a **private repo**. Add two secrets to this repo:
-`CONTENT_REPO` (e.g. `you/your-content`) and `CONTENT_REPO_PAT`. The workflow
-clones it at build time and swaps out the example persona, so the public repo
-never carries your career, your photo, or anything you later remove.
+Files ending in `.json` use JavaScript Object Notation (JSON), a common format
+for structured text data. Files ending in `.html` use HyperText Markup Language
+(HTML), the standard structure for web pages. Files ending in `.webp` use WebP,
+an image format made for websites.
 
-## The brief pipeline
+Do not commit `src/data/` if it contains private information.
 
-`POST /api/brief` validates the lead, writes it to Azure Table Storage,
-uploads any attached job req to Blob Storage, emails the ATS resume PDF to the
-submitter via SendGrid (delivery to their inbox is the email verification),
-notifies you with the full brief, and returns the Microsoft Bookings link only
-when the brief was substantive. No resume link exists anywhere on the site.
+## Keep Private Content Out Of The Public Repository
 
-## Honest notes
+For a public-code and private-content setup:
 
-- Product demo sections (`sections/DEMOS.html`) are cargo but not yet fully
-  data driven; edit the html directly or replace the section.
-- The satellite scene is engine art: generic by design, personalize the log
-  lines in `main.js` if you want.
-- No dashes in the prose. House rule. You will thank me.
+1. Keep this repository public.
+2. Keep your real `src/data/` folder in a separate private GitHub repository.
+3. Add these GitHub Actions secrets to the public repository:
+
+```text
+CONTENT_REPO
+CONTENT_REPO_PAT
+```
+
+`CONTENT_REPO` is the private repository name, such as
+`your-name/your-private-content`.
+
+`CONTENT_REPO_PAT` is a GitHub Personal Access Token (PAT). A Personal Access
+Token is a private key that lets the automated deployment read the private
+content repository. Give it read-only access to the private content repository.
+
+When the site deploys, the workflow copies the private content into `src/data/`
+for that deployment only.
+
+## Contact Form And Resume Email
+
+The contact form sends information to an Azure Function. An Azure Function is a
+small server-side program that runs only when needed.
+
+The function can:
+
+- Save the contact request in Azure Storage.
+- Save an uploaded job description file.
+- Email a resume as a Portable Document Format (PDF) file.
+- Notify the site owner.
+- Return a booking link when the request is complete.
+
+These settings are configured in Azure Static Web Apps, not in this repository:
+
+```text
+STORAGE_CONNECTION_STRING
+LEADS_TABLE
+ATTACH_CONTAINER
+AZURE_COMMUNICATION_CONNECTION_STRING
+EMAIL_SENDER_ADDRESS
+MAIL_FROM
+MAIL_TO
+RESUME_BLOB_URL
+BOOKINGS_URL
+```
+
+Do not put secret values in this repository.
+
+## Build For Deployment
+
+To create the finished static website files:
+
+```bash
+npm run build
+```
+
+The finished files are written to:
+
+```text
+dist/
+```
+
+`dist/` is ignored by Git because it is generated by the build command.
+
+## Useful Terms
+
+- Application Programming Interface (API): a way for the website to talk to a
+  server-side function.
+- Applicant Tracking System (ATS): software companies use to process job
+  applications and resumes.
+- Git: the version control system that tracks file changes over time.
+- GitHub Actions: GitHub's automated build and deployment system.
+- HyperText Markup Language (HTML): the standard structure for web pages.
+- JavaScript Object Notation (JSON): a text format for structured data.
+- Personal Access Token (PAT): a private GitHub key used by automation.
+- Portable Document Format (PDF): the common file format used for the resume.
+- Static Web App: a website where most files are prebuilt and served directly.
+- Uniform Resource Locator (URL): a web address.
+
+## License
+
+You may use this project under the license in [LICENSE](LICENSE). Keep the
+required visible credit link to [andrewdicosmo.com](https://andrewdicosmo.com).
