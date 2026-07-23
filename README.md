@@ -1,4 +1,4 @@
-# Mission File Portfolio
+# Mission Themed Resume Portfolio
 
 This is the public website code for [andrewdicosmo.com](https://andrewdicosmo.com).
 
@@ -30,34 +30,79 @@ That folder is intentionally ignored by Git, the version control system used by
 GitHub. This prevents personal details from being saved in the public code
 history.
 
-## Requirements
+## Get Your Computer Ready
 
-Install these before running the site:
+Before you can preview the website on your own computer, install these:
 
 - Node.js, the JavaScript runtime used to run the project.
 - npm, the Node Package Manager that installs the project dependencies. It is
   included with Node.js.
+- Git, the tool that downloads and tracks code from GitHub.
 
 This project currently expects Node.js version 22.
 
+## Mac Setup
+
+1. Install Node.js version 22 from [nodejs.org](https://nodejs.org/).
+2. Open the Terminal app.
+3. Check that Node.js and npm are installed:
+
+```bash
+node -v
+npm -v
+```
+
+4. Install Git if your Mac asks for it:
+
+```bash
+git --version
+```
+
+If Git is missing, your Mac may offer to install Apple's command line developer
+tools. Accept that prompt.
+
+## Windows Personal Computer (PC) Setup
+
+1. Install Node.js version 22 from [nodejs.org](https://nodejs.org/).
+2. Install Git for Windows from [git-scm.com](https://git-scm.com/).
+3. Open PowerShell.
+4. Check that Node.js, npm, and Git are installed:
+
+```powershell
+node -v
+npm -v
+git --version
+```
+
 ## Run The Site Locally
 
-1. Download this repository, or clone it if you use Git. Cloning means making a
-   copy of the repository on your computer.
-2. Open a terminal in the project folder.
-3. Install the project dependencies:
+1. Open Terminal on Mac, or PowerShell on Windows.
+2. Go to the folder where you want to keep the website.
+3. Download the repository:
+
+```bash
+git clone https://github.com/andrewdicosmo/andrewdicosmo.com.git
+```
+
+4. Move into the project folder:
+
+```bash
+cd andrewdicosmo.com
+```
+
+5. Install the project dependencies:
 
 ```bash
 npm install
 ```
 
-4. Start the local website:
+6. Start the local website:
 
 ```bash
 npm run dev
 ```
 
-5. Open the local address shown in the terminal. It is usually:
+7. Open the local address shown in the terminal. It is usually:
 
 ```text
 http://localhost:4321
@@ -65,6 +110,33 @@ http://localhost:4321
 
 On a fresh copy, the site automatically loads the sample content from
 `content.example/` into `src/data/` so you can see it working right away.
+
+## Ask ChatGPT Or Claude To Run It For You
+
+You can also ask ChatGPT, Claude, or another coding assistant to start the site.
+Copy one of these prompts.
+
+Mac prompt:
+
+```text
+I am on a Mac. Please help me run this website locally:
+https://github.com/andrewdicosmo/andrewdicosmo.com
+
+Check whether Node.js version 22, npm, and Git are installed. If anything is
+missing, tell me what to install. Then clone the repository, run npm install,
+run npm run dev, and tell me the local website address to open.
+```
+
+Windows prompt:
+
+```text
+I am on a Windows personal computer. Please help me run this website locally:
+https://github.com/andrewdicosmo/andrewdicosmo.com
+
+Use PowerShell. Check whether Node.js version 22, npm, and Git are installed. If
+anything is missing, tell me what to install. Then clone the repository, run
+npm install, run npm run dev, and tell me the local website address to open.
+```
 
 ## Add Your Own Content
 
