@@ -13,7 +13,7 @@ without placing your career history or contact details in the public code.
 [![Built with Astro](https://img.shields.io/badge/Astro-4-FF5D01?logo=astro&logoColor=white)](https://astro.build)
 [![Node.js 24](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Azure Static Web Apps](https://img.shields.io/badge/Azure-Static%20Web%20Apps-0078D4)](https://azure.microsoft.com/products/app-service/static)
-[![License: MIT + attribution](https://img.shields.io/badge/License-MIT%20%2B%20attribution-blue)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 <a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer"><strong>View the live site</strong></a> ·
 <a href="#make-it-yours-in-15-minutes">Make it yours</a> ·
@@ -328,5 +328,10 @@ for Azure Static Web Apps.
 
 ## License
 
-You may use this project under the license in [LICENSE](LICENSE). Keep the
-required visible credit link to <a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer">andrewdicosmo.com</a>.
+You may use this project under the [MIT License](LICENSE). A visible credit link
+to <a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer">andrewdicosmo.com</a>
+is appreciated when you publish a site based on this template.
+
+The license covers the public template code and example content in this
+repository. It does not grant rights to Andrew DiCosmo's private resume,
+private career data, private assets, or deployment secrets.

@@ -1,6 +1,7 @@
 {
   "name": "mission-file-portfolio",
   "version": "1.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "predev": "node scripts/use-example-content.mjs",
