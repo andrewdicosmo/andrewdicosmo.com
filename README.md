@@ -6,6 +6,14 @@ The code is public so other people can learn from it, copy it, and make their
 own version. The personal career details, photo, and private page text are not
 stored in this public repository.
 
+## Deployment Architecture
+
+How this site is built, deployed, and how a contact request travels through it.
+
+<p align="center">
+  <img src="docs/deployment-architecture.png" alt="Deployment architecture diagram: GitHub Actions builds the public site code together with private content and deploys it to Azure Static Web Apps, while an Azure Function handles contact requests, stores them, and sends the resume by email through SendGrid." width="100%">
+</p>
+
 ## What Is Included
 
 - The page layout, styling, and browser behavior.
