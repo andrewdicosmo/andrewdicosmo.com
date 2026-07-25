@@ -1,4 +1,19 @@
-// ---- sector radar sweep detection ----
+  // Open every off-site destination, including the canonical site domain, in a separate tab.
+  document.querySelectorAll('a[href]').forEach(link=>{
+    const rawHref=link.getAttribute('href');
+    if(!rawHref||rawHref.startsWith('#'))return;
+    try{
+      const destination=new URL(rawHref,window.location.href);
+      const isHttp=destination.protocol==='http:'||destination.protocol==='https:';
+      const isPortfolioDomain=['andrewdicosmo.com','www.andrewdicosmo.com'].includes(destination.hostname);
+      if(isHttp&&(isPortfolioDomain||destination.origin!==window.location.origin)){
+        link.target='_blank';
+        link.rel='noopener noreferrer';
+      }
+    }catch{}
+  });
+
+  // ---- sector radar sweep detection ----
   (function(){
     const sec=document.getElementById('sectors');
     const rot=document.getElementById('sweep-rot');

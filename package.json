@@ -9,6 +9,6 @@
     "build": "astro build && node -e \"require('node:fs').copyFileSync('staticwebapp.config.json','dist/staticwebapp.config.json')\"",
     "preview": "astro preview"
   },
-  "engines": { "node": "22.x" },
+  "engines": { "node": "25.x" },
   "dependencies": { "astro": "^4.16.0" }
 }

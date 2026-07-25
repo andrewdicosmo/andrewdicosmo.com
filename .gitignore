@@ -2,6 +2,7 @@ node_modules/
 dist/
 .astro/
 .env
+.DS_Store
 
 # CARGO — your real content never enters the public repo.
 # The build injects it (see README: Private Content Injection).

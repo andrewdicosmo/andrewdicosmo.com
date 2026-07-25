@@ -2,86 +2,98 @@
 
 # Mission Themed Resume Portfolio
 
-The public engine behind **[andrewdicosmo.com](https://andrewdicosmo.com)** — a
-mission-briefing style resume site. Clone it, add your own content, and deploy it
-with your personal details kept out of public view.
+A mission-briefing style resume portfolio you can clone, personalize, and deploy
+without placing your career history or contact details in the public code.
 
 [![Deploy status](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml/badge.svg)](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml)
 [![Built with Astro](https://img.shields.io/badge/Astro-4-FF5D01?logo=astro&logoColor=white)](https://astro.build)
-[![Node.js 22](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Node.js 25](https://img.shields.io/badge/Node.js-25-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Azure Static Web Apps](https://img.shields.io/badge/Azure-Static%20Web%20Apps-0078D4)](https://azure.microsoft.com/products/app-service/static)
 [![License: MIT + attribution](https://img.shields.io/badge/License-MIT%20%2B%20attribution-blue)](LICENSE)
 
-**[View the live site](https://andrewdicosmo.com)** ·
-[How it deploys](#deployment-architecture) ·
-[Run it locally](#run-the-site-locally) ·
-[Make it yours](#add-your-own-content)
+<a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer"><strong>View the live site</strong></a> ·
+<a href="#make-it-yours-in-15-minutes">Make it yours</a> ·
+<a href="#start-the-site-locally">Run it locally</a> ·
+<a href="#deploy-your-own-copy">Deploy your copy</a>
 
 </div>
 
 ---
 
-This is the public website code for [andrewdicosmo.com](https://andrewdicosmo.com).
-The code is public so other people can learn from it, copy it, and make their
-own version. The personal career details, photo, and private page text are not
-stored in this public repository.
+This is the public engine behind <a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer">andrewdicosmo.com</a>.
+It is designed to be both a polished portfolio and a reusable template: the
+public repository contains the design and code, while personal content stays in
+a separate private repository.
+
+> **The privacy promise:** someone can clone this repository and run a complete
+> example site, but they cannot download your real resume, career history,
+> photo, or private copy.
+
+## Make It Yours In 15 Minutes
+
+| Time | What to do | Result |
+| --- | --- | --- |
+| 5 minutes | Clone the repository and run it locally. | A working example portfolio on your computer. |
+| 5 minutes | Replace the example profile, image, and sections. | A portfolio that sounds and looks like you. |
+| 5 minutes | Put your real content in a private repository and connect it to deployment. | A public website with private personal data. |
+
+Start with [Start the site locally](#start-the-site-locally). Then use
+[Add your own content](#add-your-own-content) and
+[Deploy your own copy](#deploy-your-own-copy) when you are ready to publish.
 
 ## Deployment Architecture
 
-How this site is built, deployed, and how a contact request travels through it.
+The diagram shows how the public site, private content, contact form, and resume
+delivery work together.
 
 <p align="center">
-  <img src="docs/deployment-architecture.png" alt="Deployment architecture diagram: GitHub Actions builds the public site code together with private content and deploys it to Azure Static Web Apps, while an Azure Function handles contact requests, stores them, and sends the resume by email through SendGrid." width="100%">
+  <img src="docs/deployment-architecture.png" alt="Deployment architecture diagram: GitHub Actions builds public site code with private content and deploys it to Azure Static Web Apps. An Azure Function handles contact requests, stores them, and sends the resume through the selected email provider." width="100%">
 </p>
 
-## What Is Included
+## What You Get
 
-| | |
+| Included | Why it matters |
 | --- | --- |
-| **Site engine** | The page layout, styling, and browser behavior. |
-| **Sample profile** | A working example profile, so the site runs right after download. |
-| **Contact form** | A form and resume delivery function powered by an Azure Function. |
-| **Deployment workflow** | A GitHub Actions workflow — GitHub's automated build and deployment process. |
+| **Mission-themed site engine** | A responsive page layout, styling, and interactions built for a memorable first impression. |
+| **Working example content** | The project runs immediately after download, even before you add your own information. |
+| **Private-content pattern** | Your public code and personal details are deliberately kept apart. |
+| **Contact and resume delivery** | A server-side form endpoint can store leads, accept a job description, and send your resume. |
+| **Deployment workflow** | GitHub Actions, GitHub's automated build and deployment service, publishes the site to Azure. |
 
-## What Is Private
+## Public Code, Private Content
 
-The real site content lives outside this public repository in a separate private
-repository. That private content is copied into the site only when the website is
-deployed.
+| Public repository | Private repository |
+| --- | --- |
+| Layout, styles, form code, example content, and deployment workflow. | Your real `data/` folder: profile, career history, image, page copy, and contact settings. |
+| Safe for anyone to clone. | Read only by the deployment workflow. |
 
-The private content folder is:
+The real site content is copied into the build only while the website deploys.
+The local folder `src/data/` is ignored by Git, the version control system used
+by GitHub, so personal details are not saved in the public code history.
 
-```text
-src/data/
-```
+## Start The Site Locally
 
-That folder is intentionally ignored by Git, the version control system used by
-GitHub. This prevents personal details from being saved in the public code
-history.
+This project is tested with Node.js version 25. You need three tools:
 
-## Run The Site Locally
-
-You need three tools installed. This project expects Node.js version 22.
-
-- **Node.js** — the JavaScript runtime used to run the project.
-- **npm** — the Node Package Manager that installs the project dependencies. It
-  comes with Node.js.
-- **Git** — the tool that downloads and tracks code from GitHub.
+- **Node.js** - the program that runs this project.
+- **npm** - Node Package Manager, which installs the project's dependencies. It
+  is included with Node.js.
+- **Git** - the program that downloads and tracks code from GitHub.
 
 <details>
 <summary><b>Mac setup</b></summary>
 <br>
 
-1. Install Node.js version 22 from [nodejs.org](https://nodejs.org/).
+1. Install Node.js version 25 from [nodejs.org](https://nodejs.org/).
 2. Open the Terminal app.
-3. Check that Node.js and npm are installed:
+3. Confirm that Node.js and npm are installed:
 
 ```bash
 node -v
 npm -v
 ```
 
-4. Install Git if your Mac asks for it:
+4. Check for Git:
 
 ```bash
 git --version
@@ -96,10 +108,10 @@ tools. Accept that prompt.
 <summary><b>Windows setup</b></summary>
 <br>
 
-1. Install Node.js version 22 from [nodejs.org](https://nodejs.org/).
+1. Install Node.js version 25 from [nodejs.org](https://nodejs.org/).
 2. Install Git for Windows from [git-scm.com](https://git-scm.com/).
 3. Open PowerShell.
-4. Check that Node.js, npm, and Git are installed:
+4. Confirm that Node.js, npm, and Git are installed:
 
 ```powershell
 node -v
@@ -118,21 +130,22 @@ npm install
 npm run dev
 ```
 
-Open the local address shown in the terminal. It is usually:
+Open the address shown in the terminal. It is usually:
 
 ```text
 http://localhost:4321
 ```
 
-On a fresh copy, the site automatically loads the sample content from
-`content.example/` into `src/data/` so you can see it working right away.
+On a new copy, the site automatically copies the public example content from
+`content.example/` into the ignored `src/data/` folder. You can explore the
+site before entering any personal information.
 
 <details>
-<summary><b>Ask ChatGPT or Claude to run it for you</b></summary>
+<summary><b>Ask ChatGPT or Claude to start it for you</b></summary>
 <br>
 
-You can also ask ChatGPT, Claude, or another coding assistant to start the site.
-Copy one of these prompts.
+You can give a coding assistant one of these prompts instead of using the
+commands yourself.
 
 Mac prompt:
 
@@ -140,7 +153,7 @@ Mac prompt:
 I am on a Mac. Please help me run this website locally:
 https://github.com/andrewdicosmo/andrewdicosmo.com
 
-Check whether Node.js version 22, npm, and Git are installed. If anything is
+Check whether Node.js version 25, npm, and Git are installed. If anything is
 missing, tell me what to install. Then clone the repository, run npm install,
 run npm run dev, and tell me the local website address to open.
 ```
@@ -151,8 +164,8 @@ Windows prompt:
 I am on a Windows personal computer. Please help me run this website locally:
 https://github.com/andrewdicosmo/andrewdicosmo.com
 
-Use PowerShell. Check whether Node.js version 22, npm, and Git are installed. If
-anything is missing, tell me what to install. Then clone the repository, run
+Use PowerShell. Check whether Node.js version 25, npm, and Git are installed.
+If anything is missing, tell me what to install. Then clone the repository, run
 npm install, run npm run dev, and tell me the local website address to open.
 ```
 
@@ -160,70 +173,82 @@ npm install, run npm run dev, and tell me the local website address to open.
 
 ## Add Your Own Content
 
-Edit the files in `src/data/`:
+Your first customization is simple:
 
-| File | What it holds |
+1. Run `npm run dev` once so the example content appears in `src/data/`.
+2. Edit the files in `src/data/` on your computer.
+3. When you are ready to deploy, copy that folder into a separate **private**
+   GitHub repository as `data/` at its top level.
+4. Connect that private repository using the deployment steps below.
+
+| File | What you can change |
 | --- | --- |
-| `profile.json` | Name, headline, links, company information, and repository link. |
+| `profile.json` | Your name, headline, links, company details, and repository link. |
 | `timeline.json` | Career timeline entries. |
 | `sectors.json` | Industry or focus-area labels. |
 | `loadout.json` | Capability cards. |
-| `brief.json` | Contact form choices and scheduling link. |
-| `sections/*.html` | Larger page sections. |
-| `assets/subject.webp` | Profile image. |
+| `brief.json` | Contact form choices and booking link. |
+| `sections/*.html` | Larger page sections and the visible copy. |
+| `assets/subject.webp` | Your profile image. |
 
-Files ending in `.json` use JavaScript Object Notation (JSON), a common format
-for structured text data. Files ending in `.html` use HyperText Markup Language
-(HTML), the standard structure for web pages. Files ending in `.webp` use WebP,
-an image format made for websites.
+Files ending in `.json` use JavaScript Object Notation (JSON), a structured text
+format. Files ending in `.html` use HyperText Markup Language (HTML), the
+standard structure for web pages. Files ending in `.webp` use WebP, an image
+format made for websites.
 
 > [!WARNING]
-> Do not commit `src/data/` if it contains private information.
+> `src/data/` is intentionally ignored by Git. Do not force-add it or place
+> private information in the public repository.
 
-## Keep Private Content Out Of The Public Repository
+## Deploy Your Own Copy
 
-For a public-code and private-content setup:
+You need a GitHub account and an Azure account. Azure Static Web Apps is the
+hosting service used by this template.
 
-1. Keep this repository public.
-2. Keep your real `src/data/` folder in a separate private GitHub repository.
-3. Add these GitHub Actions secrets to the public repository:
+1. Create a separate **private** GitHub repository for your real content. Its
+   top-level folder must be `data/`, containing the files you edited locally.
+2. Create an Azure Static Web App from your public template repository. The
+   included GitHub Actions workflow builds and publishes the site.
+3. Add these GitHub Actions secrets to the public template repository:
 
 | Secret | What it is |
 | --- | --- |
-| `CONTENT_REPO` | The private repository name, such as `your-name/your-private-content`. |
-| `CONTENT_REPO_PAT` | A GitHub Personal Access Token (PAT) — a private key that lets the automated deployment read the private content repository. Give it read-only access. |
+| `CONTENT_REPO` | Your private repository name, for example `your-name/your-private-content`. |
+| `CONTENT_REPO_PAT` | A GitHub Personal Access Token (PAT), a private access key. Give it read-only access to only the private-content repository. |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | The deployment token supplied by Azure Static Web Apps. |
 
-When the site deploys, the workflow copies the private content into `src/data/`
-for that deployment only.
+4. Add the contact-form settings in Azure Static Web Apps. Do not save their
+   values in this repository.
+5. Push a change to the `main` branch. The workflow copies in the private
+   content for that build and publishes the finished site.
 
 ## Contact Form And Resume Email
 
-The contact form sends information to an Azure Function. An Azure Function is a
-small server-side program that runs only when needed.
+The contact form sends information to an Azure Function, a small server-side
+program that runs only when needed. It can store a contact request, save an
+uploaded job description, email a resume, notify you, and return a booking link.
 
-The function can:
-
-- Save the contact request in Azure Storage.
-- Save an uploaded job description file.
-- Email a resume as a Portable Document Format (PDF) file.
-- Notify the site owner.
-- Return a booking link when the request is complete.
-
-These settings are configured in Azure Static Web Apps, not in this repository:
+Set these values in Azure Static Web Apps, never in this repository:
 
 | Setting | Purpose |
 | --- | --- |
 | `STORAGE_CONNECTION_STRING` | Connects the function to Azure Storage. |
 | `LEADS_TABLE` | The table where contact requests are saved. |
 | `ATTACH_CONTAINER` | The container for uploaded job description files. |
-| `AZURE_COMMUNICATION_CONNECTION_STRING` | Connects to the email service. |
-| `EMAIL_SENDER_ADDRESS` | The address the email is sent from. |
-| `MAIL_FROM` / `MAIL_TO` | The from and to addresses for notifications. |
-| `RESUME_BLOB_URL` | Where the resume PDF is stored. |
-| `BOOKINGS_URL` | The booking link returned after a request. |
+| `RESUME_BLOB_URL` | The protected web address of the resume PDF sent to the visitor. |
+| `BOOKINGS_URL` | The booking link returned after a complete request. |
+| `MAIL_TO` | The address that receives the owner notification. |
+
+Choose one email provider:
+
+| Provider | Required settings |
+| --- | --- |
+| **Azure Communication Services (recommended)** | `AZURE_COMMUNICATION_CONNECTION_STRING` and `EMAIL_SENDER_ADDRESS`. `MAIL_FROM` may be used if `EMAIL_SENDER_ADDRESS` is not set. |
+| **SendGrid (fallback)** | `SENDGRID_API_KEY` and `MAIL_FROM`. |
 
 > [!IMPORTANT]
-> Do not put secret values in this repository.
+> Do not put any secret values, access tokens, connection strings, or resume
+> download links in this repository.
 
 ## Build For Deployment
 
@@ -233,8 +258,27 @@ To create the finished static website files:
 npm run build
 ```
 
-The finished files are written to `dist/`, which is ignored by Git because it is
-generated by the build command.
+The finished files are written to `dist/`. Git ignores this folder because the
+build command creates it automatically.
+
+## Frequently Asked Questions
+
+**Will my personal information become public?**
+
+Not if you follow the private-content setup. The public repository contains
+example content only. Keep your real `data/` folder in the separate private
+repository described above.
+
+**Can I change the colors, sections, image, and contact choices?**
+
+Yes. Use the files in `src/data/` for content and image changes. The page
+components and `src/styles/global.css` control the design and behavior.
+
+**Can I host this somewhere other than Azure?**
+
+Yes. The static site can be hosted anywhere that serves the generated `dist/`
+folder. The included automated deployment and contact-form setup are designed
+for Azure Static Web Apps.
 
 <details>
 <summary><b>Useful terms</b></summary>
@@ -258,4 +302,4 @@ generated by the build command.
 ## License
 
 You may use this project under the license in [LICENSE](LICENSE). Keep the
-required visible credit link to [andrewdicosmo.com](https://andrewdicosmo.com).
+required visible credit link to <a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer">andrewdicosmo.com</a>.
