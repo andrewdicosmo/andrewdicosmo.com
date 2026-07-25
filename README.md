@@ -7,7 +7,7 @@ without placing your career history or contact details in the public code.
 
 [![Deploy status](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml/badge.svg)](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml)
 [![Built with Astro](https://img.shields.io/badge/Astro-4-FF5D01?logo=astro&logoColor=white)](https://astro.build)
-[![Node.js 25](https://img.shields.io/badge/Node.js-25-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Node.js 24](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Azure Static Web Apps](https://img.shields.io/badge/Azure-Static%20Web%20Apps-0078D4)](https://azure.microsoft.com/products/app-service/static)
 [![License: MIT + attribution](https://img.shields.io/badge/License-MIT%20%2B%20attribution-blue)](LICENSE)
 
@@ -73,7 +73,7 @@ by GitHub, so personal details are not saved in the public code history.
 
 ## Start The Site Locally
 
-This project is tested with Node.js version 25. You need three tools:
+This project is tested with Node.js version 24. You need three tools:
 
 - **Node.js** - the program that runs this project.
 - **npm** - Node Package Manager, which installs the project's dependencies. It
@@ -84,7 +84,7 @@ This project is tested with Node.js version 25. You need three tools:
 <summary><b>Mac setup</b></summary>
 <br>
 
-1. Install Node.js version 25 from [nodejs.org](https://nodejs.org/).
+1. Install Node.js version 24 from [nodejs.org](https://nodejs.org/).
 2. Open the Terminal app.
 3. Confirm that Node.js and npm are installed:
 
@@ -108,7 +108,7 @@ tools. Accept that prompt.
 <summary><b>Windows setup</b></summary>
 <br>
 
-1. Install Node.js version 25 from [nodejs.org](https://nodejs.org/).
+1. Install Node.js version 24 from [nodejs.org](https://nodejs.org/).
 2. Install Git for Windows from [git-scm.com](https://git-scm.com/).
 3. Open PowerShell.
 4. Confirm that Node.js, npm, and Git are installed:
@@ -153,7 +153,7 @@ Mac prompt:
 I am on a Mac. Please help me run this website locally:
 https://github.com/andrewdicosmo/andrewdicosmo.com
 
-Check whether Node.js version 25, npm, and Git are installed. If anything is
+Check whether Node.js version 24, npm, and Git are installed. If anything is
 missing, tell me what to install. Then clone the repository, run npm install,
 run npm run dev, and tell me the local website address to open.
 ```
@@ -164,7 +164,7 @@ Windows prompt:
 I am on a Windows personal computer. Please help me run this website locally:
 https://github.com/andrewdicosmo/andrewdicosmo.com
 
-Use PowerShell. Check whether Node.js version 25, npm, and Git are installed.
+Use PowerShell. Check whether Node.js version 24, npm, and Git are installed.
 If anything is missing, tell me what to install. Then clone the repository, run
 npm install, run npm run dev, and tell me the local website address to open.
 ```
