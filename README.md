@@ -5,6 +5,10 @@
 A mission-briefing style resume portfolio you can clone, personalize, and deploy
 without placing your career history or contact details in the public code.
 
+<a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer">
+  <img src="docs/site-preview.gif" alt="Animated preview of the Andrew DiCosmo mission-themed resume portfolio: hero, satellite visualization, timeline, and contact brief." width="720">
+</a>
+
 [![Deploy status](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml/badge.svg)](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml)
 [![Built with Astro](https://img.shields.io/badge/Astro-4-FF5D01?logo=astro&logoColor=white)](https://astro.build)
 [![Node.js 24](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org)
