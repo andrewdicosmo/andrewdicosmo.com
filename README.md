@@ -267,21 +267,44 @@ build command creates it automatically.
 
 ## Frequently Asked Questions
 
-**Will my personal information become public?**
+### Can I try the site before adding my own information?
 
-Not if you follow the private-content setup. The public repository contains
-example content only. Keep your real `data/` folder in the separate private
-repository described above.
+Yes. Run the site locally and it will use the included example profile. You can
+click through the full design before replacing anything. Start with
+[Start the site locally](#start-the-site-locally).
 
-**Can I change the colors, sections, image, and contact choices?**
+### Will my personal information become public?
 
-Yes. Use the files in `src/data/` for content and image changes. The page
-components and `src/styles/global.css` control the design and behavior.
+Not if you follow the private-content setup. Keep your real `data/` folder in a
+separate private GitHub repository and never force-add `src/data/` to the public
+repository. See [Public code, private content](#public-code-private-content).
 
-**Can I host this somewhere other than Azure?**
+### What can I change without editing the site code?
 
-Yes. The static site can be hosted anywhere that serves the generated `dist/`
-folder. The included automated deployment and contact-form setup are designed
+You can change your name, photo, career history, page copy, contact choices,
+booking link, and repository link in `src/data/`. See
+[Add your own content](#add-your-own-content) for the file-by-file guide.
+
+### Do I need to be a developer to start?
+
+No. Follow the Mac or Windows steps, or copy one of the included prompts for
+ChatGPT or Claude. They can check your setup and start the site for you.
+
+### Will the contact form send emails while I am testing locally?
+
+You can preview the form locally, but saving contacts and sending a resume need
+the Azure settings described in [Contact form and resume email](#contact-form-and-resume-email).
+
+### How do I publish my own version?
+
+Create a private repository for your real content, connect your Azure Static
+Web App, add the three deployment secrets, and push to `main`. The complete
+checklist is in [Deploy your own copy](#deploy-your-own-copy).
+
+### Can I use a host other than Azure?
+
+Yes. Any host that can serve the generated `dist/` folder can host the static
+site. The included automated deployment and contact-form instructions are built
 for Azure Static Web Apps.
 
 <details>
