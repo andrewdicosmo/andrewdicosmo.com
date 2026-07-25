@@ -1,6 +1,7 @@
 ---
 import data from '../data/timeline.json';
 import head from '../data/sections/TIMELINE_HEAD.html?raw';
+const close = '</div></section>';
 ---
 <Fragment set:html={head} />
     {data.items.map(item => item.type === 'intel' ? (
@@ -23,5 +24,4 @@ import head from '../data/sections/TIMELINE_HEAD.html?raw';
         )}
       </div>
     ))}
-  </div>
-</section>
+  <Fragment set:html={close} />

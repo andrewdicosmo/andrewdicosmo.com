@@ -2,6 +2,7 @@
 import loadout from '../data/loadout.json';
 import sec from '../data/sectors.json';
 import head from '../data/sections/CAPS_HEAD.html?raw';
+const close = '</section>';
 const N = sec.sectors.length, step = 360 / N;
 const cx = 220, cy = 220, rb = 150, rl = 178;
 const blips = sec.sectors.map((s, i) => {
@@ -61,4 +62,4 @@ const blips = sec.sectors.map((s, i) => {
     </div>
     </div>
   </div>
-</section>
+<Fragment set:html={close} />
