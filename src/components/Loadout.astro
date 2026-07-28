@@ -1,19 +1,7 @@
 ---
 import loadout from '../data/loadout.json';
-import sec from '../data/sectors.json';
 import head from '../data/sections/CAPS_HEAD.html?raw';
 const close = '</section>';
-const N = sec.sectors.length, step = 360 / N;
-const cx = 220, cy = 220, rb = 150, rl = 178;
-const blips = sec.sectors.map((s, i) => {
-  const deg = (-90 + i * step), rad = deg * Math.PI / 180, d = ((deg % 360) + 360) % 360;
-  let anchor = 'end';
-  if (d === 270 || d === 90) anchor = 'middle';
-  else if (d > 270 || d < 90) anchor = 'start';
-  let lx = cx + rl * Math.cos(rad), ly = cy + rl * Math.sin(rad);
-  if (d === 270) ly -= 8; if (d === 90) ly += 14;
-  return { ...s, i, bx: cx + rb * Math.cos(rad), by: cy + rb * Math.sin(rad), lx, ly, anchor, begin: (i * 0.32).toFixed(2) + 's' };
-});
 ---
 <Fragment set:html={head} />
   <div class="cap-grid">
@@ -21,45 +9,5 @@ const blips = sec.sectors.map((s, i) => {
       <div class="cap"><div class="cap-code">{c.code}</div><h4><Fragment set:html={c.title} /></h4>
         <div class="chips">{c.chips.map(ch => <span class="chip"><Fragment set:html={ch} /></span>)}</div></div>
     ))}
-  </div>
-
-  <div class="sectors" id="sectors">
-    <h3>Sector Coverage</h3>
-    <div class="legend">EVERY INDUSTRY I HAVE SHIPPED WORK IN · FULL SWEEP, NO GAPS</div>
-    <div class="sectors-grid">
-    <svg class="radar" viewBox="-75 -12 590 468" xmlns="http://www.w3.org/2000/svg" aria-label="Radar scope revealing industry sectors covered">
-      <defs>
-        <linearGradient id="sweepg" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="var(--ac)" stop-opacity="0"/>
-          <stop offset="1" stop-color="var(--ac)" stop-opacity=".9"/>
-        </linearGradient>
-      </defs>
-      <circle class="ring" cx="220" cy="220" r="60"/>
-      <circle class="ring" cx="220" cy="220" r="105"/>
-      <circle class="ring" cx="220" cy="220" r="150"/>
-      <line class="xline" x1="220" y1="70" x2="220" y2="370"/>
-      <line class="xline" x1="70" y1="220" x2="370" y2="220"/>
-      <line class="xline" x1="114" y1="114" x2="326" y2="326"/>
-      <line class="xline" x1="326" y1="114" x2="114" y2="326"/>
-      <g id="sweep-rot" class="sweep">
-        <path d="M220,220 L220,70 A150,150 0 0 1 295,90 Z" fill="url(#sweepg)"/>
-      </g>
-      <circle cx="220" cy="220" r="3" fill="var(--ac)"/>
-      <text x="220" y="238" text-anchor="middle" class="clbl" id="radar-count">{sec.radarCenterScanning}</text>
-      {blips.map(b => (
-        <g class="sblip" id={'sb-' + b.i}>
-          <circle cx={b.bx.toFixed(1)} cy={b.by.toFixed(1)} r="10" class="halo"><animate attributeName="r" values="7;13;7" dur="2.6s" begin={b.begin} repeatCount="indefinite"/><animate attributeName="opacity" values=".5;.12;.5" dur="2.6s" begin={b.begin} repeatCount="indefinite"/></circle>
-          <circle cx={b.bx.toFixed(1)} cy={b.by.toFixed(1)} r="4" class="blip"/>
-          <text x={b.lx.toFixed(1)} y={b.ly.toFixed(1)} text-anchor={b.anchor} class="blbl"><Fragment set:html={b.label} /></text>
-        </g>
-      ))}
-    </svg>
-    <div class="sec-list">
-    <div class="sec-head"><span>Sector</span><span>Signal</span><span>Engagements</span></div>
-    {sec.sectors.map((s, i) => (
-      <div class="sec-row" id={'sr-' + i}><span class="sname"><Fragment set:html={s.name} /></span><span class="sig" id={'sig-' + i}><i></i><i></i><i></i><i></i></span><span class="swhere"><Fragment set:html={s.who} /></span></div>
-    ))}
-    </div>
-    </div>
   </div>
 <Fragment set:html={close} />

@@ -16,7 +16,7 @@ const close = '</div></section>';
           <div class="ops">
             {item.ops.map(op => (
               <div class="op" data-aud={op.aud}>
-                <div class="op-head"><span class="op-code">{op.code}</span><span class="aud">{op.audLabel}</span><span class="op-name"><Fragment set:html={op.name} /></span><span class={op.live ? 'op-status live' : 'op-status'}>{op.status}</span></div>
+                <div class="op-head"><span class="op-code">{op.code}</span><span class="aud">{op.audLabel}</span>{op.engagement && <span class="engagement-type">{op.engagement}</span>}<span class="op-name"><Fragment set:html={op.name} /></span><span class={op.live ? 'op-status live' : 'op-status'}>{op.status}</span></div>
                 <div class="op-body"><p><Fragment set:html={op.body} /></p><div class="chips">{op.chips.map(c => <span class="chip"><Fragment set:html={c} /></span>)}</div></div>
               </div>
             ))}

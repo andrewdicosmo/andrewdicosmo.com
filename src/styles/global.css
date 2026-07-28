@@ -162,6 +162,7 @@
   .op-head{display:flex;align-items:center;gap:14px;padding:13px 18px}
   .op-code{font-size:10.5px;font-weight:700;color:var(--ac);letter-spacing:.14em;white-space:nowrap}
   .op-name{font-size:13px;font-weight:600;color:var(--white);letter-spacing:.03em}
+  .engagement-type{font-size:8.5px;font-weight:700;letter-spacing:.14em;padding:2px 7px;border:1px solid var(--ac-dim);color:var(--ac);text-transform:uppercase;white-space:nowrap}
   .op-status{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.16em;padding:3px 9px;border:1px solid var(--ac-dim);color:var(--ac);text-transform:uppercase;white-space:nowrap}
   .op-status.live{border-color:var(--live);color:var(--live)}
   .op:hover{border-color:var(--ac-dim);background:color-mix(in srgb, var(--panel) 85%, var(--ac) 15%)}
@@ -195,7 +196,10 @@
   .cap .chips{margin-top:0}
 
   /* sector coverage matrix */
+  .sectors-section .sec-sub{margin-bottom:12px}
+  .sector-intro{max-width:760px;font-size:13px;line-height:1.9;color:var(--grey);margin-bottom:28px}
   .sectors{margin-top:44px;max-width:1100px}
+  .sectors-section .sectors{margin-top:0}
   .sectors h3{font-family:var(--disp);font-weight:700;font-size:17px;text-transform:uppercase;margin-bottom:4px}
   .sectors .legend{font-size:10px;color:var(--grey);letter-spacing:.1em;margin-bottom:16px}
   .sectors-grid{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:36px;align-items:center;margin-top:16px}
@@ -436,6 +440,7 @@
 
     .cap-grid{grid-template-columns:1fr;gap:10px}
     .cap{padding:20px}
+    .sector-intro{font-size:12.5px;line-height:1.8;margin-bottom:24px}
     .sectors{margin-top:36px}
     .sectors-grid{gap:20px}
     .sec-head{display:none}
