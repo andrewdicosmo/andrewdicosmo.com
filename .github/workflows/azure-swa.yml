@@ -11,7 +11,7 @@ jobs:
       CONTENT_REPO: ${{ secrets.CONTENT_REPO }}
       CONTENT_REPO_PAT: ${{ secrets.CONTENT_REPO_PAT }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
 
       # PRIVATE CONTENT INJECTION (optional):
       # keep your real src/data in a private repo; provide CONTENT_REPO_PAT + CONTENT_REPO

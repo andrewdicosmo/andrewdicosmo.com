@@ -95,6 +95,9 @@
     setTimeout(()=>document.getElementById('bname').focus({preventScroll:true}),600);
   }
   window.startBrief=startBrief;
+  document.querySelectorAll('[data-brief-path]').forEach(button=>{
+    button.addEventListener('click',()=>startBrief(button.dataset.briefPath));
+  });
   function sendBrief(){
     const name=document.getElementById('bname'), email=document.getElementById('bemail');
     let ok=true;
