@@ -1,0 +1,20 @@
+---
+import proof from '../data/proof.json';
+---
+<section class="proof" id="proof">
+  <div class="proof-head">
+    <div class="sec-sub"><Fragment set:html={proof.kicker} /></div>
+    <h2 class="sec-title"><Fragment set:html={proof.title} /></h2>
+    <p><Fragment set:html={proof.intro} /></p>
+  </div>
+  <div class="proof-grid">
+    {proof.items.map(item => (
+      <article class="proof-card">
+        <div class="proof-code">{item.code}</div>
+        <h3><Fragment set:html={item.title} /></h3>
+        <p><Fragment set:html={item.body} /></p>
+      </article>
+    ))}
+  </div>
+  <p class="proof-footer"><Fragment set:html={proof.footer} /></p>
+</section>

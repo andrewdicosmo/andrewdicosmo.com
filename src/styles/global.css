@@ -129,6 +129,19 @@
   .built-free{margin-top:26px;max-width:860px;font-size:9px;letter-spacing:.12em;color:var(--ac-dim);text-transform:uppercase;line-height:1.8;border-top:1px solid var(--faint);padding-top:10px}
   .built-free b{color:var(--grey);font-weight:600}
 
+  /* ============ HANDS-ON PROOF ============ */
+  .proof{padding:80px 6vw 90px}
+  .proof-head{max-width:780px}
+  .proof-head .sec-sub{margin-bottom:8px}
+  .proof-head p{font-size:13px;line-height:1.9;color:var(--grey);max-width:720px}
+  .proof-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:1100px;margin-top:30px}
+  .proof-card{border:1px solid var(--faint);background:var(--panel);padding:24px 26px}
+  .proof-code{font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.2em;text-transform:uppercase}
+  .proof-card h3{font-family:var(--disp);font-size:19px;font-weight:700;text-transform:uppercase;margin:8px 0 10px}
+  .proof-card p{font-size:12.5px;line-height:1.85;color:var(--grey)}
+  .proof-card p b,.proof-footer b{color:var(--white);font-weight:600}
+  .proof-footer{margin-top:18px;max-width:820px;font-size:10.5px;line-height:1.8;letter-spacing:.07em;color:var(--ac)}
+
   /* ============ TIMELINE ============ */
   .tl{position:relative;padding:80px 6vw 100px}
   .spine-wrap{position:relative;max-width:860px}
@@ -291,6 +304,9 @@
   .firm span{font-size:10.5px;color:var(--grey);letter-spacing:.06em}
   .firm em{font-style:normal;color:var(--ac);font-size:12px}
   .brief-panel{margin-top:20px;max-width:1100px}
+  .engagement-note{max-width:860px;margin:-22px 0 24px;font-size:11px;line-height:1.8;letter-spacing:.06em;color:var(--grey)}
+  .engagement-note b{color:var(--ac);font-weight:600}
+  .engagement-note span{color:var(--ac-dim);margin:0 5px}
   .path-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 16px}
   .pathcard{border:1px solid var(--faint);background:var(--bg);padding:20px 22px;cursor:pointer;user-select:none;position:relative;transition:all .18s ease}
   .pathcard:hover{border-color:var(--ac-dim)}
@@ -398,6 +414,11 @@
     .built{padding:8px 10px;font-size:8px}
 
     .tl,.caps,.demo,.contact,.gift{padding:64px 20px}
+    .proof{padding:64px 20px}
+    .proof-grid{grid-template-columns:1fr;gap:10px;margin-top:24px}
+    .proof-card{padding:20px}
+    .proof-card h3{font-size:18px}
+    .proof-head p,.proof-card p{font-size:12.5px;line-height:1.8}
     .debrief{margin:0 20px;padding:48px 0 64px;font-size:12px;line-height:1.9}
     .spine{left:14px}
     .spine-fill{left:14px}

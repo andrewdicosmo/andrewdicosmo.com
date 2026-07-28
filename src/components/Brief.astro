@@ -6,6 +6,7 @@ const firm = profile.firm;
 <section class="contact" id="contact">
   <h2 class="sec-title">Choose Your <span>Engagement</span></h2>
   <div class="sec-sub">ONE BRIEF · SELECT A PATH, OR BOTH, AND IT BUILDS ITSELF</div>
+  <p class="engagement-note"><Fragment set:html={brief.availability} /> <span>·</span> <Fragment set:html={brief.terms} /></p>
 
   <div class="door-panel brief-panel" id="brief" style="margin-top:0;max-width:1100px">
     <div class="dp-tag">Transmit · The brief</div>
@@ -32,7 +33,7 @@ const firm = profile.firm;
       <div class="step-lbl" style="margin-top:2px">02 · Parameters</div>
       <div class="fs" id="fs-w2">
         <div class="f2" style="margin-bottom:10px">
-          <div><label>Salary range</label>
+          <div><label>W-2 compensation range</label>
           <select>{brief.salary.map(o => <option>{o}</option>)}</select></div>
           <div><label>Job req · link or attach · optional</label>
           <div class="fattach">

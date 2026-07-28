@@ -1,0 +1,28 @@
+{
+  "kicker": "HOW I WORK TODAY",
+  "title": "Hands-On <span>Engineering</span>",
+  "intro": "Use this section to explain how you balance implementation, technical leadership, and client delivery.",
+  "items": [
+    {
+      "code": "PROOF-01",
+      "title": "Build &amp; Ship",
+      "body": "Describe the software, APIs, cloud services, and production systems you personally build and support."
+    },
+    {
+      "code": "PROOF-02",
+      "title": "Choose by Fit",
+      "body": "Show an engineering decision where you chose the simplest dependable approach for the problem."
+    },
+    {
+      "code": "PROOF-03",
+      "title": "Deliver at Scale",
+      "body": "Summarize a meaningful system without disclosing confidential client or program details."
+    },
+    {
+      "code": "PROOF-04",
+      "title": "Partner Clearly",
+      "body": "Explain how you work with technical teams, business stakeholders, and clients."
+    }
+  ],
+  "footer": "Add your availability and engagement details here. Keep confidential terms out of the public template."
+}
