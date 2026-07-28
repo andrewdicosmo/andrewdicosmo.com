@@ -10,8 +10,8 @@
     },
     {
       "code": "PROOF-02",
-      "title": "Choose by Fit",
-      "body": "Show an engineering decision where you chose the simplest dependable approach for the problem."
+      "title": "Design for Fit",
+      "body": "Show an engineering decision where you chose the right architecture for the problem."
     },
     {
       "code": "PROOF-03",
@@ -20,7 +20,7 @@
     },
     {
       "code": "PROOF-04",
-      "title": "Partner Clearly",
+      "title": "Client Delivery",
       "body": "Explain how you work with technical teams, business stakeholders, and clients."
     }
   ],
