@@ -369,11 +369,12 @@
   @media (max-width:820px){.doors-grid{grid-template-columns:1fr}}
   /* ============ GIFT / GITHUB ============ */
   .gift{padding:78px 6vw;text-align:left;position:relative}
-  .gift-inner{max-width:860px;border:1px dashed var(--ac-dim);padding:44px 46px;position:relative}
+  /* match the 1100px panels used by the brief and demo sections */
+  .gift-inner{max-width:1100px;border:1px dashed var(--ac-dim);padding:44px 46px;position:relative}
   .gift-stamp{position:absolute;top:-16px;right:26px;transform:rotate(5deg);border:3px solid var(--stamp);color:var(--stamp);font-weight:700;font-size:11px;letter-spacing:.2em;padding:7px 14px;text-transform:uppercase;background:var(--bg)}
   .gift h2{font-family:var(--disp);font-weight:700;font-size:clamp(26px,3.6vw,44px);text-transform:uppercase;line-height:1.1}
   .gift h2 span{color:var(--ac)}
-  .gift p{margin-top:18px;font-size:13px;line-height:2;color:var(--grey);max-width:640px}
+  .gift p{margin-top:18px;font-size:13px;line-height:2;color:var(--grey);max-width:760px}
   .gift p b{color:var(--white)}
   .gift .doors{margin-top:28px}
 
