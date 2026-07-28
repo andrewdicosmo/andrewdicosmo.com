@@ -3,7 +3,8 @@
  "domain": "example.com",
  "typedBrief": "MISSION BRIEF // N YEARS OF BUILDING // READ ON",
  "spanYears": "12",
- "subjectLine": "Example Engineer \u00b7 Replace Me In src/data",
+ "subjectLine": "Example Engineer · Replace Me In src/data",
+ "metaDescription": "Replace me in src/data/profile.json — a one-to-two sentence summary for search engines and link previews.",
  "firm": {
   "name": "ExampleCo",
   "url": "https://example.com",

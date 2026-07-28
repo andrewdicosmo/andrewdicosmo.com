@@ -126,7 +126,9 @@
     };
     const finish=(bookingsUrl)=>{
       const sw=document.getElementById('sched-wrap');
-      sw.style.display=complete?'block':'none';
+      // only offer the scheduler when a bookings page actually exists;
+      // otherwise the anchor would point at "#" and go nowhere
+      sw.style.display=(complete&&bookingsUrl)?'block':'none';
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
@@ -163,13 +165,16 @@
   });
 
   // ---- typewriter ----
-  const msg="MISSION BRIEF // 23 YEARS OF BUILDING // READ ON";
+  const msg=(window.__SITE&&window.__SITE.typedBrief)||"MISSION BRIEF // READ ON";
   const t=document.getElementById('typed');let ti=0;
   (function type(){ if(ti<=msg.length){t.textContent=msg.slice(0,ti++);setTimeout(type,34);} })();
 
   // ---- redaction ----
+  // hover reveals on desktop; click covers touch, focus covers keyboard
   document.querySelectorAll('.redact').forEach(r=>{
+    r.setAttribute('tabindex','0');
     r.addEventListener('mouseenter',()=>r.classList.add('open'));
+    r.addEventListener('focus',()=>r.classList.add('open'));
     r.addEventListener('click',()=>r.classList.toggle('open'));
   });
 
@@ -507,8 +512,15 @@
     const caret=document.createElement('span');
     caret.className='op-caret';caret.textContent='▶';
     head.appendChild(caret);
-    head.addEventListener('click',()=>o.classList.toggle('open'));
+    // the heads are plain divs, so give them button semantics for
+    // keyboard and screen reader users
+    head.setAttribute('role','button');
+    head.setAttribute('tabindex','0');
+    head.setAttribute('aria-expanded','false');
+    const flip=()=>{const open=o.classList.toggle('open');head.setAttribute('aria-expanded',open);};
+    head.addEventListener('click',flip);
+    head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip();}});
   });
   // open the first operation by default so visitors see the expand pattern
   const firstOp=document.querySelector('.op');
-  if(firstOp)firstOp.classList.add('open');
+  if(firstOp){firstOp.classList.add('open');firstOp.querySelector('.op-head')?.setAttribute('aria-expanded','true');}

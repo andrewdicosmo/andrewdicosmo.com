@@ -14,13 +14,13 @@ const firm = profile.firm;
 
     <div class="step-lbl">01 · Path</div>
     <div class="path-row">
-      <div class="pathcard" id="door-hire" onclick="toggleDoor('w2')" role="button" aria-pressed="false">
+      <div class="pathcard" id="door-hire" onclick="toggleDoor('w2')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('w2')}" role="button" tabindex="0" aria-pressed="false">
         <span class="dsel" id="dsel-w2">Tap to select</span>
         <div class="pc-tag">Path 01 · Hiring</div>
         <h4>Hire Me</h4>
         <p>Senior AI engineering, computer vision, and cloud security as a W2 hire. The ATS friendly resume lands in your inbox when you transmit.</p>
       </div>
-      <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" role="button" aria-pressed="false">
+      <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('c2c')}" role="button" tabindex="0" aria-pressed="false">
         <span class="dsel" id="dsel-c2c">Tap to select</span>
         <div class="pc-tag">Path 02 · Consulting</div>
         <h4>Work With Me, C2C</h4>

@@ -1,0 +1,16 @@
+---
+// Builds to /404.html; Azure SWA serves it with a real 404 status via the
+// responseOverrides entry in staticwebapp.config.json.
+import Base from '../layouts/Base.astro';
+import profile from '../data/profile.json';
+---
+<Base title={'404 · ' + profile.name}>
+  <section style="min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 20px">
+    <div>
+      <div class="file-tab" style="display:inline-block;margin-bottom:24px">File Not Found // 404</div>
+      <h1 style="margin:0 0 12px">SIGNAL <span style="color:var(--ac)">LOST</span></h1>
+      <p style="opacity:.75;margin:0 0 28px">This coordinate has nothing on it. The mission file is at the origin.</p>
+      <a class="door primary" href="/" style="display:inline-block;text-decoration:none">Return to the Build Log</a>
+    </div>
+  </section>
+</Base>
