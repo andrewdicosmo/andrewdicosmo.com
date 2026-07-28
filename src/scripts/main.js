@@ -20,26 +20,17 @@
     const count=document.getElementById('radar-count');
     if(!sec||!rot)return;
     sec.classList.add('scanning');
-    let started=false, t0=0, found=0, lastCycle=0;
-    const CYCLE=1440; // reveal on spin 1, hold spins 2 to 4, then reset
-    function reset(){
-      found=0; count.textContent='SCANNING';
-      const SCr=(window.__SITE&&window.__SITE.sectorCount)||8;for(let i=0;i<SCr;i++){
-        const b=document.getElementById('sb-'+i), r=document.getElementById('sr-'+i);
-        if(b)b.classList.remove('on'); if(r)r.classList.remove('found');
-        const sig=document.getElementById('sig-'+i);
-        if(sig)for(const box of sig.children)box.classList.remove('lit');
-      }
-    }
+    let started=false, t0=0, found=0;
+    // The sweep keeps rotating forever, but detection is monotonic: sectors
+    // reveal on the first spin, contact boxes fill over the next three, and
+    // then everything holds. No reset — wiping the table a reader is mid-way
+    // through felt like the site taking the payoff back.
     function frame(now){
       if(!t0)t0=now;
       const deg=((now-t0)/7000*360);
-      const cyc=deg%CYCLE;
-      if(cyc<lastCycle)reset();
-      lastCycle=cyc;
       rot.setAttribute('transform','rotate('+(deg%360)+' 220 220)');
-      if(cyc<=362){
-        const SCn=(window.__SITE&&window.__SITE.sectorCount)||8;const STEPn=360/SCn;const n=Math.min(SCn,Math.floor(cyc/STEPn)+ (cyc%STEPn>2?1:0));
+      if(deg<=362){
+        const SCn=(window.__SITE&&window.__SITE.sectorCount)||8;const STEPn=360/SCn;const n=Math.min(SCn,Math.floor(deg/STEPn)+ (deg%STEPn>2?1:0));
         for(let i=found;i<n;i++){
           const b=document.getElementById('sb-'+i), r=document.getElementById('sr-'+i);
           if(b)b.classList.add('on'); if(r)r.classList.add('found');
@@ -48,14 +39,18 @@
         }
       }
       // contact strength: one box per beam pass over each sector's bearing
-      const SCT=(window.__SITE&&window.__SITE.sectorCount)||8;const STEP=360/SCT;for(let i=0;i<SCT;i++){
+      const SCT=(window.__SITE&&window.__SITE.sectorCount)||8;const STEP=360/SCT;let full=true;for(let i=0;i<SCT;i++){
         const bearing=i*STEP+2;
-        const passes=cyc>=bearing?Math.min(4,Math.floor((cyc-bearing)/360)+1):0;
+        const passes=deg>=bearing?Math.min(4,Math.floor((deg-bearing)/360)+1):0;
+        if(passes<4)full=false;
         const sig=document.getElementById('sig-'+i);
         if(sig){const boxes=sig.children;
           for(let k=0;k<4;k++){boxes[k].classList.toggle('lit',k<passes);}
         }
       }
+      // once every sector is revealed and at full contact strength the state
+      // is stable; keep spinning the beam only (cheaper frame)
+      if(full){ (function spin(t){ rot.setAttribute('transform','rotate('+(((t-t0)/7000*360)%360)+' 220 220)'); requestAnimationFrame(spin); })(now); return; }
       requestAnimationFrame(frame);
     }
     const io=new IntersectionObserver(es=>{
@@ -170,12 +165,15 @@
   (function type(){ if(ti<=msg.length){t.textContent=msg.slice(0,ti++);setTimeout(type,34);} })();
 
   // ---- redaction ----
-  // hover reveals on desktop; click covers touch, focus covers keyboard
-  document.querySelectorAll('.redact').forEach(r=>{
+  // hover reveals on desktop; click covers touch, focus covers keyboard.
+  // Most visitors never think to hover, so the bars also auto-declassify a
+  // beat after the typewriter finishes, staggered so it plays as a reveal.
+  document.querySelectorAll('.redact').forEach((r,i)=>{
     r.setAttribute('tabindex','0');
     r.addEventListener('mouseenter',()=>r.classList.add('open'));
     r.addEventListener('focus',()=>r.classList.add('open'));
     r.addEventListener('click',()=>r.classList.toggle('open'));
+    setTimeout(()=>r.classList.add('open'), msg.length*34+900+i*400);
   });
 
   // ---- grid ----

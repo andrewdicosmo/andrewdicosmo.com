@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.2
+
+- Wide monitors: content band now centers itself once the viewport passes
+  ~1520px instead of pinning to the left gutter; timeline column widened.
+- Sector radar holds its completed state after the reveal instead of wiping
+  and re-scanning every four spins (the beam keeps rotating).
+- Hero redactions auto-declassify a beat after the typewriter finishes, so
+  the reveal no longer depends on visitors discovering the hover.
+- Timeline intel entries: body text one shade brighter and a wider measure.
+
 ## v1.0.1
 
 - Fixed a double-executing script: the example DEBRIEF section carried an inline
