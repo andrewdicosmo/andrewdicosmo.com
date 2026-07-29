@@ -500,8 +500,12 @@
 
   // ---- audience lens ----
   function applyLens(l){
-    document.querySelectorAll('[data-aud]').forEach(el=>{
+    document.querySelectorAll('.op[data-aud], .intel[data-aud]').forEach(el=>{
       el.classList.toggle('dimmed', l!=='all' && el.dataset.aud!==l);
+    });
+    document.querySelectorAll('.phase[data-aud]').forEach(el=>{
+      const hasMatchingOp=!!el.querySelector(`.op[data-aud="${l}"]`);
+      el.classList.toggle('dimmed', l!=='all' && el.dataset.aud!==l && !hasMatchingOp);
     });
     document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
   }
@@ -522,6 +526,6 @@
     head.addEventListener('click',flip);
     head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip();}});
   });
-  // open the first operation by default so visitors see the expand pattern
+  // Open the first case by default so visitors see the expand pattern.
   const firstOp=document.querySelector('.op');
   if(firstOp){firstOp.classList.add('open');firstOp.querySelector('.op-head')?.setAttribute('aria-expanded','true');}

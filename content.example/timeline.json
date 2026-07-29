@@ -3,7 +3,7 @@
   {
    "type": "phase",
    "aud": "comm",
-   "tag": "Phase 02",
+   "tag": "Current Build",
    "yrs": "2020 \u2013 NOW",
    "title": "Current Era",
    "sum": "Describe your current chapter here. This is example content: replace everything in src/data with your own story.",
@@ -11,7 +11,7 @@
     {
      "aud": "comm",
      "code": "OP-020",
-     "audLabel": "Comm",
+     "audLabel": "Commercial",
      "name": "Your Flagship Project",
      "live": true,
      "status": "Live",
@@ -32,7 +32,7 @@
   {
    "type": "phase",
    "aud": "comm",
-   "tag": "Phase 01 \u00b7 Origin",
+   "tag": "Technical Foundation",
    "yrs": "2014 \u2013 2020",
    "title": "Origin Story",
    "sum": "Where it started. The example persona exists so the template runs out of the box.",

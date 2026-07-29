@@ -10,10 +10,17 @@
       <div class="ph"><img src="{{SUBJECT_SRC}}" alt="Alex Operator"><div class="tint"></div><div class="scan"></div></div>
     </div>
     <div class="dossier">
-      SUBJECT&nbsp;&nbsp;&nbsp;<b>Example Engineer · Replace Me</b><br>
-      CLEARANCE&nbsp;<b>TS/SCI active · CI polygraph</b><br>
-      STATUS&nbsp;&nbsp;&nbsp;&nbsp;Accepting <b>W2</b> or <b>B2B</b> missions. First to engage wins<br>
-      KNOWN FOR&nbsp;<span class="redact">building things that ship</span> and <span class="redact">pushing the limits of AI</span>
+      SUBJECT:&nbsp;&nbsp;&nbsp;<b>Example Engineer · Replace Me</b><br>
+      CLEARANCE:&nbsp;<b>Replace or remove this line</b><br>
+      STATUS:&nbsp;&nbsp;&nbsp;&nbsp;<b>{{ACTIVE_STATUS_LABEL}}</b> · {{AVAILABILITY_LINE}}<br>
+      KNOWN FOR:&nbsp;<span class="redact">building things that ship</span> and <span class="redact">pushing the limits of AI</span>
+      <div class="availability-module" data-status="{{AVAILABILITY_STATUS}}">
+        <div class="status-rail">
+          <span class="status-pill {{AVAILABLE_ACTIVE}}">Available</span>
+          <span class="status-pill {{ENGAGED_ACTIVE}}">Engaged</span>
+        </div>
+        <div class="status-copy"><b>{{ACTIVE_STATUS_LABEL}}</b> · {{AVAILABILITY_LINE}}{{AVAILABILITY_WINDOW}}</div>
+      </div>
     </div>
     </div>
     <div class="doors">

@@ -3,9 +3,14 @@
  "domain": "example.com",
  "typedBrief": "MISSION BRIEF // N YEARS OF BUILDING // READ ON",
  "spanYears": "12",
- "subjectLine": "Example Engineer · Replace Me In src/data",
- "metaDescription": "Replace me in src/data/profile.json — a one-to-two sentence summary for search engines and link previews.",
- "firm": {
+  "subjectLine": "Example Engineer · Replace Me In src/data",
+  "metaDescription": "Replace me in src/data/profile.json — a one-to-two sentence summary for search engines and link previews.",
+  "availability": {
+    "status": "available",
+    "line": "W-2 or C2C · Start quickly",
+    "availableFrom": ""
+  },
+  "firm": {
   "name": "ExampleCo",
   "url": "https://example.com",
   "tag": "Replace with your firm"

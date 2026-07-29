@@ -2,10 +2,11 @@
 import data from '../data/timeline.json';
 import head from '../data/sections/TIMELINE_HEAD.html?raw';
 const close = '</div></section>';
+const displayCode = (code) => String(code || '').replace(/^OP-/, 'CASE-');
 ---
 <Fragment set:html={head} />
     {data.items.map(item => item.type === 'intel' ? (
-      <div class="intel"><div class="wp"></div><div class="i-tag"><span class="i-yr">{item.yr}</span><Fragment set:html={item.label} /></div><div class="i-txt"><Fragment set:html={item.html} /></div></div>
+      <div class="intel" data-aud={item.aud}><div class="wp"></div><div class="i-tag"><span class="i-yr">{item.yr}</span><Fragment set:html={item.label} /></div><div class="i-txt"><Fragment set:html={item.html} /></div></div>
     ) : (
       <div class="phase" data-aud={item.aud}>
         <div class="waypoint"></div>
@@ -16,7 +17,7 @@ const close = '</div></section>';
           <div class="ops">
             {item.ops.map(op => (
               <div class="op" data-aud={op.aud}>
-                <div class="op-head"><span class="op-code">{op.code}</span><span class="aud">{op.audLabel}</span>{op.engagement && <span class="engagement-type">{op.engagement}</span>}<span class="op-name"><Fragment set:html={op.name} /></span><span class={op.live ? 'op-status live' : 'op-status'}>{op.status}</span></div>
+                <div class="op-head"><span class="op-code">{displayCode(op.code)}</span><span class="aud">{op.audLabel}</span>{op.engagement && <span class="engagement-type">{op.engagement}</span>}<span class="op-name"><Fragment set:html={op.name} /></span><span class={op.live ? 'op-status live' : 'op-status'}>{op.status}</span></div>
                 <div class="op-body"><p><Fragment set:html={op.body} /></p><div class="chips">{op.chips.map(c => <span class="chip"><Fragment set:html={c} /></span>)}</div></div>
               </div>
             ))}

@@ -57,6 +57,12 @@ const person = {
   <script is:inline set:html={`window.__SITE=${JSON.stringify(site)};`}></script>
 </head>
 <body data-theme="cyan">
+  <div class="themes" aria-label="Theme color">
+    <span>Signal</span>
+    <button class="tbtn cy on" type="button" data-t="cyan" aria-label="Use cyan theme"></button>
+    <button class="tbtn gr" type="button" data-t="green" aria-label="Use green theme"></button>
+    <button class="tbtn am" type="button" data-t="amber" aria-label="Use amber theme"></button>
+  </div>
   <slot />
   <script src="../scripts/main.js"></script>
 </body>
