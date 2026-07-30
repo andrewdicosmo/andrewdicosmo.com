@@ -5,6 +5,12 @@ const { EmailClient } = require('@azure/communication-email');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
+const escapeHtml = (value) => clean(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
 
 function formatPath(paths = {}) {
   const selected = compact([
@@ -68,38 +74,59 @@ function formatOwnerInquiry(lead, body) {
   return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
 }
 
-function formatSubmitterReply(lead, body) {
+function getSubmitterReplyModel(lead, body) {
   const paths = body.paths || {};
   const fields = formatFields(body.fields || [], paths);
   const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
   const hasNotes = !!clean(body.brief);
   const selectedPath = formatPath(paths);
-  const companyLine = clean(lead.company) ? ` at ${clean(lead.company)}` : '';
-  const lines = [
-    `Hi ${lead.name},`,
-    '',
-    `Thanks for reaching out${companyLine}. I attached my ATS friendly resume for easy forwarding and applicant tracking systems.`
-  ];
+  const companyLine = clean(lead.company) ? ` from ${clean(lead.company)}` : '';
+  let pathMessage;
 
   if (paths.w2 && paths.c2c) {
-    lines.push('', 'I saw that you selected both W-2 hiring and C2C consulting. I can discuss either path and will look at the role, scope, timeline, and team needs before recommending the cleanest fit.');
+    pathMessage = 'I saw that you selected both W-2 hiring and C2C consulting. I can discuss either path and will look at the role, scope, timeline, and team needs before recommending the cleanest fit.';
   } else if (paths.w2) {
-    lines.push('', 'I saw that this is for a W-2 role. I will review the role details and follow up with how my AI engineering, computer vision, cloud, and security background maps to what you are hiring for.');
+    pathMessage = 'I saw that this is for a W-2 role. I will review the role details and follow up with how my AI engineering, computer vision, cloud, and security background maps to what you are hiring for.';
   } else if (paths.c2c) {
-    lines.push('', 'I saw that this is for C2C consulting. I will review the scope and follow up with how I would approach the work, timeline, and next steps.');
+    pathMessage = 'I saw that this is for C2C consulting. I will review the scope and follow up with how I would approach the work, timeline, and next steps.';
   } else {
-    lines.push('', 'I will review what you sent and follow up with the best next step.');
+    pathMessage = 'I will review what you sent and follow up with the best next step.';
   }
 
-  if (fields.length || chips.length || hasNotes) {
-    lines.push('', 'I received the useful details you provided:');
-    if (selectedPath) lines.push(`- Path: ${selectedPath}`);
-    fields.forEach((field) => lines.push(`- ${field.label}: ${field.value}`));
-    if (chips.length) lines.push(`- Work areas: ${chips.join(', ')}`);
-    if (hasNotes) lines.push('- Additional context: received');
+  const summary = compact([
+    selectedPath ? ['Engagement path', selectedPath] : null,
+    clean(lead.company) ? ['Company', clean(lead.company)] : null,
+    clean(lead.role) ? ['Role or title', clean(lead.role)] : null,
+    ...fields.map((field) => [field.label, field.value]),
+    chips.length ? ['Focus areas', chips.join(', ')] : null,
+    hasNotes ? ['Additional context', 'Received'] : null
+  ]);
+
+  return {
+    name: lead.name,
+    companyLine,
+    pathMessage,
+    summary,
+    complete: !!lead.complete
+  };
+}
+
+function formatSubmitterReplyText(lead, body) {
+  const reply = getSubmitterReplyModel(lead, body);
+  const lines = [
+    `Hi ${reply.name},`,
+    '',
+    `Thanks for reaching out${reply.companyLine}. I attached my resume for easy forwarding.`
+  ];
+
+  lines.push('', reply.pathMessage);
+
+  if (reply.summary.length) {
+    lines.push('', 'I received:');
+    reply.summary.forEach(([label, value]) => lines.push(`- ${label}: ${value}`));
   }
 
-  if (lead.complete) {
+  if (reply.complete) {
     lines.push('', 'This looks complete enough for me to respond without another intake round. I will follow up within one business day.');
   } else {
     lines.push('', 'If anything important was left out, you can reply directly to this email with the missing context. I will still review what came through.');
@@ -109,8 +136,61 @@ function formatSubmitterReply(lead, body) {
   return lines.join('\n').slice(0, 12000);
 }
 
+function formatSubmitterReplyHtml(lead, body) {
+  const reply = getSubmitterReplyModel(lead, body);
+  const rows = reply.summary.map(([label, value]) => `
+                    <tr>
+                      <td style="padding:10px 0;color:#66727c;font-size:13px;line-height:1.4;width:38%;border-bottom:1px solid #e7edf2;">${escapeHtml(label)}</td>
+                      <td style="padding:10px 0;color:#16222b;font-size:13px;line-height:1.4;font-weight:700;border-bottom:1px solid #e7edf2;">${escapeHtml(value)}</td>
+                    </tr>`).join('');
+  const nextStep = reply.complete
+    ? 'This looks complete enough for me to respond without another intake round. I will follow up within one business day.'
+    : 'If anything important was left out, you can reply directly to this email with the missing context. I will still review what came through.';
+
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:#f4f7f9;font-family:Arial,Helvetica,sans-serif;color:#16222b;">
+    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Resume attached. I received your inquiry and will follow up within one business day.</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9;margin:0;padding:28px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #dfe7ee;border-radius:12px;overflow:hidden;">
+            <tr>
+              <td style="background:#16222b;padding:20px 26px;">
+                <div style="font-size:12px;line-height:1.4;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div>
+                <div style="font-size:24px;line-height:1.25;color:#ffffff;font-weight:800;margin-top:8px;">Thanks for reaching out</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:26px;">
+                <p style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">Hi ${escapeHtml(reply.name)},</p>
+                <p style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">Thanks for reaching out${escapeHtml(reply.companyLine)}. I attached my resume for easy forwarding.</p>
+                <p style="margin:0 0 22px;color:#364653;font-size:14px;line-height:1.7;">${escapeHtml(reply.pathMessage)}</p>
+
+                ${rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:3px solid #1e6f8f;margin:18px 0 22px;">
+                  <tr>
+                    <td colspan="2" style="padding:14px 0 4px;color:#16222b;font-size:12px;line-height:1.4;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;">I received</td>
+                  </tr>
+                  ${rows}
+                </table>` : ''}
+
+                <div style="background:#eef6fa;border-left:4px solid #1e6f8f;padding:14px 16px;margin:0 0 22px;">
+                  <p style="margin:0;color:#243540;font-size:14px;line-height:1.7;">${escapeHtml(nextStep)}</p>
+                </div>
+
+                <p style="margin:0;color:#16222b;font-size:15px;line-height:1.7;">Thanks,<br><strong>Andrew DiCosmo</strong></p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`.slice(0, 20000);
+}
+
 // POST /api/brief
-// Stores the lead, uploads any job-req attachment, emails the ATS resume to the
+// Stores the lead, uploads any job-req attachment, emails the resume to the
 // submitter, notifies the owner, and returns the scheduler URL for complete
 // inquiries. Email prefers Azure Communication Services, matching InstaMapp's
 // production pattern, with SendGrid retained as a fallback. Every external
@@ -175,13 +255,14 @@ app.http('brief', {
           const pdf = await fetch(process.env.RESUME_BLOB_URL);
           if (pdf.ok) resumeAttachment = {
             content: Buffer.from(await pdf.arrayBuffer()).toString('base64'),
-            filename: 'resume.pdf', type: 'application/pdf', disposition: 'attachment'
+            filename: 'Andrew_DiCosmo_Resume.pdf', type: 'application/pdf', disposition: 'attachment'
           };
         }
         const submitterMessage = {
           recipient: email,
           subject: 'Resume attached, and thanks for reaching out',
-          text: formatSubmitterReply(lead, body),
+          text: formatSubmitterReplyText(lead, body),
+          html: formatSubmitterReplyHtml(lead, body),
           attachments: resumeAttachment ? [resumeAttachment] : []
         };
         const ownerMessage = to ? {
@@ -196,7 +277,9 @@ app.http('brief', {
           const sendAcs = async (msg) => {
             const poller = await client.beginSend({
               senderAddress: from,
-              content: { subject: msg.subject, plainText: msg.text },
+              content: msg.html
+                ? { subject: msg.subject, plainText: msg.text, html: msg.html }
+                : { subject: msg.subject, plainText: msg.text },
               recipients: { to: [{ address: msg.recipient }] },
               attachments: msg.attachments.map((a) => ({
                 name: a.filename,
@@ -216,7 +299,10 @@ app.http('brief', {
               personalizations: [{ to: [{ email: msg.recipient }] }],
               from: { email: from },
               subject: msg.subject,
-              content: [{ type: 'text/plain', value: msg.text }],
+              content: compact([
+                { type: 'text/plain', value: msg.text },
+                msg.html ? { type: 'text/html', value: msg.html } : null
+              ]),
               attachments: msg.attachments
             })
           });
