@@ -19,7 +19,7 @@ const siteUrl = 'https://' + (profile.domain || 'example.com');
 const description = (profile.metaDescription || profile.subjectLine || '').replace(/&amp;/g, '&');
 // og.png is a static 1200x630 card checked into public/. If the name or subject
 // line changes, regenerate it from scripts/og-card.html (instructions in that file).
-const ogImage = siteUrl + '/og.png';
+const ogImage = siteUrl + '/og.png?v=ad-logo';
 const person = {
   '@context': 'https://schema.org',
   '@type': 'Person',
