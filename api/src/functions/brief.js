@@ -242,17 +242,22 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   const selectedPath = formatPath(paths);
   const company = clean(lead.company);
   const role = clean(lead.role);
+  const attachmentMessage = paths.w2 && !paths.c2c
+    ? "I've attached my resume for your review and to share with the hiring team if helpful."
+    : paths.c2c && !paths.w2
+      ? "I've attached my resume for additional background on my experience."
+      : "I've attached my resume for reference.";
   let opening;
   let nextStep;
 
   if (company && role) {
-    opening = `Thanks for reaching out regarding ${role} at ${company}. I attached my resume for easy forwarding.`;
+    opening = `Thanks for reaching out regarding ${role} at ${company}. ${attachmentMessage}`;
   } else if (company) {
-    opening = `Thanks for reaching out from ${company}. I attached my resume for easy forwarding.`;
+    opening = `Thanks for reaching out from ${company}. ${attachmentMessage}`;
   } else if (role) {
-    opening = `Thanks for reaching out regarding ${role}. I attached my resume for easy forwarding.`;
+    opening = `Thanks for reaching out regarding ${role}. ${attachmentMessage}`;
   } else {
-    opening = 'Thanks for reaching out. I attached my resume for easy forwarding.';
+    opening = `Thanks for reaching out. ${attachmentMessage}`;
   }
 
   if (!lead.complete) {
