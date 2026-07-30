@@ -1,3 +1,95 @@
+  // ---- analytics and funnel telemetry ----
+  (function(){
+    const site=window.__SITE||{};
+    const analytics=site.analytics||{};
+    const params=new URLSearchParams(window.location.search);
+    const utm={};
+    ['source','medium','campaign','term','content'].forEach(key=>{
+      const value=params.get('utm_'+key);
+      if(value)utm[key]=value.slice(0,180);
+    });
+    function randomId(){
+      if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();
+      return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+    }
+    function sessionId(){
+      try{
+        const key='ad_site_session';
+        let value=window.sessionStorage.getItem(key);
+        if(!value){value=randomId();window.sessionStorage.setItem(key,value);}
+        return value;
+      }catch{return randomId();}
+    }
+    function visitorId(){
+      try{
+        const key='ad_site_visitor';
+        let value=window.localStorage.getItem(key);
+        if(!value){value=randomId();window.localStorage.setItem(key,value);}
+        return value;
+      }catch{return '';}
+    }
+    const sid=sessionId();
+    const vid=visitorId();
+    const pageContext={
+      sessionId:sid,
+      visitorId:vid,
+      path:window.location.pathname,
+      title:document.title,
+      referrer:document.referrer||'',
+      search:window.location.search||'',
+      utm
+    };
+    function cleanProps(props){
+      const out={};
+      Object.entries(props||{}).forEach(([key,value])=>{
+        if(value===undefined||value===null||value==='')return;
+        if(typeof value==='string')out[key]=value.slice(0,240);
+        else if(typeof value==='number'||typeof value==='boolean')out[key]=value;
+        else out[key]=String(value).slice(0,240);
+      });
+      return out;
+    }
+    function firstParty(event,props){
+      if(!analytics.firstPartyEnabled||!site.metricsEndpoint)return;
+      const payload=JSON.stringify({
+        event,
+        props:cleanProps(props),
+        sessionId:sid,
+        page:pageContext,
+        clientTime:new Date().toISOString()
+      });
+      try{
+        if(navigator.sendBeacon){
+          if(navigator.sendBeacon(site.metricsEndpoint,new Blob([payload],{type:'application/json'})))return;
+        }
+      }catch{}
+      fetch(site.metricsEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(()=>{});
+    }
+    function thirdParty(event,props){
+      const clean=cleanProps(props);
+      if(typeof window.gtag==='function')window.gtag('event',event,clean);
+      if(typeof window.clarity==='function'){
+        window.clarity('event',event);
+        Object.entries(clean).slice(0,8).forEach(([key,value])=>window.clarity('set',key,String(value)));
+      }
+    }
+    window.__analyticsContext=function(){
+      return {
+        sessionId:sid,
+        visitorId:vid,
+        landingPage:pageContext.path,
+        referrer:pageContext.referrer,
+        utm
+      };
+    };
+    window.__track=function(event,props){
+      if(!event)return;
+      firstParty(event,props);
+      thirdParty(event,props);
+    };
+    window.__track('page_view',{path:window.location.pathname});
+  })();
+
   // Open every off-site destination, including the canonical site domain, in a separate tab.
   document.querySelectorAll('a[href]').forEach(link=>{
     const rawHref=link.getAttribute('href');
@@ -9,6 +101,10 @@
       if(isHttp&&(isPortfolioDomain||destination.origin!==window.location.origin)){
         link.target='_blank';
         link.rel='noopener noreferrer';
+        link.addEventListener('click',()=>window.__track&&window.__track('external_link_click',{
+          href:destination.href,
+          text:link.textContent.trim().slice(0,80)
+        }));
       }
     }catch{}
   });
@@ -73,6 +169,7 @@
     d.classList.toggle('sel',paths[k]);
     d.setAttribute('aria-pressed',paths[k]);
     document.getElementById('dsel-'+k).textContent=paths[k]?'Selected':'Tap to select';
+    if(window.__track)window.__track('engagement_path_toggle',{path:k,selected:paths[k],w2:paths.w2,c2c:paths.c2c});
     buildBrief();
   }
   window.toggleDoor=toggleDoor;
@@ -91,6 +188,7 @@
     else{t.textContent='Engagement Inquiry';}
   }
   function startBrief(type){
+    if(window.__track)window.__track('hero_cta_click',{path:type});
     if(!paths[type])toggleDoor(type);
     goDoor('brief');
     setTimeout(()=>document.getElementById('bname').focus({preventScroll:true}),600);
@@ -159,6 +257,7 @@
     }
 
     showBriefErrors(errors);
+    if(errors.length&&window.__track)window.__track('inquiry_validation_failed',{w2:paths.w2,c2c:paths.c2c,errorCount:errors.length});
     if(firstTarget){
       if(typeof firstTarget.focus==='function')firstTarget.focus({preventScroll:true});
       firstTarget.scrollIntoView({behavior:'smooth',block:'center'});
@@ -182,7 +281,8 @@
       chips:selectedChips,
       name:name.value.trim(), email:email.value.trim(),
       company:company.value.trim(), role:role.value.trim(),
-      reqLink:(jrLink&&jrLink.value.trim())||'', brief:(msg&&msg.value.trim())||''
+      reqLink:(jrLink&&jrLink.value.trim())||'', brief:(msg&&msg.value.trim())||'',
+      analytics:window.__analyticsContext?window.__analyticsContext():undefined
     };
     const finish=(bookingsUrl)=>{
       const sw=document.getElementById('sched-wrap');
@@ -192,10 +292,12 @@
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
+      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,hasBookingUrl:!!bookingsUrl});
       goDoor('brief');
     };
     const send=(fileB64,fileName)=>{
       if(fileB64){payload.attachment={name:fileName,data:fileB64};}
+      if(window.__track)window.__track('inquiry_submit_attempt',{w2:paths.w2,c2c:paths.c2c,hasAttachment:!!fileB64,hasJobLink:!!payload.reqLink});
       fetch((window.__SITE&&window.__SITE.apiEndpoint)||'/api/brief',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
         .then(async r=>{
           const data=await r.json().catch(()=>({}));
@@ -203,9 +305,12 @@
           return data;
         })
         .then(d=>finish(d&&d.bookingsUrl))
-        .catch(error=>showBriefErrors(Array.isArray(error.messages)&&error.messages.length
-          ?error.messages
-          :['The inquiry could not be sent. Please review the fields and try again.']));
+        .catch(error=>{
+          if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
+          showBriefErrors(Array.isArray(error.messages)&&error.messages.length
+            ?error.messages
+            :['The inquiry could not be sent. Please review the fields and try again.']);
+        });
     };
     if(jrFile&&jrFile.files&&jrFile.files[0]&&jrFile.files[0].size<5*1024*1024){
       const rd=new FileReader();
@@ -217,7 +322,12 @@
   window.sendBrief=sendBrief;
   function jrPicked(inp){
     const b=document.getElementById('jrbtn');
-    if(inp.files&&inp.files[0]){b.textContent=inp.files[0].name;b.classList.add('has');}
+    if(inp.files&&inp.files[0]){
+      const name=inp.files[0].name||'';
+      const ext=name.includes('.')?name.split('.').pop().toLowerCase():'unknown';
+      b.textContent=inp.files[0].name;b.classList.add('has');
+      if(window.__track)window.__track('job_attachment_selected',{extension:ext,sizeBucket:inp.files[0].size>1024*1024?'1mb_plus':'under_1mb'});
+    }
     else{b.textContent='Attach PDF / DOC';b.classList.remove('has');}
   }
   window.jrPicked=jrPicked;
@@ -227,6 +337,7 @@
     b.addEventListener('click',()=>{
       document.body.dataset.theme=b.dataset.t;
       document.querySelectorAll('.tbtn').forEach(x=>x.classList.toggle('on',x===b));
+      if(window.__track)window.__track('theme_change',{theme:b.dataset.t});
     });
   });
 

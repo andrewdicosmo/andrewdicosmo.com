@@ -226,6 +226,37 @@ hosting service used by this template.
 5. Push a change to the `main` branch. The workflow copies in the private
    content for that build and publishes the finished site.
 
+## Visitor Analytics And Funnel Tracking
+
+The template can track visitor activity in three ways:
+
+| Tool | What it tells you |
+| --- | --- |
+| **Google Analytics** | Page views, traffic sources, campaigns, and engagement events. |
+| **Microsoft Clarity** | Session recordings, heatmaps, rage clicks, and scroll behavior. |
+| **First-party funnel events** | Same-origin events stored in your Azure Storage account, such as page views, path selection, validation errors, form submit attempts, and successful inquiries. |
+
+Add these GitHub repository variables before deploying:
+
+| Variable | Purpose |
+| --- | --- |
+| `PUBLIC_GOOGLE_ANALYTICS_ID` | Your Google Analytics measurement identifier, such as `G-XXXXXXXXXX`. |
+| `PUBLIC_MICROSOFT_CLARITY_ID` | Your Microsoft Clarity project identifier. |
+| `PUBLIC_FIRST_PARTY_ANALYTICS` | Optional. Use `false` to turn off the built-in Azure funnel events. |
+
+Add this optional Azure Static Web Apps setting:
+
+| Setting | Purpose |
+| --- | --- |
+| `EVENTS_TABLE` | The Azure Table name for first-party funnel events. Defaults to `siteEvents`. |
+
+The first-party event endpoint does not store a visitor's name, email address,
+form message, or Internet Protocol address. It stores an anonymous browser
+identifier, a session identifier, landing page, referrer, and campaign tags.
+When a visitor submits the inquiry form, the lead record stores the same
+anonymous identifiers so you can connect the lead to the funnel path without
+putting private form details into analytics tools.
+
 ## Contact Form And Resume Email
 
 The contact form sends information to an Azure Function, a small server-side

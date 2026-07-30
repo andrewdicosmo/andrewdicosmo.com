@@ -10,6 +10,9 @@ jobs:
     env:
       CONTENT_REPO: ${{ secrets.CONTENT_REPO }}
       CONTENT_REPO_PAT: ${{ secrets.CONTENT_REPO_PAT }}
+      PUBLIC_FIRST_PARTY_ANALYTICS: ${{ vars.PUBLIC_FIRST_PARTY_ANALYTICS }}
+      PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.PUBLIC_GOOGLE_ANALYTICS_ID }}
+      PUBLIC_MICROSOFT_CLARITY_ID: ${{ vars.PUBLIC_MICROSOFT_CLARITY_ID }}
     steps:
       - uses: actions/checkout@v7
 

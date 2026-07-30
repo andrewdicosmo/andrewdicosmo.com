@@ -24,6 +24,26 @@ function safeHttpsUrl(value) {
   }
 }
 
+function cleanLeadMetadata(value, max = 240) {
+  return clean(value).replace(/[\r\n\t]+/g, ' ').slice(0, max);
+}
+
+function getLeadAnalytics(body = {}) {
+  const analytics = body.analytics && typeof body.analytics === 'object' ? body.analytics : {};
+  const utm = analytics.utm && typeof analytics.utm === 'object' ? analytics.utm : {};
+  return {
+    analyticsSessionId: cleanLeadMetadata(analytics.sessionId, 80),
+    analyticsVisitorId: cleanLeadMetadata(analytics.visitorId, 80),
+    landingPage: cleanLeadMetadata(analytics.landingPage, 300),
+    referrer: cleanLeadMetadata(analytics.referrer, 500),
+    utmSource: cleanLeadMetadata(utm.source, 180),
+    utmMedium: cleanLeadMetadata(utm.medium, 180),
+    utmCampaign: cleanLeadMetadata(utm.campaign, 180),
+    utmTerm: cleanLeadMetadata(utm.term, 180),
+    utmContent: cleanLeadMetadata(utm.content, 180)
+  };
+}
+
 function getEmailLogoAttachment() {
   try {
     return {
@@ -435,6 +455,7 @@ app.http('brief', {
     }
     body = { ...body, ...validation.normalized, complete: true };
     const { name, email, company, role, paths, brief, reqLink, chips } = validation.normalized;
+    const analytics = getLeadAnalytics(body);
 
     const conn = process.env.STORAGE_CONNECTION_STRING;
     const lead = {
@@ -448,7 +469,8 @@ app.http('brief', {
       reqLink,
       brief,
       complete: true,
-      ua: request.headers.get('user-agent') || ''
+      ua: request.headers.get('user-agent') || '',
+      ...Object.fromEntries(Object.entries(analytics).filter(([, value]) => value))
     };
 
     // 1) store the lead
