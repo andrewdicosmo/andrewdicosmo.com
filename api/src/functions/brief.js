@@ -100,6 +100,118 @@ function formatOwnerInquiry(lead, body) {
   return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
 }
 
+function formatOwnerInquiryHtml(lead, body) {
+  const paths = formatPath(body.paths || {});
+  const fields = formatFields(body.fields || [], body.paths || {});
+  const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
+  const inquiryNotes = clean(body.brief);
+  const reqLink = safeHttpsUrl(body.reqLink);
+  const contactRows = compact([
+    ['Name', lead.name],
+    ['Email', lead.email],
+    clean(lead.company) ? ['Company', clean(lead.company)] : null,
+    clean(lead.role) ? ['Role or title', clean(lead.role)] : null,
+    paths ? ['Engagement path', paths] : null
+  ]);
+  const detailRows = [...contactRows, ...fields].map(([label, value]) => `
+                    <tr>
+                      <td class="detail-row" style="padding:10px 0;border-bottom:1px solid #e7edf2;">
+                        <div class="muted" style="color:#66727c;font-size:11px;line-height:1.4;text-transform:uppercase;letter-spacing:0.6px;">${escapeHtml(label)}</div>
+                        <div class="body-copy" style="margin-top:3px;color:#16222b;font-size:14px;line-height:1.5;font-weight:700;">${escapeHtml(value)}</div>
+                      </td>
+                    </tr>`).join('');
+  const workAreas = chips.length
+    ? `<div style="margin:0 0 22px;">
+                  <div class="section-label" style="margin:0 0 9px;color:#16222b;font-size:12px;line-height:1.4;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;">Work areas</div>
+                  ${chips.map((chip) => `<span class="chip" style="display:inline-block;margin:0 6px 6px 0;padding:6px 9px;background:#e8f4f9;border:1px solid #c9e3ee;border-radius:4px;color:#21495b;font-size:12px;line-height:1.2;font-weight:700;">${escapeHtml(chip)}</span>`).join('')}
+                </div>`
+    : '';
+  const jobRequirement = (reqLink || lead.attachmentBlob)
+    ? `<div class="callout" style="margin:0 0 22px;padding:14px 16px;background:#f4f7f9;border-left:4px solid #1e6f8f;">
+                  <div class="section-label" style="margin:0 0 7px;color:#16222b;font-size:12px;line-height:1.4;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;">Job requirement</div>
+                  ${reqLink ? `<div class="body-copy" style="font-size:13px;line-height:1.6;"><a href="${escapeHtml(reqLink)}" style="color:#1e6f8f;text-decoration:underline;">Open supplied link</a></div>` : ''}
+                  ${lead.attachmentBlob ? `<div class="muted" style="margin-top:${reqLink ? '5px' : '0'};color:#66727c;font-size:12px;line-height:1.5;">Attachment stored as ${escapeHtml(lead.attachmentBlob)}</div>` : ''}
+                </div>`
+    : '';
+  const notes = inquiryNotes
+    ? `<div style="margin:0 0 22px;">
+                  <div class="section-label" style="margin:0 0 8px;color:#16222b;font-size:12px;line-height:1.4;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;">Inquiry notes</div>
+                  <div class="notes body-copy" style="padding:14px 16px;background:#f4f7f9;color:#243540;font-size:14px;line-height:1.7;white-space:pre-wrap;">${escapeHtml(inquiryNotes)}</div>
+                </div>`
+    : '';
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .page-bg { background: #10171c !important; }
+        .email-card { background: #182229 !important; border-color: #33434e !important; }
+        .body-copy, .section-label { color: #f2f6f8 !important; }
+        .muted { color: #b2c0c9 !important; }
+        .detail-row { border-color: #33434e !important; }
+        .callout, .notes { background: #21343e !important; }
+        .chip { background: #213d4a !important; border-color: #315566 !important; color: #bdeafa !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0;padding:0;background:#f4f7f9;font-family:Arial,Helvetica,sans-serif;color:#16222b;">
+    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">New ${lead.complete ? 'complete' : 'partial'} inquiry from ${escapeHtml(lead.name)}${lead.company ? ` at ${escapeHtml(lead.company)}` : ''}.</div>
+    <table class="page-bg" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9;margin:0;padding:28px 12px;">
+      <tr>
+        <td align="center">
+          <table class="email-card" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #dfe7ee;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="background:#16222b;padding:20px 26px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="68" style="width:68px;padding:0 14px 0 0;vertical-align:middle;">
+                      <img src="cid:ad-monogram" width="54" height="36" alt="AD" style="display:block;width:54px;height:36px;border:0;">
+                    </td>
+                    <td style="vertical-align:middle;">
+                      <div style="font-size:12px;line-height:1.4;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div>
+                      <div style="font-size:24px;line-height:1.25;color:#ffffff;font-weight:800;margin-top:6px;">New inquiry</div>
+                    </td>
+                    <td align="right" style="vertical-align:middle;">
+                      <span style="display:inline-block;padding:6px 9px;background:${lead.complete ? '#dff5e7' : '#fff0ce'};border-radius:4px;color:${lead.complete ? '#176438' : '#76540b'};font-size:11px;line-height:1.2;font-weight:800;text-transform:uppercase;">${lead.complete ? 'Complete' : 'Partial'}</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:26px;">
+                <div class="muted" style="margin:0 0 4px;color:#66727c;font-size:12px;line-height:1.4;">Lead ID: ${escapeHtml(lead.rowKey)}</div>
+                <div class="body-copy" style="margin:0 0 18px;color:#16222b;font-size:20px;line-height:1.4;font-weight:800;">${escapeHtml(lead.name)}${lead.company ? ` · ${escapeHtml(lead.company)}` : ''}</div>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:3px solid #1e6f8f;margin:0 0 22px;">
+                  ${detailRows}
+                </table>
+
+                ${workAreas}
+                ${jobRequirement}
+                ${notes}
+
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="background:#1e6f8f;border-radius:5px;">
+                      <a href="mailto:${escapeHtml(lead.email)}" style="display:inline-block;padding:13px 20px;color:#ffffff;text-decoration:none;font-size:14px;line-height:1.2;font-weight:700;">Reply to ${escapeHtml(lead.name)}</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`.slice(0, 20000);
+}
+
 function getSubmitterReplyModel(lead, body, options = {}) {
   const paths = body.paths || {};
   const fields = formatFields(body.fields || [], paths);
@@ -372,9 +484,10 @@ app.http('brief', {
           recipient: to,
           subject: `INQUIRY · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
           text: formatOwnerInquiry(lead, body),
+          html: formatOwnerInquiryHtml(lead, body),
           replyTo: email,
           replyToName: name,
-          attachments: []
+          attachments: compact([emailLogoAttachment])
         } : null;
 
         if (acs) {
