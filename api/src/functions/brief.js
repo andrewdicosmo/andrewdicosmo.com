@@ -5,7 +5,7 @@ const { EmailClient } = require('@azure/communication-email');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
-const escapeHtml = (value) => clean(value)
+const escapeHtml = (value) => String(value || '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
