@@ -27,11 +27,11 @@ function formatFields(fields = [], paths = {}) {
     });
 }
 
-function formatOwnerBrief(lead, body) {
+function formatOwnerInquiry(lead, body) {
   const paths = formatPath(body.paths || {});
   const fields = formatFields(body.fields || [], body.paths || {});
   const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
-  const brief = clean(body.brief);
+  const inquiryNotes = clean(body.brief);
   const reqLink = clean(body.reqLink);
   const lines = [
     'New AndrewDiCosmo.com inquiry',
@@ -63,7 +63,7 @@ function formatOwnerBrief(lead, body) {
     if (lead.attachmentBlob) lines.push(`Attachment stored: ${lead.attachmentBlob}`);
   }
 
-  if (brief) lines.push('', 'Inquiry notes', brief);
+  if (inquiryNotes) lines.push('', 'Inquiry notes', inquiryNotes);
 
   return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
 }
@@ -72,13 +72,13 @@ function formatSubmitterReply(lead, body) {
   const paths = body.paths || {};
   const fields = formatFields(body.fields || [], paths);
   const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
-  const hasBrief = !!clean(body.brief);
+  const hasNotes = !!clean(body.brief);
   const selectedPath = formatPath(paths);
   const companyLine = clean(lead.company) ? ` at ${clean(lead.company)}` : '';
   const lines = [
     `Hi ${lead.name},`,
     '',
-    `Thanks for sending the inquiry${companyLine}. I attached my ATS friendly resume for easy forwarding and applicant tracking systems.`
+    `Thanks for reaching out${companyLine}. I attached my ATS friendly resume for easy forwarding and applicant tracking systems.`
   ];
 
   if (paths.w2 && paths.c2c) {
@@ -91,12 +91,12 @@ function formatSubmitterReply(lead, body) {
     lines.push('', 'I will review what you sent and follow up with the best next step.');
   }
 
-  if (fields.length || chips.length || hasBrief) {
-    lines.push('', 'I received the useful details you provided');
+  if (fields.length || chips.length || hasNotes) {
+    lines.push('', 'I received the useful details you provided:');
     if (selectedPath) lines.push(`- Path: ${selectedPath}`);
     fields.forEach((field) => lines.push(`- ${field.label}: ${field.value}`));
     if (chips.length) lines.push(`- Work areas: ${chips.join(', ')}`);
-    if (hasBrief) lines.push('- Additional notes: received');
+    if (hasNotes) lines.push('- Additional context: received');
   }
 
   if (lead.complete) {
@@ -187,7 +187,7 @@ app.http('brief', {
         const ownerMessage = to ? {
           recipient: to,
           subject: `INQUIRY · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
-          text: formatOwnerBrief(lead, body),
+          text: formatOwnerInquiry(lead, body),
           attachments: []
         } : null;
 
