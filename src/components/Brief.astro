@@ -5,12 +5,12 @@ const firm = profile.firm;
 ---
 <section class="contact" id="contact">
   <h2 class="sec-title">Choose Your <span>Engagement</span></h2>
-  <div class="sec-sub">ONE BRIEF · SELECT A PATH, OR BOTH, AND IT BUILDS ITSELF</div>
+  <div class="sec-sub">ONE INQUIRY · SELECT A PATH, OR BOTH, AND IT BUILDS ITSELF</div>
   <p class="engagement-note"><Fragment set:html={brief.availability} /> <span>·</span> <Fragment set:html={brief.terms} /></p>
 
   <div class="door-panel brief-panel" id="brief" style="margin-top:0;max-width:1100px">
-    <div class="dp-tag">Transmit · The brief</div>
-    <h3 id="brief-title">The Brief</h3>
+    <div class="dp-tag">Transmit · Engagement inquiry</div>
+    <h3 id="brief-title">Engagement Inquiry</h3>
 
     <div class="step-lbl">01 · Path</div>
     <div class="path-row">
@@ -28,7 +28,7 @@ const firm = profile.firm;
       </div>
     </div>
 
-    <div class="brief-empty" id="brief-empty">Select a path above and <b>the brief builds itself</b></div>
+    <div class="brief-empty" id="brief-empty">Select a path above and <b>the inquiry builds itself</b></div>
     <div class="cform" id="brief-form" style="display:none">
       <div class="step-lbl" style="margin-top:2px">02 · Parameters</div>
       <div class="fs" id="fs-w2">
@@ -66,18 +66,18 @@ const firm = profile.firm;
         <div><label>Company</label><input type="text" placeholder="COMPANY"></div>
         <div><label>Your role</label><input type="text" placeholder="ROLE / TITLE"></div>
       </div>
-      <div><label>The brief · anything the fields above did not cover</label>
+      <div><label>Additional context · anything the fields above did not cover</label>
       <textarea id="bmsg" placeholder=""></textarea></div>
       <button class="door primary" type="button" onclick="sendBrief()">Transmit · Receive the resume</button>
-      <p class="form-note">Submitting sends me the brief and sends <b>the ATS friendly resume (PDF)</b> to your email. I reply within one business day.</p>
+      <p class="form-note">Submitting sends me your inquiry and sends <b>the ATS friendly resume (PDF)</b> to your email. I reply within one business day.</p>
     </div>
     <div class="brief-success" id="brief-done">
       <div class="bs-code">Transmission received</div>
       <h4>Resume Inbound</h4>
-      <p>Check your inbox. The ATS friendly resume is on its way, and I will follow up on the brief within one business day. If it does not arrive, check spam or write me directly.</p>
+      <p>Check your inbox. The ATS friendly resume is on its way, and I will follow up on your inquiry within one business day. If it does not arrive, check spam or write me directly.</p>
       <div id="sched-wrap" style="display:none;margin-top:18px">
-        <p style="margin-bottom:12px">Your brief has <b style="color:var(--ac)">everything I need</b>. If you want to move fast, skip the email round trip and grab a time now.</p>
-        <a class="door primary" href="#" style="display:inline-block;text-decoration:none">Schedule the debrief · Pick a time</a>
+        <p style="margin-bottom:12px">Your inquiry has <b style="color:var(--ac)">everything I need</b>. If you want to move fast, skip the email round trip and grab a time now.</p>
+        <a class="door primary" href="#" style="display:inline-block;text-decoration:none">Schedule a call · Pick a time</a>
       </div>
     </div>
   </div>

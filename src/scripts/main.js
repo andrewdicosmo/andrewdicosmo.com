@@ -84,10 +84,10 @@
     document.getElementById('fs-c2c').classList.toggle('show',paths.c2c);
     const t=document.getElementById('brief-title');
     const m=document.getElementById('bmsg');
-    if(paths.w2&&paths.c2c){t.textContent='The Brief \u00b7 Hiring + Consulting';m.placeholder='The role or the problem, timeline, what you are building';}
-    else if(paths.w2){t.textContent='The Brief \u00b7 Hiring';m.placeholder='The role, the team, timeline, what you are building';}
-    else if(paths.c2c){t.textContent='The Brief \u00b7 Consulting';m.placeholder='The problem, scope, timeline, what you are building';}
-    else{t.textContent='The Brief';}
+    if(paths.w2&&paths.c2c){t.textContent='Engagement Inquiry \u00b7 Hiring + Consulting';m.placeholder='The role or the problem, timeline, what you are building';}
+    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Hiring';m.placeholder='The role, the team, timeline, what you are building';}
+    else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, what you are building';}
+    else{t.textContent='Engagement Inquiry';}
   }
   function startBrief(type){
     if(!paths[type])toggleDoor(type);
@@ -169,7 +169,7 @@
   });
 
   // ---- typewriter ----
-  const msg=(window.__SITE&&window.__SITE.typedBrief)||"MISSION BRIEF // READ ON";
+  const msg=(window.__SITE&&window.__SITE.typedBrief)||"MISSION STATUS // READ ON";
   const t=document.getElementById('typed');let ti=0;
   (function type(){ if(ti<=msg.length){t.textContent=msg.slice(0,ti++);setTimeout(type,34);} })();
 

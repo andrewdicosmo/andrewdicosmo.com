@@ -34,7 +34,7 @@ function formatOwnerBrief(lead, body) {
   const brief = clean(body.brief);
   const reqLink = clean(body.reqLink);
   const lines = [
-    'New AndrewDiCosmo.com brief',
+    'New AndrewDiCosmo.com inquiry',
     '',
     `Status: ${lead.complete ? 'Complete' : 'Partial'}`,
     paths ? `Path: ${paths}` : null,
@@ -63,7 +63,7 @@ function formatOwnerBrief(lead, body) {
     if (lead.attachmentBlob) lines.push(`Attachment stored: ${lead.attachmentBlob}`);
   }
 
-  if (brief) lines.push('', 'Brief', brief);
+  if (brief) lines.push('', 'Inquiry notes', brief);
 
   return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
 }
@@ -78,7 +78,7 @@ function formatSubmitterReply(lead, body) {
   const lines = [
     `Hi ${lead.name},`,
     '',
-    `Thanks for sending the brief${companyLine}. I attached my ATS friendly resume for easy forwarding and applicant tracking systems.`
+    `Thanks for sending the inquiry${companyLine}. I attached my ATS friendly resume for easy forwarding and applicant tracking systems.`
   ];
 
   if (paths.w2 && paths.c2c) {
@@ -96,7 +96,7 @@ function formatSubmitterReply(lead, body) {
     if (selectedPath) lines.push(`- Path: ${selectedPath}`);
     fields.forEach((field) => lines.push(`- ${field.label}: ${field.value}`));
     if (chips.length) lines.push(`- Work areas: ${chips.join(', ')}`);
-    if (hasBrief) lines.push('- Brief notes: received');
+    if (hasBrief) lines.push('- Additional notes: received');
   }
 
   if (lead.complete) {
@@ -112,7 +112,7 @@ function formatSubmitterReply(lead, body) {
 // POST /api/brief
 // Stores the lead, uploads any job-req attachment, emails the ATS resume to the
 // submitter, notifies the owner, and returns the scheduler URL for complete
-// briefs. Email prefers Azure Communication Services, matching InstaMapp's
+// inquiries. Email prefers Azure Communication Services, matching InstaMapp's
 // production pattern, with SendGrid retained as a fallback. Every external
 // dependency is env-driven; missing config degrades gracefully instead of
 // failing the visitor.
@@ -180,13 +180,13 @@ app.http('brief', {
         }
         const submitterMessage = {
           recipient: email,
-          subject: 'Resume attached, and thanks for the brief',
+          subject: 'Resume attached, and thanks for reaching out',
           text: formatSubmitterReply(lead, body),
           attachments: resumeAttachment ? [resumeAttachment] : []
         };
         const ownerMessage = to ? {
           recipient: to,
-          subject: `BRIEF · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
+          subject: `INQUIRY · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
           text: formatOwnerBrief(lead, body),
           attachments: []
         } : null;

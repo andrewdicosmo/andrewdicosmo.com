@@ -2,11 +2,11 @@
 
 # Mission Themed Resume Portfolio
 
-A mission-briefing style resume portfolio you can clone, personalize, and deploy
+A mission-themed resume portfolio you can clone, personalize, and deploy
 without placing your career history or contact details in the public code.
 
 <a href="https://andrewdicosmo.com" target="_blank" rel="noopener noreferrer">
-  <img src="docs/site-preview.gif" alt="Animated preview of the Andrew DiCosmo mission-themed resume portfolio: hero, satellite visualization, timeline, and contact brief." width="720">
+  <img src="docs/site-preview.gif" alt="Animated preview of the Andrew DiCosmo mission-themed resume portfolio: hero, satellite visualization, timeline, and contact inquiry." width="720">
 </a>
 
 [![Deploy status](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml/badge.svg)](https://github.com/andrewdicosmo/andrewdicosmo.com/actions/workflows/azure-swa.yml)
@@ -191,7 +191,7 @@ Your first customization is simple:
 | `timeline.json` | Career timeline entries. |
 | `sectors.json` | Industry or focus-area labels. |
 | `loadout.json` | Capability cards. |
-| `brief.json` | Contact form choices and booking link. |
+| `brief.json` | Contact inquiry choices and booking link. |
 | `sections/*.html` | Larger page sections and the visible copy. |
 | `assets/subject.webp` | Your profile image. |
 
