@@ -32,8 +32,6 @@ function validateInquiry(body = {}) {
   const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
   const specificChips = chips.filter((chip) => chip.toLowerCase() !== 'not sure yet');
   const attachmentData = clean(body.attachment?.data);
-  const hasAttachment = !!attachmentData && attachmentData.length < MAX_ATTACHMENT_DATA_LENGTH;
-  const hasRequirement = !!reqLink || hasAttachment;
   const hasContext = brief.length >= MIN_CONTEXT_LENGTH;
   const missing = [];
 
@@ -47,13 +45,13 @@ function validateInquiry(body = {}) {
     missing.push('Keep the job requirement attachment under 5 MB.');
   }
 
-  if (paths.w2 && !paths.c2c && !hasRequirement && !hasContext) {
-    missing.push('Supply a job requirement or at least 40 characters describing the hiring need.');
+  if (paths.w2 && !paths.c2c && !hasContext) {
+    missing.push('Describe the role or hiring need in at least 40 characters.');
   } else if (paths.c2c && !paths.w2) {
     if (!specificChips.length) missing.push('Select at least one specific work area.');
     if (!hasContext) missing.push('Describe the project in at least 40 characters.');
-  } else if (paths.w2 && paths.c2c && !hasRequirement && !hasContext) {
-    missing.push('Supply a job requirement or at least 40 characters describing the opportunity.');
+  } else if (paths.w2 && paths.c2c && !hasContext) {
+    missing.push('Describe the opportunity in at least 40 characters.');
   }
 
   return {

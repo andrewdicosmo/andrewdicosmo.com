@@ -22,14 +22,15 @@ test('accepts a W-2 inquiry with substantive context', () => {
   assert.deepEqual(result.missing, []);
 });
 
-test('accepts a W-2 inquiry with a valid job link instead of context', () => {
+test('still requires W-2 context when an optional job link is supplied', () => {
   const result = validateInquiry({
     ...common,
     paths: { w2: true },
     reqLink: 'https://example.com/jobs/senior-ai-engineer'
   });
 
-  assert.equal(result.valid, true);
+  assert.equal(result.valid, false);
+  assert.ok(result.missing.includes('Describe the role or hiring need in at least 40 characters.'));
 });
 
 test('rejects an insecure job link', () => {
@@ -54,7 +55,7 @@ test('rejects contact-only submissions even when complete is spoofed', () => {
   assert.equal(result.valid, false);
   assert.ok(result.missing.includes('Enter your company.'));
   assert.ok(result.missing.includes('Enter your role or title.'));
-  assert.ok(result.missing.some((item) => item.includes('Supply a job requirement')));
+  assert.ok(result.missing.includes('Describe the role or hiring need in at least 40 characters.'));
 });
 
 test('requires a specific work area and context for C2C inquiries', () => {
@@ -81,10 +82,22 @@ test('accepts a complete C2C inquiry', () => {
   assert.equal(result.valid, true);
 });
 
-test('accepts a combined inquiry with a valid attachment', () => {
+test('still requires context when an optional attachment is supplied', () => {
   const result = validateInquiry({
     ...common,
     paths: { w2: true, c2c: true },
+    attachment: { name: 'job.pdf', data: 'cGRm' }
+  });
+
+  assert.equal(result.valid, false);
+  assert.ok(result.missing.includes('Describe the opportunity in at least 40 characters.'));
+});
+
+test('accepts a combined inquiry with context and an optional attachment', () => {
+  const result = validateInquiry({
+    ...common,
+    paths: { w2: true, c2c: true },
+    brief: 'We are considering both a direct hire and consulting support for a production AI initiative.',
     attachment: { name: 'job.pdf', data: 'cGRm' }
   });
 

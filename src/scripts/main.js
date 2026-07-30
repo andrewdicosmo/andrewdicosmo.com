@@ -85,8 +85,8 @@
     const t=document.getElementById('brief-title');
     const m=document.getElementById('bmsg');
     const ml=document.getElementById('bmsg-label');
-    if(paths.w2&&paths.c2c){t.textContent='Engagement Inquiry \u00b7 Hiring + Consulting';m.placeholder='The role or problem, timeline, and what you are building';if(ml)ml.textContent='Opportunity context \u00b7 40+ characters unless a job req is supplied';}
-    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Hiring';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 40+ characters unless a job req is supplied';}
+    if(paths.w2&&paths.c2c){t.textContent='Engagement Inquiry \u00b7 Hiring + Consulting';m.placeholder='The role or problem, timeline, and what you are building';if(ml)ml.textContent='Opportunity context \u00b7 required \u00b7 40+ characters';}
+    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Hiring';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 required \u00b7 40+ characters';}
     else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, and what you are building';if(ml)ml.textContent='Project context \u00b7 required \u00b7 40+ characters';}
     else{t.textContent='Engagement Inquiry';}
   }
@@ -139,7 +139,6 @@
     if(linkValue){
       try{validLink=new URL(linkValue).protocol==='https:';}catch{validLink=false;}
     }
-    const hasReq=(!fileTooLarge&&!!file)||(!!linkValue&&validLink);
     const hasContext=context.length>=40;
 
     if(!paths.w2&&!paths.c2c)add('Select Hiring, Consulting, or both.');
@@ -150,15 +149,13 @@
     if(fileTooLarge)add('Keep the job requirement attachment under 5 MB.',reqWrap);
     if(!validLink)add('Enter a valid job requirement URL.',jrLink);
 
-    if(paths.w2&&!paths.c2c&&!hasReq&&!hasContext){
-      add('Supply a job requirement or at least 40 characters describing the hiring need.',msg);
-      if(reqWrap){reqWrap.classList.add('err');reqWrap.setAttribute('aria-invalid','true');}
+    if(paths.w2&&!paths.c2c&&!hasContext){
+      add('Describe the role or hiring need in at least 40 characters.',msg);
     }else if(paths.c2c&&!paths.w2){
       if(!specificChips.length)add('Select at least one specific work area.',workAreas);
       if(!hasContext)add('Describe the project in at least 40 characters.',msg);
-    }else if(paths.w2&&paths.c2c&&!hasReq&&!hasContext){
-      add('Supply a job requirement or at least 40 characters describing the opportunity.',msg);
-      if(reqWrap){reqWrap.classList.add('err');reqWrap.setAttribute('aria-invalid','true');}
+    }else if(paths.w2&&paths.c2c&&!hasContext){
+      add('Describe the opportunity in at least 40 characters.',msg);
     }
 
     showBriefErrors(errors);
