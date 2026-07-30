@@ -2,6 +2,8 @@ const { app } = require('@azure/functions');
 const { TableClient } = require('@azure/data-tables');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { EmailClient } = require('@azure/communication-email');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
@@ -18,6 +20,21 @@ function safeHttpsUrl(value) {
     return url.protocol === 'https:' ? url.href : '';
   } catch {
     return '';
+  }
+}
+
+function getEmailLogoAttachment() {
+  try {
+    return {
+      content: fs.readFileSync(path.join(__dirname, '../../assets/ad-monogram.png')).toString('base64'),
+      filename: 'ad-monogram.png',
+      type: 'image/png',
+      disposition: 'inline',
+      contentId: 'ad-monogram',
+      content_id: 'ad-monogram'
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -218,8 +235,17 @@ function formatSubmitterReplyHtml(lead, body, options = {}) {
           <table class="email-card" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #dfe7ee;border-radius:8px;overflow:hidden;">
             <tr>
               <td style="background:#16222b;padding:20px 26px;">
-                <div style="font-size:12px;line-height:1.4;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div>
-                <div style="font-size:24px;line-height:1.25;color:#ffffff;font-weight:800;margin-top:8px;">Thanks for reaching out</div>
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="68" style="width:68px;padding:0 14px 0 0;vertical-align:middle;">
+                      <img src="cid:ad-monogram" width="54" height="36" alt="AD" style="display:block;width:54px;height:36px;border:0;">
+                    </td>
+                    <td style="vertical-align:middle;">
+                      <div style="font-size:12px;line-height:1.4;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div>
+                      <div style="font-size:24px;line-height:1.25;color:#ffffff;font-weight:800;margin-top:6px;">Thanks for reaching out</div>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
             <tr>
@@ -324,6 +350,7 @@ app.http('brief', {
     if ((acs || sg) && from) {
       try {
         let resumeAttachment = null;
+        const emailLogoAttachment = getEmailLogoAttachment();
         if (process.env.RESUME_BLOB_URL) {
           const pdf = await fetch(process.env.RESUME_BLOB_URL);
           if (pdf.ok) resumeAttachment = {
@@ -339,7 +366,7 @@ app.http('brief', {
           html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
           replyTo,
           replyToName: senderName,
-          attachments: resumeAttachment ? [resumeAttachment] : []
+          attachments: compact([emailLogoAttachment, resumeAttachment])
         };
         const ownerMessage = to ? {
           recipient: to,
@@ -363,7 +390,8 @@ app.http('brief', {
               attachments: msg.attachments.map((a) => ({
                 name: a.filename,
                 contentType: a.type,
-                contentInBase64: a.content
+                contentInBase64: a.content,
+                contentId: a.contentId
               }))
             });
             await poller.pollUntilDone();
@@ -383,7 +411,13 @@ app.http('brief', {
                 { type: 'text/plain', value: msg.text },
                 msg.html ? { type: 'text/html', value: msg.html } : null
               ]),
-              attachments: msg.attachments
+              attachments: msg.attachments.map((a) => ({
+                content: a.content,
+                filename: a.filename,
+                type: a.type,
+                disposition: a.disposition,
+                content_id: a.content_id
+              }))
             })
           });
           await sendGrid(submitterMessage);
