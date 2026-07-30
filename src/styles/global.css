@@ -368,6 +368,11 @@
   .fgrid > div{display:flex;flex-direction:column}
   .f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .cform .err{border-color:#ff5b5b !important}
+  .pchips.err,.fattach.err{border:1px solid #ff5b5b;padding:8px}
+  .form-errors{border-left:3px solid #ff5b5b;background:rgba(255,91,91,.08);color:#ffd1d1;padding:11px 13px;font-size:10.5px;line-height:1.7;letter-spacing:.04em}
+  .form-errors[hidden]{display:none}
+  .form-errors b{display:block;color:#ff8a8a;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+  .form-errors ul{margin:0;padding-left:18px}
   .form-note{font-size:10.5px;color:var(--grey);letter-spacing:.05em;line-height:1.8;margin-top:2px}
   .form-note b{color:var(--ac)}
   .brief-success{display:none;padding:26px 0 8px}

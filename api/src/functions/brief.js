@@ -4,6 +4,7 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 const { EmailClient } = require('@azure/communication-email');
 const fs = require('node:fs');
 const path = require('node:path');
+const { validateInquiry } = require('../inquiry-validation');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
@@ -59,9 +60,7 @@ function formatOwnerSubject(lead, body) {
       : paths.c2c
         ? 'C2C'
         : '';
-  const inquiryType = lead.complete
-    ? engagement ? `${engagement} inquiry` : 'New inquiry'
-    : engagement ? `Partial ${engagement} inquiry` : 'Partial inquiry';
+  const inquiryType = engagement ? `${engagement} inquiry` : 'New inquiry';
   const name = cleanSubjectPart(lead.name);
   const company = cleanSubjectPart(lead.company);
   const role = cleanSubjectPart(lead.role);
@@ -91,7 +90,6 @@ function formatOwnerInquiry(lead, body) {
   const lines = [
     'New AndrewDiCosmo.com inquiry',
     '',
-    `Status: ${lead.complete ? 'Complete' : 'Partial'}`,
     paths ? `Path: ${paths}` : null,
     `Lead ID: ${lead.rowKey}`,
     '',
@@ -182,7 +180,7 @@ function formatOwnerInquiryHtml(lead, body) {
     </style>
   </head>
   <body style="margin:0;padding:0;background:#f4f7f9;font-family:Arial,Helvetica,sans-serif;color:#16222b;">
-    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">New ${lead.complete ? 'complete' : 'partial'} inquiry from ${escapeHtml(lead.name)}${lead.company ? ` at ${escapeHtml(lead.company)}` : ''}.</div>
+    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">New inquiry from ${escapeHtml(lead.name)}${lead.company ? ` at ${escapeHtml(lead.company)}` : ''}.</div>
     <table class="page-bg" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9;margin:0;padding:28px 12px;">
       <tr>
         <td align="center">
@@ -199,7 +197,7 @@ function formatOwnerInquiryHtml(lead, body) {
                       <div style="font-size:24px;line-height:1.25;color:#ffffff;font-weight:800;margin-top:6px;">New inquiry</div>
                     </td>
                     <td align="right" style="vertical-align:middle;">
-                      <span style="display:inline-block;padding:6px 9px;background:${lead.complete ? '#dff5e7' : '#fff0ce'};border-radius:4px;color:${lead.complete ? '#176438' : '#76540b'};font-size:11px;line-height:1.2;font-weight:800;text-transform:uppercase;">${lead.complete ? 'Complete' : 'Partial'}</span>
+                      <span style="display:inline-block;padding:6px 9px;background:#dff5e7;border-radius:4px;color:#176438;font-size:11px;line-height:1.2;font-weight:800;text-transform:uppercase;">Validated</span>
                     </td>
                   </tr>
                 </table>
@@ -260,9 +258,7 @@ function getSubmitterReplyModel(lead, body, options = {}) {
     opening = `Thanks for reaching out. ${attachmentMessage}`;
   }
 
-  if (!lead.complete) {
-    nextStep = 'I received the information submitted so far. If you would like a response, please reply to this email with the role or project details you want me to review.';
-  } else if (paths.w2 && paths.c2c) {
+  if (paths.w2 && paths.c2c) {
     nextStep = 'I will review the role and scope and respond personally within one business day.';
   } else if (paths.w2) {
     nextStep = 'I will review the role details and respond personally within one business day.';
@@ -285,7 +281,6 @@ function getSubmitterReplyModel(lead, body, options = {}) {
     opening,
     nextStep,
     summary,
-    complete: !!lead.complete,
     bookingUrl: safeHttpsUrl(options.bookingUrl),
     replyEmail: clean(options.replyEmail),
     linkedinUrl: safeHttpsUrl(options.linkedinUrl)
@@ -415,7 +410,7 @@ function formatSubmitterReplyHtml(lead, body, options = {}) {
 
 // POST /api/brief
 // Stores the lead, uploads any job-req attachment, emails the resume to the
-// submitter, notifies the owner, and returns the scheduler URL for complete
+// submitter, notifies the owner, and returns the scheduler URL for validated
 // inquiries. Email prefers Azure Communication Services, matching InstaMapp's
 // production pattern, with SendGrid retained as a fallback. Every external
 // dependency is env-driven; missing config degrades gracefully instead of
@@ -427,24 +422,32 @@ app.http('brief', {
     let body;
     try { body = await request.json(); } catch { return { status: 400, jsonBody: { ok: false, error: 'invalid json' } }; }
 
-    const email = String(body.email || '').trim();
-    const name = String(body.name || '').trim();
-    if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      return { status: 400, jsonBody: { ok: false, error: 'name and valid email required' } };
+    const validation = validateInquiry(body);
+    if (!validation.valid) {
+      return {
+        status: 400,
+        jsonBody: {
+          ok: false,
+          error: 'complete inquiry required',
+          missing: validation.missing
+        }
+      };
     }
+    body = { ...body, ...validation.normalized, complete: true };
+    const { name, email, company, role, paths, brief, reqLink, chips } = validation.normalized;
 
     const conn = process.env.STORAGE_CONNECTION_STRING;
     const lead = {
       partitionKey: 'lead',
       rowKey: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name, email,
-      company: String(body.company || ''), role: String(body.role || ''),
-      paths: JSON.stringify(body.paths || {}),
-      fields: JSON.stringify(body.fields || []),
-      chips: JSON.stringify(body.chips || []),
-      reqLink: String(body.reqLink || ''),
-      brief: String(body.brief || '').slice(0, 8000),
-      complete: !!body.complete,
+      company, role,
+      paths: JSON.stringify(paths),
+      fields: JSON.stringify(Array.isArray(body.fields) ? body.fields : []),
+      chips: JSON.stringify(chips),
+      reqLink,
+      brief,
+      complete: true,
       ua: request.headers.get('user-agent') || ''
     };
 
@@ -475,7 +478,7 @@ app.http('brief', {
     const replyTo = process.env.MAIL_REPLY_TO || to || from;
     const senderName = process.env.MAIL_FROM_NAME || 'Andrew DiCosmo';
     const submitterReplyOptions = {
-      bookingUrl: lead.complete ? process.env.BOOKINGS_URL : '',
+      bookingUrl: process.env.BOOKINGS_URL,
       replyEmail: replyTo,
       linkedinUrl: process.env.LINKEDIN_URL
     };
@@ -493,9 +496,7 @@ app.http('brief', {
         const submitterMessage = {
           recipient: email,
           recipientName: name,
-          subject: lead.complete
-            ? 'Andrew DiCosmo | Resume and next steps'
-            : 'Andrew DiCosmo | More details needed',
+          subject: 'Andrew DiCosmo | Resume and next steps',
           text: formatSubmitterReplyText(lead, body, submitterReplyOptions),
           html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
           replyTo,
@@ -561,6 +562,6 @@ app.http('brief', {
       } catch (e) { context.error('mail failed', e); }
     } else context.warn('Mail not configured; no mail sent');
 
-    return { jsonBody: { ok: true, bookingsUrl: lead.complete ? (process.env.BOOKINGS_URL || '') : '' } };
+    return { jsonBody: { ok: true, bookingsUrl: process.env.BOOKINGS_URL || '' } };
   }
 });

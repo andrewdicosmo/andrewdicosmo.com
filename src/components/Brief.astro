@@ -36,8 +36,8 @@ const firm = profile.firm;
           <div><label>W-2 compensation range</label>
           <select>{brief.salary.map(o => <option>{o}</option>)}</select></div>
           <div><label>Job req · link or attach · optional</label>
-          <div class="fattach">
-            <input type="url" placeholder="LINK TO THE JOB REQ">
+          <div class="fattach" id="job-requirement">
+            <input type="url" id="jr-link" placeholder="LINK TO THE JOB REQ">
             <input type="file" id="jrfile" accept=".pdf,.doc,.docx" style="display:none" onchange="jrPicked(this)">
             <button type="button" class="fbtn" id="jrbtn" onclick="document.getElementById('jrfile').click()">Attach PDF / DOC</button>
           </div></div>
@@ -51,7 +51,7 @@ const firm = profile.firm;
           <select>{brief.term.map(o => <option>{o}</option>)}</select></div>
         </div>
         <div style="margin-bottom:10px"><label>What kind of work · tap all that fit</label>
-        <div class="pchips">
+        <div class="pchips" id="work-areas">
           {brief.chips.map(c => <button type="button" class="pchip" onclick="this.classList.toggle('on')">{c}</button>)}
         </div></div>
         <div style="max-width:340px"><label>Where the project stands</label>
@@ -63,13 +63,14 @@ const firm = profile.firm;
         <div><label>Work email · required</label><input type="email" id="bemail" placeholder="EMAIL"></div>
       </div>
       <div class="f2">
-        <div><label>Company</label><input type="text" placeholder="COMPANY"></div>
-        <div><label>Your role</label><input type="text" placeholder="ROLE / TITLE"></div>
+        <div><label>Company · required</label><input type="text" id="bcompany" placeholder="COMPANY"></div>
+        <div><label>Your role · required</label><input type="text" id="brole" placeholder="ROLE / TITLE"></div>
       </div>
-      <div><label>Additional context · anything the fields above did not cover</label>
-      <textarea id="bmsg" placeholder=""></textarea></div>
+      <div><label id="bmsg-label">Additional context</label>
+      <textarea id="bmsg" minlength="40" placeholder=""></textarea></div>
+      <div class="form-errors" id="brief-errors" role="alert" hidden></div>
       <button class="door primary" type="button" onclick="sendBrief()">Transmit · Receive the resume</button>
-      <p class="form-note">Submitting sends me your inquiry and sends <b>the ATS friendly resume (PDF)</b> to your email. I reply within one business day.</p>
+      <p class="form-note">A complete inquiry sends me your details and sends <b>the resume (PDF)</b> to your email. I reply within one business day.</p>
     </div>
     <div class="brief-success" id="brief-done">
       <div class="bs-code">Transmission received</div>

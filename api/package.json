@@ -2,6 +2,9 @@
   "name": "mission-file-api",
   "version": "1.0.0",
   "main": "src/functions/*.js",
+  "scripts": {
+    "test": "node --test"
+  },
   "engines": { "node": "22.x" },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

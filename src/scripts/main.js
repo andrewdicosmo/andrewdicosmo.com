@@ -84,9 +84,10 @@
     document.getElementById('fs-c2c').classList.toggle('show',paths.c2c);
     const t=document.getElementById('brief-title');
     const m=document.getElementById('bmsg');
-    if(paths.w2&&paths.c2c){t.textContent='Engagement Inquiry \u00b7 Hiring + Consulting';m.placeholder='The role or the problem, timeline, what you are building';}
-    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Hiring';m.placeholder='The role, the team, timeline, what you are building';}
-    else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, what you are building';}
+    const ml=document.getElementById('bmsg-label');
+    if(paths.w2&&paths.c2c){t.textContent='Engagement Inquiry \u00b7 Hiring + Consulting';m.placeholder='The role or problem, timeline, and what you are building';if(ml)ml.textContent='Opportunity context \u00b7 40+ characters unless a job req is supplied';}
+    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Hiring';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 40+ characters unless a job req is supplied';}
+    else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, and what you are building';if(ml)ml.textContent='Project context \u00b7 required \u00b7 40+ characters';}
     else{t.textContent='Engagement Inquiry';}
   }
   function startBrief(type){
@@ -98,21 +99,80 @@
   document.querySelectorAll('[data-brief-path]').forEach(button=>{
     button.addEventListener('click',()=>startBrief(button.dataset.briefPath));
   });
-  function sendBrief(){
-    const name=document.getElementById('bname'), email=document.getElementById('bemail');
-    let ok=true;
-    name.classList.toggle('err',!name.value.trim()); if(!name.value.trim())ok=false;
-    const em=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value); email.classList.toggle('err',!em); if(!em)ok=false;
-    if(!ok)return;
-    const form=document.getElementById('brief-form');
-    const anySelect=[...form.querySelectorAll('select')].some(sel=>sel.selectedIndex>0);
-    const anyChip=form.querySelectorAll('.pchip.on').length>0;
-    const jrFile=document.getElementById('jrfile');
-    const jrLink=form.querySelector('input[type=url]');
-    const hasReq=(jrFile&&jrFile.files&&jrFile.files.length>0)||(jrLink&&jrLink.value.trim().length>5);
+  function showBriefErrors(messages){
+    const box=document.getElementById('brief-errors');
+    if(!box)return;
+    box.replaceChildren();
+    box.hidden=!messages.length;
+    if(!messages.length)return;
+    const title=document.createElement('b');
+    title.textContent='Complete the inquiry';
+    const list=document.createElement('ul');
+    messages.forEach(message=>{const item=document.createElement('li');item.textContent=message;list.appendChild(item);});
+    box.append(title,list);
+  }
+  function validateBrief(form){
+    form.querySelectorAll('.err').forEach(el=>{el.classList.remove('err');el.removeAttribute('aria-invalid');});
+    const errors=[];
+    let firstTarget=null;
+    const add=(message,target)=>{
+      errors.push(message);
+      if(target){target.classList.add('err');target.setAttribute('aria-invalid','true');if(!firstTarget)firstTarget=target;}
+    };
+    const name=document.getElementById('bname');
+    const email=document.getElementById('bemail');
+    const company=document.getElementById('bcompany');
+    const role=document.getElementById('brole');
     const msg=document.getElementById('bmsg');
-    const hasMsg=msg&&msg.value.trim().length>=20;
-    const complete=anySelect||anyChip||hasReq||hasMsg;
+    const jrFile=document.getElementById('jrfile');
+    const jrLink=document.getElementById('jr-link');
+    const reqWrap=document.getElementById('job-requirement');
+    const workAreas=document.getElementById('work-areas');
+    const selectedChips=[...form.querySelectorAll('.pchip.on')].map(c=>c.textContent.trim());
+    const specificChips=selectedChips.filter(chip=>chip.toLowerCase()!=='not sure yet');
+    const context=msg.value.trim();
+    const validEmail=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim());
+    const file=jrFile&&jrFile.files&&jrFile.files[0];
+    const fileTooLarge=!!(file&&file.size>=5*1024*1024);
+    const linkValue=(jrLink&&jrLink.value.trim())||'';
+    let validLink=!linkValue;
+    if(linkValue){
+      try{validLink=new URL(linkValue).protocol==='https:';}catch{validLink=false;}
+    }
+    const hasReq=(!fileTooLarge&&!!file)||(!!linkValue&&validLink);
+    const hasContext=context.length>=40;
+
+    if(!paths.w2&&!paths.c2c)add('Select Hiring, Consulting, or both.');
+    if(!name.value.trim())add('Enter your name.',name);
+    if(!validEmail)add('Enter a valid email address.',email);
+    if(!company.value.trim())add('Enter your company.',company);
+    if(!role.value.trim())add('Enter your role or title.',role);
+    if(fileTooLarge)add('Keep the job requirement attachment under 5 MB.',reqWrap);
+    if(!validLink)add('Enter a valid job requirement URL.',jrLink);
+
+    if(paths.w2&&!paths.c2c&&!hasReq&&!hasContext){
+      add('Supply a job requirement or at least 40 characters describing the hiring need.',msg);
+      if(reqWrap){reqWrap.classList.add('err');reqWrap.setAttribute('aria-invalid','true');}
+    }else if(paths.c2c&&!paths.w2){
+      if(!specificChips.length)add('Select at least one specific work area.',workAreas);
+      if(!hasContext)add('Describe the project in at least 40 characters.',msg);
+    }else if(paths.w2&&paths.c2c&&!hasReq&&!hasContext){
+      add('Supply a job requirement or at least 40 characters describing the opportunity.',msg);
+      if(reqWrap){reqWrap.classList.add('err');reqWrap.setAttribute('aria-invalid','true');}
+    }
+
+    showBriefErrors(errors);
+    if(firstTarget){
+      if(typeof firstTarget.focus==='function')firstTarget.focus({preventScroll:true});
+      firstTarget.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    return {ok:!errors.length,name,email,company,role,msg,jrFile,jrLink,selectedChips};
+  }
+  function sendBrief(){
+    const form=document.getElementById('brief-form');
+    const validation=validateBrief(form);
+    if(!validation.ok)return;
+    const {name,email,company,role,msg,jrFile,jrLink,selectedChips}=validation;
     const fields=[...form.querySelectorAll('select')]
       .filter(sel=>{
         const group=sel.closest('.fs');
@@ -122,17 +182,16 @@
     const payload={
       paths:{w2:paths.w2,c2c:paths.c2c},
       fields,
-      chips:[...form.querySelectorAll('.pchip.on')].map(c=>c.textContent),
+      chips:selectedChips,
       name:name.value.trim(), email:email.value.trim(),
-      company:(form.querySelector('input[placeholder="COMPANY"]')||{}).value||'',
-      role:(form.querySelector('input[placeholder="ROLE / TITLE"]')||{}).value||'',
-      reqLink:(jrLink&&jrLink.value.trim())||'', brief:(msg&&msg.value.trim())||'', complete
+      company:company.value.trim(), role:role.value.trim(),
+      reqLink:(jrLink&&jrLink.value.trim())||'', brief:(msg&&msg.value.trim())||''
     };
     const finish=(bookingsUrl)=>{
       const sw=document.getElementById('sched-wrap');
       // only offer the scheduler when a bookings page actually exists;
       // otherwise the anchor would point at "#" and go nowhere
-      sw.style.display=(complete&&bookingsUrl)?'block':'none';
+      sw.style.display=bookingsUrl?'block':'none';
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
@@ -141,9 +200,15 @@
     const send=(fileB64,fileName)=>{
       if(fileB64){payload.attachment={name:fileName,data:fileB64};}
       fetch((window.__SITE&&window.__SITE.apiEndpoint)||'/api/brief',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-        .then(r=>r.ok?r.json():Promise.reject(r.status))
+        .then(async r=>{
+          const data=await r.json().catch(()=>({}));
+          if(!r.ok){const error=new Error(data.error||'Submission failed');error.messages=data.missing;throw error;}
+          return data;
+        })
         .then(d=>finish(d&&d.bookingsUrl))
-        .catch(()=>finish((window.__SITE&&window.__SITE.bookingsUrl)||''));
+        .catch(error=>showBriefErrors(Array.isArray(error.messages)&&error.messages.length
+          ?error.messages
+          :['The inquiry could not be sent. Please review the fields and try again.']));
     };
     if(jrFile&&jrFile.files&&jrFile.files[0]&&jrFile.files[0].size<5*1024*1024){
       const rd=new FileReader();
