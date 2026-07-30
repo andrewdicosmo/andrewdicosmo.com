@@ -94,11 +94,11 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   let pathMessage;
 
   if (company && role) {
-    opening = `Thanks for reaching out about the ${role} opportunity at ${company}. I attached my resume for easy forwarding.`;
+    opening = `Thanks for reaching out regarding ${role} at ${company}. I attached my resume for easy forwarding.`;
   } else if (company) {
     opening = `Thanks for reaching out from ${company}. I attached my resume for easy forwarding.`;
   } else if (role) {
-    opening = `Thanks for reaching out about the ${role} opportunity. I attached my resume for easy forwarding.`;
+    opening = `Thanks for reaching out regarding ${role}. I attached my resume for easy forwarding.`;
   } else {
     opening = 'Thanks for reaching out. I attached my resume for easy forwarding.';
   }
