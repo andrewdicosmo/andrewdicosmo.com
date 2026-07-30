@@ -46,6 +46,29 @@ function formatPath(paths = {}) {
   return selected.length ? selected.join(' + ') : '';
 }
 
+function cleanSubjectPart(value) {
+  return clean(value).replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').slice(0, 80);
+}
+
+function formatOwnerSubject(lead, body) {
+  const paths = body.paths || {};
+  const engagement = paths.w2 && paths.c2c
+    ? 'W-2 + C2C'
+    : paths.w2
+      ? 'W-2'
+      : paths.c2c
+        ? 'C2C'
+        : '';
+  const inquiryType = lead.complete
+    ? engagement ? `${engagement} inquiry` : 'New inquiry'
+    : engagement ? `Partial ${engagement} inquiry` : 'Partial inquiry';
+  const name = cleanSubjectPart(lead.name);
+  const company = cleanSubjectPart(lead.company);
+  const role = cleanSubjectPart(lead.role);
+  const contact = company ? `${name} at ${company}` : name;
+  return compact([inquiryType, role, contact]).join(' | ').slice(0, 180);
+}
+
 function formatFields(fields = [], paths = {}) {
   const defaultValues = new Set(['Prefer to discuss', 'Not sure yet', 'Just an idea']);
   return fields
@@ -233,7 +256,7 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   }
 
   if (!lead.complete) {
-    nextStep = 'I will review what came through. If anything important was left out, reply directly to this email with the missing context.';
+    nextStep = 'I received the information submitted so far. If you would like a response, please reply to this email with the role or project details you want me to review.';
   } else if (paths.w2 && paths.c2c) {
     nextStep = 'I will review the role and scope and respond personally within one business day.';
   } else if (paths.w2) {
@@ -465,7 +488,9 @@ app.http('brief', {
         const submitterMessage = {
           recipient: email,
           recipientName: name,
-          subject: 'Andrew DiCosmo | Resume and next steps',
+          subject: lead.complete
+            ? 'Andrew DiCosmo | Resume and next steps'
+            : 'Andrew DiCosmo | More details needed',
           text: formatSubmitterReplyText(lead, body, submitterReplyOptions),
           html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
           replyTo,
@@ -474,7 +499,7 @@ app.http('brief', {
         };
         const ownerMessage = to ? {
           recipient: to,
-          subject: `INQUIRY · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
+          subject: formatOwnerSubject(lead, body),
           text: formatOwnerInquiry(lead, body),
           html: formatOwnerInquiryHtml(lead, body),
           replyTo: email,
