@@ -113,9 +113,15 @@
     const msg=document.getElementById('bmsg');
     const hasMsg=msg&&msg.value.trim().length>=20;
     const complete=anySelect||anyChip||hasReq||hasMsg;
+    const fields=[...form.querySelectorAll('select')]
+      .filter(sel=>{
+        const group=sel.closest('.fs');
+        return (!group||group.classList.contains('show'))&&sel.selectedIndex>0;
+      })
+      .map(sel=>({label:sel.closest('div')?.querySelector('label')?.textContent||'',value:sel.value}));
     const payload={
       paths:{w2:paths.w2,c2c:paths.c2c},
-      fields:[...form.querySelectorAll('select')].map(sel=>({label:sel.closest('div')?.querySelector('label')?.textContent||'',value:sel.value})),
+      fields,
       chips:[...form.querySelectorAll('.pchip.on')].map(c=>c.textContent),
       name:name.value.trim(), email:email.value.trim(),
       company:(form.querySelector('input[placeholder="COMPANY"]')||{}).value||'',

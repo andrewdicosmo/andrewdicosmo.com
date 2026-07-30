@@ -3,6 +3,71 @@ const { TableClient } = require('@azure/data-tables');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { EmailClient } = require('@azure/communication-email');
 
+const clean = (value) => String(value || '').trim();
+const compact = (items) => items.filter(Boolean);
+
+function formatPath(paths = {}) {
+  const selected = compact([
+    paths.w2 ? 'W-2 role' : '',
+    paths.c2c ? 'C2C consulting' : ''
+  ]);
+  return selected.length ? selected.join(' + ') : '';
+}
+
+function formatFields(fields = [], paths = {}) {
+  const defaultValues = new Set(['Prefer to discuss', 'Not sure yet', 'Just an idea']);
+  return fields
+    .map((field) => ({ label: clean(field.label), value: clean(field.value) }))
+    .filter((field) => {
+      if (!field.label || !field.value || defaultValues.has(field.value)) return false;
+      const label = field.label.toLowerCase();
+      if (!paths.w2 && label.includes('w-2')) return false;
+      if (!paths.c2c && (label.includes('budget') || label === 'term' || label.includes('project stands'))) return false;
+      return true;
+    });
+}
+
+function formatOwnerBrief(lead, body) {
+  const paths = formatPath(body.paths || {});
+  const fields = formatFields(body.fields || [], body.paths || {});
+  const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
+  const brief = clean(body.brief);
+  const reqLink = clean(body.reqLink);
+  const lines = [
+    'New AndrewDiCosmo.com brief',
+    '',
+    `Status: ${lead.complete ? 'Complete' : 'Partial'}`,
+    paths ? `Path: ${paths}` : null,
+    `Lead ID: ${lead.rowKey}`,
+    '',
+    'Contact',
+    `Name: ${lead.name}`,
+    `Email: ${lead.email}`,
+    clean(lead.company) ? `Company: ${clean(lead.company)}` : null,
+    clean(lead.role) ? `Role: ${clean(lead.role)}` : null
+  ];
+
+  if (fields.length) {
+    lines.push('', 'Preferences');
+    fields.forEach((field) => lines.push(`${field.label}: ${field.value}`));
+  }
+
+  if (chips.length) {
+    lines.push('', 'Work Areas');
+    chips.forEach((chip) => lines.push(`- ${chip}`));
+  }
+
+  if (reqLink || lead.attachmentBlob) {
+    lines.push('', 'Job Requirement');
+    if (reqLink) lines.push(`Link: ${reqLink}`);
+    if (lead.attachmentBlob) lines.push(`Attachment stored: ${lead.attachmentBlob}`);
+  }
+
+  if (brief) lines.push('', 'Brief', brief);
+
+  return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
+}
+
 // POST /api/brief
 // Stores the lead, uploads any job-req attachment, emails the ATS resume to the
 // submitter, notifies the owner, and returns the scheduler URL for complete
@@ -81,7 +146,7 @@ app.http('brief', {
         const ownerMessage = to ? {
           recipient: to,
           subject: `BRIEF · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
-          text: JSON.stringify(body, null, 2).slice(0, 20000),
+          text: formatOwnerBrief(lead, body),
           attachments: []
         } : null;
 
