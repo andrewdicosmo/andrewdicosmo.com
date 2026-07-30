@@ -220,7 +220,7 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   const company = clean(lead.company);
   const role = clean(lead.role);
   let opening;
-  let pathMessage;
+  let nextStep;
 
   if (company && role) {
     opening = `Thanks for reaching out regarding ${role} at ${company}. I attached my resume for easy forwarding.`;
@@ -232,14 +232,16 @@ function getSubmitterReplyModel(lead, body, options = {}) {
     opening = 'Thanks for reaching out. I attached my resume for easy forwarding.';
   }
 
-  if (paths.w2 && paths.c2c) {
-    pathMessage = 'I will review the role and scope, then follow up about the engagement path that best fits the work.';
+  if (!lead.complete) {
+    nextStep = 'I will review what came through. If anything important was left out, reply directly to this email with the missing context.';
+  } else if (paths.w2 && paths.c2c) {
+    nextStep = 'I will review the role and scope and respond personally within one business day.';
   } else if (paths.w2) {
-    pathMessage = 'I will review the role details and follow up about how my experience aligns with what you are building.';
+    nextStep = 'I will review the role details and respond personally within one business day.';
   } else if (paths.c2c) {
-    pathMessage = 'I will review the scope and follow up with an initial perspective on the work and next steps.';
+    nextStep = 'I will review the scope and respond personally within one business day.';
   } else {
-    pathMessage = 'I will review what you sent and follow up with the best next step.';
+    nextStep = 'I will review your message and respond personally within one business day.';
   }
 
   const summary = compact([
@@ -253,7 +255,7 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   return {
     name: lead.name,
     opening,
-    pathMessage,
+    nextStep,
     summary,
     complete: !!lead.complete,
     bookingUrl: safeHttpsUrl(options.bookingUrl),
@@ -270,18 +272,12 @@ function formatSubmitterReplyText(lead, body, options = {}) {
     reply.opening
   ];
 
-  lines.push('', reply.pathMessage);
-
   if (reply.summary.length) {
     lines.push('', 'Your inquiry summary:');
     reply.summary.forEach(([label, value]) => lines.push(`- ${label}: ${value}`));
   }
 
-  if (reply.complete) {
-    lines.push('', 'Thanks for sharing these details. I will review everything and respond personally within one business day.');
-  } else {
-    lines.push('', 'I will review what came through. If anything important was left out, reply directly to this email with the missing context.');
-  }
+  lines.push('', reply.nextStep);
 
   if (reply.bookingUrl) {
     lines.push('', 'Schedule a conversation:', reply.bookingUrl);
@@ -302,9 +298,6 @@ function formatSubmitterReplyHtml(lead, body, options = {}) {
                         <div class="body-copy" style="margin-top:3px;color:#16222b;font-size:14px;line-height:1.5;font-weight:700;">${escapeHtml(value)}</div>
                       </td>
                     </tr>`).join('');
-  const nextStep = reply.complete
-    ? 'Thanks for sharing these details. I will review everything and respond personally within one business day.'
-    : 'I will review what came through. If anything important was left out, reply directly to this email with the missing context.';
   const bookingButton = reply.bookingUrl
     ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                   <tr>
@@ -364,7 +357,6 @@ function formatSubmitterReplyHtml(lead, body, options = {}) {
               <td style="padding:26px;">
                 <p class="body-copy" style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">Hi ${escapeHtml(reply.name)},</p>
                 <p class="body-copy" style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">${escapeHtml(reply.opening)}</p>
-                <p class="muted" style="margin:0 0 22px;color:#364653;font-size:14px;line-height:1.7;">${escapeHtml(reply.pathMessage)}</p>
 
                 ${rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:3px solid #1e6f8f;margin:18px 0 22px;">
                   <tr>
@@ -374,7 +366,7 @@ function formatSubmitterReplyHtml(lead, body, options = {}) {
                 </table>` : ''}
 
                 <div class="callout" style="background:#eef6fa;border-left:4px solid #1e6f8f;padding:14px 16px;margin:0 0 22px;">
-                  <p class="body-copy" style="margin:0;color:#243540;font-size:14px;line-height:1.7;">${escapeHtml(nextStep)}</p>
+                  <p class="body-copy" style="margin:0;color:#243540;font-size:14px;line-height:1.7;">${escapeHtml(reply.nextStep)}</p>
                 </div>
 
                 ${bookingButton}
