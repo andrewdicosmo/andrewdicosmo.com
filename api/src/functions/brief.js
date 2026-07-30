@@ -68,6 +68,47 @@ function formatOwnerBrief(lead, body) {
   return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
 }
 
+function formatSubmitterReply(lead, body) {
+  const paths = body.paths || {};
+  const fields = formatFields(body.fields || [], paths);
+  const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
+  const hasBrief = !!clean(body.brief);
+  const selectedPath = formatPath(paths);
+  const companyLine = clean(lead.company) ? ` at ${clean(lead.company)}` : '';
+  const lines = [
+    `Hi ${lead.name},`,
+    '',
+    `Thanks for sending the brief${companyLine}. I attached my ATS friendly resume for easy forwarding and applicant tracking systems.`
+  ];
+
+  if (paths.w2 && paths.c2c) {
+    lines.push('', 'I saw that you selected both W-2 hiring and C2C consulting. I can discuss either path and will look at the role, scope, timeline, and team needs before recommending the cleanest fit.');
+  } else if (paths.w2) {
+    lines.push('', 'I saw that this is for a W-2 role. I will review the role details and follow up with how my AI engineering, computer vision, cloud, and security background maps to what you are hiring for.');
+  } else if (paths.c2c) {
+    lines.push('', 'I saw that this is for C2C consulting. I will review the scope and follow up with how I would approach the work, timeline, and next steps.');
+  } else {
+    lines.push('', 'I will review what you sent and follow up with the best next step.');
+  }
+
+  if (fields.length || chips.length || hasBrief) {
+    lines.push('', 'I received the useful details you provided');
+    if (selectedPath) lines.push(`- Path: ${selectedPath}`);
+    fields.forEach((field) => lines.push(`- ${field.label}: ${field.value}`));
+    if (chips.length) lines.push(`- Work areas: ${chips.join(', ')}`);
+    if (hasBrief) lines.push('- Brief notes: received');
+  }
+
+  if (lead.complete) {
+    lines.push('', 'This looks complete enough for me to respond without another intake round. I will follow up within one business day.');
+  } else {
+    lines.push('', 'If anything important was left out, you can reply directly to this email with the missing context. I will still review what came through.');
+  }
+
+  lines.push('', 'Thanks,', 'Andrew DiCosmo');
+  return lines.join('\n').slice(0, 12000);
+}
+
 // POST /api/brief
 // Stores the lead, uploads any job-req attachment, emails the ATS resume to the
 // submitter, notifies the owner, and returns the scheduler URL for complete
@@ -140,7 +181,7 @@ app.http('brief', {
         const submitterMessage = {
           recipient: email,
           subject: 'Resume attached, and thanks for the brief',
-          text: `${name},\n\nThe ATS friendly resume is attached. I read every brief personally and will follow up within one business day.\n\nAndrew`,
+          text: formatSubmitterReply(lead, body),
           attachments: resumeAttachment ? [resumeAttachment] : []
         };
         const ownerMessage = to ? {
