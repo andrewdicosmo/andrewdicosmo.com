@@ -242,6 +242,9 @@ Set these values in Azure Static Web Apps, never in this repository:
 | `RESUME_BLOB_URL` | The protected web address of the resume PDF sent to the visitor. |
 | `BOOKINGS_URL` | The booking link returned after a complete request. |
 | `MAIL_TO` | The address that receives the owner notification. |
+| `MAIL_REPLY_TO` | Optional reply address for visitor emails. Defaults to `MAIL_TO`, then the sending address. |
+| `MAIL_FROM_NAME` | Optional sender display name. Defaults to `Andrew DiCosmo`. |
+| `LINKEDIN_URL` | Optional LinkedIn profile shown in the visitor email footer. |
 
 Choose one email provider:
 

@@ -12,6 +12,15 @@ const escapeHtml = (value) => String(value || '')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+function safeHttpsUrl(value) {
+  try {
+    const url = new URL(clean(value));
+    return url.protocol === 'https:' ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
 function formatPath(paths = {}) {
   const selected = compact([
     paths.w2 ? 'W-2 role' : '',
@@ -74,21 +83,32 @@ function formatOwnerInquiry(lead, body) {
   return lines.filter((line) => line !== null && line !== undefined).join('\n').slice(0, 20000);
 }
 
-function getSubmitterReplyModel(lead, body) {
+function getSubmitterReplyModel(lead, body, options = {}) {
   const paths = body.paths || {};
   const fields = formatFields(body.fields || [], paths);
   const chips = Array.isArray(body.chips) ? body.chips.map(clean).filter(Boolean) : [];
-  const hasNotes = !!clean(body.brief);
   const selectedPath = formatPath(paths);
-  const companyLine = clean(lead.company) ? ` from ${clean(lead.company)}` : '';
+  const company = clean(lead.company);
+  const role = clean(lead.role);
+  let opening;
   let pathMessage;
 
+  if (company && role) {
+    opening = `Thanks for reaching out about the ${role} opportunity at ${company}. I attached my resume for easy forwarding.`;
+  } else if (company) {
+    opening = `Thanks for reaching out from ${company}. I attached my resume for easy forwarding.`;
+  } else if (role) {
+    opening = `Thanks for reaching out about the ${role} opportunity. I attached my resume for easy forwarding.`;
+  } else {
+    opening = 'Thanks for reaching out. I attached my resume for easy forwarding.';
+  }
+
   if (paths.w2 && paths.c2c) {
-    pathMessage = 'I saw that you selected both W-2 hiring and C2C consulting. I can discuss either path and will look at the role, scope, timeline, and team needs before recommending the cleanest fit.';
+    pathMessage = 'I will review the role and scope, then follow up about the engagement path that best fits the work.';
   } else if (paths.w2) {
-    pathMessage = 'I saw that this is for a W-2 role. I will review the role details and follow up with how my AI engineering, computer vision, cloud, and security background maps to what you are hiring for.';
+    pathMessage = 'I will review the role details and follow up about how my experience aligns with what you are building.';
   } else if (paths.c2c) {
-    pathMessage = 'I saw that this is for C2C consulting. I will review the scope and follow up with how I would approach the work, timeline, and next steps.';
+    pathMessage = 'I will review the scope and follow up with an initial perspective on the work and next steps.';
   } else {
     pathMessage = 'I will review what you sent and follow up with the best next step.';
   }
@@ -98,63 +118,104 @@ function getSubmitterReplyModel(lead, body) {
     clean(lead.company) ? ['Company', clean(lead.company)] : null,
     clean(lead.role) ? ['Role or title', clean(lead.role)] : null,
     ...fields.map((field) => [field.label, field.value]),
-    chips.length ? ['Focus areas', chips.join(', ')] : null,
-    hasNotes ? ['Additional context', 'Received'] : null
+    chips.length ? ['Focus areas', chips.join(', ')] : null
   ]);
 
   return {
     name: lead.name,
-    companyLine,
+    opening,
     pathMessage,
     summary,
-    complete: !!lead.complete
+    complete: !!lead.complete,
+    bookingUrl: safeHttpsUrl(options.bookingUrl),
+    replyEmail: clean(options.replyEmail),
+    linkedinUrl: safeHttpsUrl(options.linkedinUrl)
   };
 }
 
-function formatSubmitterReplyText(lead, body) {
-  const reply = getSubmitterReplyModel(lead, body);
+function formatSubmitterReplyText(lead, body, options = {}) {
+  const reply = getSubmitterReplyModel(lead, body, options);
   const lines = [
     `Hi ${reply.name},`,
     '',
-    `Thanks for reaching out${reply.companyLine}. I attached my resume for easy forwarding.`
+    reply.opening
   ];
 
   lines.push('', reply.pathMessage);
 
   if (reply.summary.length) {
-    lines.push('', 'I received:');
+    lines.push('', 'Your inquiry summary:');
     reply.summary.forEach(([label, value]) => lines.push(`- ${label}: ${value}`));
   }
 
   if (reply.complete) {
-    lines.push('', 'This looks complete enough for me to respond without another intake round. I will follow up within one business day.');
+    lines.push('', 'Thanks for sharing these details. I will review everything and respond personally within one business day.');
   } else {
-    lines.push('', 'If anything important was left out, you can reply directly to this email with the missing context. I will still review what came through.');
+    lines.push('', 'I will review what came through. If anything important was left out, reply directly to this email with the missing context.');
   }
 
-  lines.push('', 'Thanks,', 'Andrew DiCosmo');
+  if (reply.bookingUrl) {
+    lines.push('', 'Schedule a conversation:', reply.bookingUrl);
+  }
+
+  lines.push('', 'Thanks,', 'Andrew DiCosmo', 'https://andrewdicosmo.com');
+  if (reply.replyEmail) lines.push(reply.replyEmail);
+  if (reply.linkedinUrl) lines.push(reply.linkedinUrl);
   return lines.join('\n').slice(0, 12000);
 }
 
-function formatSubmitterReplyHtml(lead, body) {
-  const reply = getSubmitterReplyModel(lead, body);
+function formatSubmitterReplyHtml(lead, body, options = {}) {
+  const reply = getSubmitterReplyModel(lead, body, options);
   const rows = reply.summary.map(([label, value]) => `
                     <tr>
-                      <td style="padding:10px 0;color:#66727c;font-size:13px;line-height:1.4;width:38%;border-bottom:1px solid #e7edf2;">${escapeHtml(label)}</td>
-                      <td style="padding:10px 0;color:#16222b;font-size:13px;line-height:1.4;font-weight:700;border-bottom:1px solid #e7edf2;">${escapeHtml(value)}</td>
+                      <td class="summary-row" style="padding:11px 0;border-bottom:1px solid #e7edf2;">
+                        <div class="muted" style="color:#66727c;font-size:12px;line-height:1.4;text-transform:uppercase;letter-spacing:0.6px;">${escapeHtml(label)}</div>
+                        <div class="body-copy" style="margin-top:3px;color:#16222b;font-size:14px;line-height:1.5;font-weight:700;">${escapeHtml(value)}</div>
+                      </td>
                     </tr>`).join('');
   const nextStep = reply.complete
-    ? 'This looks complete enough for me to respond without another intake round. I will follow up within one business day.'
-    : 'If anything important was left out, you can reply directly to this email with the missing context. I will still review what came through.';
+    ? 'Thanks for sharing these details. I will review everything and respond personally within one business day.'
+    : 'I will review what came through. If anything important was left out, reply directly to this email with the missing context.';
+  const bookingButton = reply.bookingUrl
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+                  <tr>
+                    <td style="background:#1e6f8f;border-radius:5px;">
+                      <a href="${escapeHtml(reply.bookingUrl)}" style="display:inline-block;padding:13px 20px;color:#ffffff;text-decoration:none;font-size:14px;line-height:1.2;font-weight:700;">Schedule a conversation</a>
+                    </td>
+                  </tr>
+                </table>`
+    : '';
+  const replyEmail = reply.replyEmail
+    ? ` &nbsp;·&nbsp; <a href="mailto:${escapeHtml(reply.replyEmail)}" style="color:#456575;text-decoration:underline;">${escapeHtml(reply.replyEmail)}</a>`
+    : '';
+  const linkedinLink = reply.linkedinUrl
+    ? ` &nbsp;·&nbsp; <a href="${escapeHtml(reply.linkedinUrl)}" style="color:#456575;text-decoration:underline;">LinkedIn</a>`
+    : '';
 
   return `<!doctype html>
 <html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .page-bg { background: #10171c !important; }
+        .email-card { background: #182229 !important; border-color: #33434e !important; }
+        .body-copy { color: #f2f6f8 !important; }
+        .muted { color: #b2c0c9 !important; }
+        .summary-row { border-color: #33434e !important; }
+        .callout { background: #21343e !important; }
+        .footer-copy, .footer-copy a { color: #b2c0c9 !important; }
+      }
+    </style>
+  </head>
   <body style="margin:0;padding:0;background:#f4f7f9;font-family:Arial,Helvetica,sans-serif;color:#16222b;">
-    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Resume attached. I received your inquiry and will follow up within one business day.</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9;margin:0;padding:28px 12px;">
+    <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Andrew DiCosmo's resume is attached. I will review your inquiry and follow up personally.</div>
+    <table class="page-bg" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9;margin:0;padding:28px 12px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #dfe7ee;border-radius:12px;overflow:hidden;">
+          <table class="email-card" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #dfe7ee;border-radius:8px;overflow:hidden;">
             <tr>
               <td style="background:#16222b;padding:20px 26px;">
                 <div style="font-size:12px;line-height:1.4;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div>
@@ -163,22 +224,27 @@ function formatSubmitterReplyHtml(lead, body) {
             </tr>
             <tr>
               <td style="padding:26px;">
-                <p style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">Hi ${escapeHtml(reply.name)},</p>
-                <p style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">Thanks for reaching out${escapeHtml(reply.companyLine)}. I attached my resume for easy forwarding.</p>
-                <p style="margin:0 0 22px;color:#364653;font-size:14px;line-height:1.7;">${escapeHtml(reply.pathMessage)}</p>
+                <p class="body-copy" style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">Hi ${escapeHtml(reply.name)},</p>
+                <p class="body-copy" style="margin:0 0 16px;color:#16222b;font-size:15px;line-height:1.7;">${escapeHtml(reply.opening)}</p>
+                <p class="muted" style="margin:0 0 22px;color:#364653;font-size:14px;line-height:1.7;">${escapeHtml(reply.pathMessage)}</p>
 
                 ${rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:3px solid #1e6f8f;margin:18px 0 22px;">
                   <tr>
-                    <td colspan="2" style="padding:14px 0 4px;color:#16222b;font-size:12px;line-height:1.4;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;">I received</td>
+                    <td class="body-copy" style="padding:14px 0 4px;color:#16222b;font-size:12px;line-height:1.4;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;">Your inquiry summary</td>
                   </tr>
                   ${rows}
                 </table>` : ''}
 
-                <div style="background:#eef6fa;border-left:4px solid #1e6f8f;padding:14px 16px;margin:0 0 22px;">
-                  <p style="margin:0;color:#243540;font-size:14px;line-height:1.7;">${escapeHtml(nextStep)}</p>
+                <div class="callout" style="background:#eef6fa;border-left:4px solid #1e6f8f;padding:14px 16px;margin:0 0 22px;">
+                  <p class="body-copy" style="margin:0;color:#243540;font-size:14px;line-height:1.7;">${escapeHtml(nextStep)}</p>
                 </div>
 
-                <p style="margin:0;color:#16222b;font-size:15px;line-height:1.7;">Thanks,<br><strong>Andrew DiCosmo</strong></p>
+                ${bookingButton}
+
+                <p class="body-copy" style="margin:0 0 20px;color:#16222b;font-size:15px;line-height:1.7;">Thanks,<br><strong>Andrew DiCosmo</strong></p>
+                <p class="footer-copy" style="margin:0;padding-top:16px;border-top:1px solid #e7edf2;color:#66727c;font-size:12px;line-height:1.7;">
+                  <a href="https://andrewdicosmo.com" style="color:#456575;text-decoration:underline;">AndrewDiCosmo.com</a>${replyEmail}${linkedinLink}
+                </p>
               </td>
             </tr>
           </table>
@@ -248,6 +314,13 @@ app.http('brief', {
     const sg = process.env.SENDGRID_API_KEY;
     const from = process.env.EMAIL_SENDER_ADDRESS || process.env.MAIL_FROM;
     const to = process.env.MAIL_TO;
+    const replyTo = process.env.MAIL_REPLY_TO || to || from;
+    const senderName = process.env.MAIL_FROM_NAME || 'Andrew DiCosmo';
+    const submitterReplyOptions = {
+      bookingUrl: lead.complete ? process.env.BOOKINGS_URL : '',
+      replyEmail: replyTo,
+      linkedinUrl: process.env.LINKEDIN_URL
+    };
     if ((acs || sg) && from) {
       try {
         let resumeAttachment = null;
@@ -260,15 +333,20 @@ app.http('brief', {
         }
         const submitterMessage = {
           recipient: email,
-          subject: 'Resume attached, and thanks for reaching out',
-          text: formatSubmitterReplyText(lead, body),
-          html: formatSubmitterReplyHtml(lead, body),
+          recipientName: name,
+          subject: 'Andrew DiCosmo | Resume and next steps',
+          text: formatSubmitterReplyText(lead, body, submitterReplyOptions),
+          html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
+          replyTo,
+          replyToName: senderName,
           attachments: resumeAttachment ? [resumeAttachment] : []
         };
         const ownerMessage = to ? {
           recipient: to,
           subject: `INQUIRY · ${name}${lead.company ? ' · ' + lead.company : ''}${lead.complete ? ' · COMPLETE' : ''}`,
           text: formatOwnerInquiry(lead, body),
+          replyTo: email,
+          replyToName: name,
           attachments: []
         } : null;
 
@@ -280,7 +358,8 @@ app.http('brief', {
               content: msg.html
                 ? { subject: msg.subject, plainText: msg.text, html: msg.html }
                 : { subject: msg.subject, plainText: msg.text },
-              recipients: { to: [{ address: msg.recipient }] },
+              recipients: { to: [{ address: msg.recipient, displayName: msg.recipientName }] },
+              replyTo: msg.replyTo ? [{ address: msg.replyTo, displayName: msg.replyToName }] : undefined,
               attachments: msg.attachments.map((a) => ({
                 name: a.filename,
                 contentType: a.type,
@@ -296,8 +375,9 @@ app.http('brief', {
             method: 'POST',
             headers: { Authorization: `Bearer ${sg}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              personalizations: [{ to: [{ email: msg.recipient }] }],
-              from: { email: from },
+              personalizations: [{ to: [{ email: msg.recipient, name: msg.recipientName }] }],
+              from: { email: from, name: senderName },
+              reply_to: msg.replyTo ? { email: msg.replyTo, name: msg.replyToName } : undefined,
               subject: msg.subject,
               content: compact([
                 { type: 'text/plain', value: msg.text },
