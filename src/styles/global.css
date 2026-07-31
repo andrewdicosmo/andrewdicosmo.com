@@ -70,6 +70,9 @@
   .door:hover{border-color:var(--ac);color:var(--ac)}
   .door.primary{background:var(--ac);border-color:var(--ac);color:var(--bg)}
   .door.primary:hover{filter:brightness(1.2)}
+  .leadership-strip{grid-column:1 / -1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--faint);background:var(--panel)}
+  .leadership-strip span{display:flex;align-items:center;justify-content:center;min-height:52px;padding:11px 14px;border-right:1px solid var(--faint);color:var(--ac);font-size:9.5px;font-weight:700;line-height:1.55;letter-spacing:.12em;text-align:center;text-transform:uppercase}
+  .leadership-strip span:last-child{border-right:0}
 
   /* ============ PANELS (shared by both animations) ============ */
   .scene-wrap{border:1px solid var(--faint);background:var(--panel);position:relative}
@@ -150,6 +153,7 @@
   .proof-card p{font-size:12.5px;line-height:1.85;color:var(--grey)}
   .proof-card p b,.proof-footer b{color:var(--white);font-weight:600}
   .proof-footer{margin-top:18px;max-width:820px;font-size:10.5px;line-height:1.8;letter-spacing:.07em;color:var(--ac)}
+  .leadership{background:color-mix(in srgb,var(--panel) 45%,var(--bg))}
 
   /* ============ TIMELINE ============ */
   .tl{position:relative;padding:72px 6vw 84px}
@@ -198,13 +202,13 @@
 
   /* ============ CAPABILITIES ============ */
   .caps{padding:72px 6vw 78px}
-  .cap-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;max-width:1200px}
+  .cap-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:1200px}
   .cap{border:1px solid var(--faint);background:var(--panel);padding:20px 18px;opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
   .cap.vis{opacity:1;transform:none}
   .cap-code{font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.2em;text-transform:uppercase}
   .cap h4{font-family:var(--disp);font-weight:700;font-size:17px;text-transform:uppercase;margin:8px 0 12px}
   .cap .chips{margin-top:0}
-  @media (max-width:1180px){.cap-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-width:900px}.cap{padding:20px 22px}}
+  @media (max-width:1180px){.cap-grid{max-width:900px}.cap{padding:20px 22px}}
 
   /* sector coverage matrix */
   .sectors-section .sec-sub{margin-bottom:12px}
@@ -322,7 +326,7 @@
   .engagement-note{max-width:860px;margin:-22px 0 24px;font-size:11px;line-height:1.8;letter-spacing:.06em;color:var(--grey)}
   .engagement-note b{color:var(--ac);font-weight:600}
   .engagement-note span{color:var(--ac-dim);margin:0 5px}
-  .path-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 16px}
+  .path-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 16px}
   .pathcard{border:1px solid var(--faint);background:var(--bg);padding:20px 22px;cursor:pointer;user-select:none;position:relative;transition:all .18s ease}
   .pathcard:hover{border-color:var(--ac-dim)}
   .pathcard.sel{border-color:var(--ac);background:color-mix(in srgb, var(--ac) 6%, var(--bg))}
@@ -406,6 +410,10 @@
 
   @media (max-width:900px){
     .hero{grid-template-columns:1fr;padding-top:90px}
+    .leadership-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .leadership-strip span:nth-child(even){border-right:0}
+    .leadership-strip span{border-bottom:1px solid var(--faint)}
+    .leadership-strip span:last-child{grid-column:1 / -1;border-bottom:0}
     .demo-grid{grid-template-columns:1fr}
     .dc-grid{grid-template-columns:1fr}
   }
@@ -423,6 +431,9 @@
     .dossier-row{gap:14px;align-items:center}
     .subject{width:96px;padding:7px}
     .dossier{font-size:12px;line-height:1.75;letter-spacing:.02em}
+    .leadership-strip{grid-template-columns:1fr}
+    .leadership-strip span,.leadership-strip span:nth-child(even){min-height:44px;border-right:0;border-bottom:1px solid var(--faint);font-size:8.5px}
+    .leadership-strip span:last-child{grid-column:auto;border-bottom:0}
     .availability-module{width:100%;align-items:flex-start;gap:8px;margin-top:12px}
     .status-rail{flex:0 0 auto;flex-direction:column;gap:5px}
     .status-pill{font-size:8px;padding:5px 7px}

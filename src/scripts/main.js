@@ -162,29 +162,34 @@
     el.classList.remove('hl');void el.offsetWidth;el.classList.add('hl');
   }
   window.goDoor=goDoor;
-  const paths={w2:false,c2c:false};
+  const paths={w2:false,c2c:false,cto:false};
   function toggleDoor(k){
+    if(!(k in paths))return;
     paths[k]=!paths[k];
-    const d=document.getElementById(k==='w2'?'door-hire':'door-firm');
+    const ids={w2:'door-hire',c2c:'door-firm',cto:'door-leadership'};
+    const d=document.getElementById(ids[k]);
     d.classList.toggle('sel',paths[k]);
     d.setAttribute('aria-pressed',paths[k]);
     document.getElementById('dsel-'+k).textContent=paths[k]?'Selected':'Tap to select';
-    if(window.__track)window.__track('engagement_path_toggle',{path:k,selected:paths[k],w2:paths.w2,c2c:paths.c2c});
+    if(window.__track)window.__track('engagement_path_toggle',{path:k,selected:paths[k],w2:paths.w2,c2c:paths.c2c,cto:paths.cto});
     buildBrief();
   }
   window.toggleDoor=toggleDoor;
   function buildBrief(){
-    const any=paths.w2||paths.c2c;
+    const any=paths.w2||paths.c2c||paths.cto;
     document.getElementById('brief-empty').style.display=any?'none':'block';
     document.getElementById('brief-form').style.display=any?'flex':'none';
     document.getElementById('fs-w2').classList.toggle('show',paths.w2);
     document.getElementById('fs-c2c').classList.toggle('show',paths.c2c);
+    document.getElementById('fs-cto').classList.toggle('show',paths.cto);
     const t=document.getElementById('brief-title');
     const m=document.getElementById('bmsg');
     const ml=document.getElementById('bmsg-label');
-    if(paths.w2&&paths.c2c){t.textContent='Engagement Inquiry \u00b7 Hiring + Consulting';m.placeholder='The role or problem, timeline, and what you are building';if(ml)ml.textContent='Opportunity context \u00b7 required \u00b7 40+ characters';}
-    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Hiring';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 required \u00b7 40+ characters';}
+    const selected=[paths.w2?'Full-Time':'',paths.c2c?'Consulting':'',paths.cto?'Technology Leadership':''].filter(Boolean);
+    if(selected.length>1){t.textContent='Engagement Inquiry \u00b7 '+selected.join(' + ');m.placeholder='The role or mandate, priorities, timeline, and what you need to accomplish';if(ml)ml.textContent='Opportunity context \u00b7 required \u00b7 40+ characters';}
+    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Full-Time';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 required \u00b7 40+ characters';}
     else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, and what you are building';if(ml)ml.textContent='Project context \u00b7 required \u00b7 40+ characters';}
+    else if(paths.cto){t.textContent='Engagement Inquiry \u00b7 Technology Leadership';m.placeholder='The leadership mandate, team, priorities, timeline, and preferred working arrangement';if(ml)ml.textContent='Leadership context \u00b7 required \u00b7 40+ characters';}
     else{t.textContent='Engagement Inquiry';}
   }
   function startBrief(type){
@@ -239,7 +244,7 @@
     }
     const hasContext=context.length>=40;
 
-    if(!paths.w2&&!paths.c2c)add('Select Hiring, Consulting, or both.');
+    if(!paths.w2&&!paths.c2c&&!paths.cto)add('Select Full-Time, Consulting, Technology Leadership, or a combination.');
     if(!name.value.trim())add('Enter your name.',name);
     if(!validEmail)add('Enter a valid email address.',email);
     if(!company.value.trim())add('Enter your company.',company);
@@ -247,17 +252,20 @@
     if(fileTooLarge)add('Keep the job requirement attachment under 5 MB.',reqWrap);
     if(!validLink)add('Enter a valid job requirement URL.',jrLink);
 
-    if(paths.w2&&!paths.c2c&&!hasContext){
+    const selectedPathCount=Number(paths.w2)+Number(paths.c2c)+Number(paths.cto);
+    if(paths.w2&&selectedPathCount===1&&!hasContext){
       add('Describe the role or hiring need in at least 40 characters.',msg);
-    }else if(paths.c2c&&!paths.w2){
+    }else if(paths.c2c&&selectedPathCount===1){
       if(!specificChips.length)add('Select at least one specific work area.',workAreas);
       if(!hasContext)add('Describe the project in at least 40 characters.',msg);
-    }else if(paths.w2&&paths.c2c&&!hasContext){
+    }else if(paths.cto&&selectedPathCount===1&&!hasContext){
+      add('Describe the technology leadership need in at least 40 characters.',msg);
+    }else if(selectedPathCount>1&&!hasContext){
       add('Describe the opportunity in at least 40 characters.',msg);
     }
 
     showBriefErrors(errors);
-    if(errors.length&&window.__track)window.__track('inquiry_validation_failed',{w2:paths.w2,c2c:paths.c2c,errorCount:errors.length});
+    if(errors.length&&window.__track)window.__track('inquiry_validation_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,errorCount:errors.length});
     if(firstTarget){
       if(typeof firstTarget.focus==='function')firstTarget.focus({preventScroll:true});
       firstTarget.scrollIntoView({behavior:'smooth',block:'center'});
@@ -276,7 +284,7 @@
       })
       .map(sel=>({label:sel.closest('div')?.querySelector('label')?.textContent||'',value:sel.value}));
     const payload={
-      paths:{w2:paths.w2,c2c:paths.c2c},
+      paths:{w2:paths.w2,c2c:paths.c2c,cto:paths.cto},
       fields,
       chips:selectedChips,
       name:name.value.trim(), email:email.value.trim(),
@@ -292,12 +300,12 @@
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
-      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,hasBookingUrl:!!bookingsUrl});
+      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasBookingUrl:!!bookingsUrl});
       goDoor('brief');
     };
     const send=(fileB64,fileName)=>{
       if(fileB64){payload.attachment={name:fileName,data:fileB64};}
-      if(window.__track)window.__track('inquiry_submit_attempt',{w2:paths.w2,c2c:paths.c2c,hasAttachment:!!fileB64,hasJobLink:!!payload.reqLink});
+      if(window.__track)window.__track('inquiry_submit_attempt',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasAttachment:!!fileB64,hasJobLink:!!payload.reqLink});
       fetch((window.__SITE&&window.__SITE.apiEndpoint)||'/api/brief',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
         .then(async r=>{
           const data=await r.json().catch(()=>({}));
@@ -306,7 +314,7 @@
         })
         .then(d=>finish(d&&d.bookingsUrl))
         .catch(error=>{
-          if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
+          if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
           showBriefErrors(Array.isArray(error.messages)&&error.messages.length
             ?error.messages
             :['The inquiry could not be sent. Please review the fields and try again.']);

@@ -5,7 +5,7 @@ const firm = profile.firm;
 ---
 <section class="contact" id="contact">
   <h2 class="sec-title">Choose Your <span>Engagement</span></h2>
-  <div class="sec-sub">ONE INQUIRY · SELECT A PATH, OR BOTH, AND IT BUILDS ITSELF</div>
+  <div class="sec-sub">ONE INQUIRY · SELECT ONE OR MORE PATHS, AND IT BUILDS ITSELF</div>
   <p class="engagement-note"><Fragment set:html={brief.availability} /> <span>·</span> <Fragment set:html={brief.terms} /></p>
 
   <div class="door-panel brief-panel" id="brief" style="margin-top:0;max-width:1100px">
@@ -16,15 +16,21 @@ const firm = profile.firm;
     <div class="path-row">
       <div class="pathcard" id="door-hire" onclick="toggleDoor('w2')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('w2')}" role="button" tabindex="0" aria-pressed="false">
         <span class="dsel" id="dsel-w2">Tap to select</span>
-        <div class="pc-tag">Path 01 · Hiring</div>
-        <h4>Hire Me</h4>
-        <p>Senior AI engineering, computer vision, and cloud security as a W2 hire. The ATS friendly resume lands in your inbox when you transmit.</p>
+        <div class="pc-tag">Path 01 · Full-Time</div>
+        <h4>Leadership or Engineering</h4>
+        <p>CTO, VP Engineering, technology leadership, or senior hands-on engineering as a W-2 hire. The resume lands in your inbox when you transmit.</p>
       </div>
       <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('c2c')}" role="button" tabindex="0" aria-pressed="false">
         <span class="dsel" id="dsel-c2c">Tap to select</span>
         <div class="pc-tag">Path 02 · Consulting</div>
         <h4>Work With Me, C2C</h4>
         <p>You engage me, not a company. The work runs through my firm, <a href={firm.url} onclick="event.stopPropagation()" style="color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac-dim)">{firm.name.split(',')[0]}</a>: cloud, security, and AI engineering.</p>
+      </div>
+      <div class="pathcard" id="door-leadership" onclick="toggleDoor('cto')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('cto')}" role="button" tabindex="0" aria-pressed="false">
+        <span class="dsel" id="dsel-cto">Tap to select</span>
+        <div class="pc-tag">Path 03 · Technology Leadership</div>
+        <h4>Fractional / Interim</h4>
+        <p>Set the strategy and roadmap, establish engineering and governance practices, and lead delivery with hands-on depth. W-2 and C2C arrangements are supported.</p>
       </div>
     </div>
 
@@ -56,6 +62,10 @@ const firm = profile.firm;
         </div></div>
         <div style="max-width:340px"><label>Where the project stands</label>
         <select>{brief.stage.map(o => <option>{o}</option>)}</select></div>
+      </div>
+      <div class="fs" id="fs-cto">
+        <div style="max-width:440px;margin-bottom:10px"><label>Leadership arrangement</label>
+        <select>{brief.leadershipArrangement.map(o => <option>{o}</option>)}</select></div>
       </div>
       <div class="step-lbl">03 · Transmit</div>
       <div class="f2">

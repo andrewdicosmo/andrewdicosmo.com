@@ -1,0 +1,20 @@
+---
+import leadership from '../data/leadership.json';
+---
+<section class="proof leadership" id="leadership">
+  <div class="proof-head">
+    <div class="sec-sub"><Fragment set:html={leadership.kicker} /></div>
+    <h2 class="sec-title"><Fragment set:html={leadership.title} /></h2>
+    <p><Fragment set:html={leadership.intro} /></p>
+  </div>
+  <div class="proof-grid">
+    {leadership.items.map(item => (
+      <article class="proof-card">
+        <div class="proof-code">{item.code}</div>
+        <h3><Fragment set:html={item.title} /></h3>
+        <p><Fragment set:html={item.body} /></p>
+      </article>
+    ))}
+  </div>
+  <p class="proof-footer"><Fragment set:html={leadership.footer} /></p>
+</section>

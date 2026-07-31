@@ -103,3 +103,25 @@ test('accepts a combined inquiry with context and an optional attachment', () =>
 
   assert.equal(result.valid, true);
 });
+
+test('requires context for a technology leadership inquiry', () => {
+  const result = validateInquiry({
+    ...common,
+    paths: { cto: true },
+    brief: 'Too short'
+  });
+
+  assert.equal(result.valid, false);
+  assert.ok(result.missing.includes('Describe the technology leadership need in at least 40 characters.'));
+});
+
+test('accepts a complete technology leadership inquiry', () => {
+  const result = validateInquiry({
+    ...common,
+    paths: { cto: true },
+    brief: 'We need an interim technology leader to establish the roadmap and strengthen engineering delivery.'
+  });
+
+  assert.equal(result.valid, true);
+  assert.deepEqual(result.normalized.paths, { w2: false, c2c: false, cto: true });
+});

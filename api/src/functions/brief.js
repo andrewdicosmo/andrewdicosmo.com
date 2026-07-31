@@ -62,7 +62,8 @@ function getEmailLogoAttachment() {
 function formatPath(paths = {}) {
   const selected = compact([
     paths.w2 ? 'W-2 role' : '',
-    paths.c2c ? 'C2C consulting' : ''
+    paths.c2c ? 'C2C consulting' : '',
+    paths.cto ? 'Technology leadership' : ''
   ]);
   return selected.length ? selected.join(' + ') : '';
 }
@@ -73,13 +74,11 @@ function cleanSubjectPart(value) {
 
 function formatOwnerSubject(lead, body) {
   const paths = body.paths || {};
-  const engagement = paths.w2 && paths.c2c
-    ? 'W-2 + C2C'
-    : paths.w2
-      ? 'W-2'
-      : paths.c2c
-        ? 'C2C'
-        : '';
+  const engagement = compact([
+    paths.w2 ? 'W-2' : '',
+    paths.c2c ? 'C2C' : '',
+    paths.cto ? 'Technology leadership' : ''
+  ]).join(' + ');
   const inquiryType = engagement ? `${engagement} inquiry` : 'New inquiry';
   const name = cleanSubjectPart(lead.name);
   const company = cleanSubjectPart(lead.company);
@@ -97,6 +96,7 @@ function formatFields(fields = [], paths = {}) {
       const label = field.label.toLowerCase();
       if (!paths.w2 && label.includes('w-2')) return false;
       if (!paths.c2c && (label.includes('budget') || label === 'term' || label.includes('project stands'))) return false;
+      if (!paths.cto && label.includes('leadership arrangement')) return false;
       return true;
     });
 }
@@ -260,9 +260,12 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   const selectedPath = formatPath(paths);
   const company = clean(lead.company);
   const role = clean(lead.role);
-  const attachmentMessage = paths.w2 && !paths.c2c
+  const selectedPathCount = Number(paths.w2) + Number(paths.c2c) + Number(paths.cto);
+  const attachmentMessage = paths.cto && selectedPathCount === 1
+    ? "I've attached my resume for background on my technology leadership and hands-on delivery experience."
+    : paths.w2 && selectedPathCount === 1
     ? "I've attached my resume for your review and to share with the hiring team if helpful."
-    : paths.c2c && !paths.w2
+    : paths.c2c && selectedPathCount === 1
       ? "I've attached my resume for additional background on my experience."
       : "I've attached my resume for reference.";
   let opening;
@@ -278,8 +281,10 @@ function getSubmitterReplyModel(lead, body, options = {}) {
     opening = `Thanks for reaching out. ${attachmentMessage}`;
   }
 
-  if (paths.w2 && paths.c2c) {
+  if (selectedPathCount > 1) {
     nextStep = 'I will review the role and scope and respond personally within one business day.';
+  } else if (paths.cto) {
+    nextStep = 'I will review the leadership mandate and respond personally within one business day.';
   } else if (paths.w2) {
     nextStep = 'I will review the role details and respond personally within one business day.';
   } else if (paths.c2c) {

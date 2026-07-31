@@ -1,0 +1,28 @@
+{
+  "kicker": "HOW I LEAD · OWN THE STRATEGY, NOT JUST THE TICKET",
+  "title": "Technology <span>Leadership</span>",
+  "intro": "Use this section to explain how you set direction, lead teams, and remain accountable for delivery.",
+  "items": [
+    {
+      "code": "LEAD-01",
+      "title": "Vision &amp; Strategy",
+      "body": "Describe the technology strategy, architecture direction, and build-versus-buy decisions you have owned."
+    },
+    {
+      "code": "LEAD-02",
+      "title": "Build &amp; Lead Teams",
+      "body": "Explain how you set engineering standards, develop people, and create the conditions for strong delivery."
+    },
+    {
+      "code": "LEAD-03",
+      "title": "Practice &amp; Portfolio",
+      "body": "Summarize your responsibility for roadmaps, budgets, portfolios, estimates, and executive communication."
+    },
+    {
+      "code": "LEAD-04",
+      "title": "Governance &amp; Risk",
+      "body": "Show how you establish security, compliance, technology governance, and responsible AI practices."
+    }
+  ],
+  "footer": "<b>Leadership style:</b> connect strategy, team health, governance, and delivery without losing touch with the running system."
+}

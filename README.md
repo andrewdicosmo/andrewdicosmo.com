@@ -188,6 +188,8 @@ Your first customization is simple:
 | File | What you can change |
 | --- | --- |
 | `profile.json` | Your name, headline, links, company details, and repository link. |
+| `leadership.json` | Technology leadership narrative and proof points. |
+| `proof.json` | Hands-on engineering narrative and proof points. |
 | `timeline.json` | Career timeline entries. |
 | `sectors.json` | Industry or focus-area labels. |
 | `loadout.json` | Capability cards. |
