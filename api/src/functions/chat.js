@@ -1,5 +1,6 @@
 const { app } = require('@azure/functions');
 const { runAssistant, mockResult } = require('../chat-ai');
+const { accessGate } = require('../chat-access');
 const { searchKnowledge } = require('../chat-knowledge');
 const { deliverChatNotifications } = require('../chat-email');
 const {
@@ -49,6 +50,28 @@ app.http('chat', {
         status: 429,
         headers: { 'Retry-After': String(rate.retryAfter) },
         jsonBody: { ok: false, error: 'message limit reached', retryAfter: rate.retryAfter }
+      };
+    }
+    const gate = accessGate(session, message);
+    if (gate) {
+      appendMessage(session, 'user', message);
+      appendMessage(session, 'assistant', gate.reply);
+      await saveSession(session);
+      return {
+        jsonBody: {
+          ok: true,
+          mode: 'live',
+          sessionId: session.rowKey,
+          sessionToken: opened.token,
+          reply: gate.reply,
+          suggestions: [],
+          evidence: [],
+          sources: [],
+          intent: session.intent,
+          stage: session.stage,
+          blockedOn: gate.blockedOn,
+          resumeSent: false
+        }
       };
     }
     const budget = await withinBudget();

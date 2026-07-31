@@ -61,6 +61,7 @@ function newSession(request) {
     role: '',
     timezone: '',
     preferredTime: '',
+    nameRequested: false,
     questionCount: 0,
     assistantCount: 0,
     qualified: false,

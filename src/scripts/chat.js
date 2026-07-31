@@ -182,6 +182,7 @@
       setStatus(data.mode==='mock'||templateDemo?'Template demo mode':'Secure channel ready',false);
       if(data.resumeSent)track('chat_resume_sent',{resumeSent:true});
       if(data.intent==='job_fit')track('chat_job_fit_analyzed',{analyzed:true});
+      if(data.blockedOn)track('chat_information_gate',{field:data.blockedOn,turn:userTurns});
       if(!response.ok)track('chat_request_failed',{status:response.status});
     }catch{
       addMessage('assistant',fallbackReply());
