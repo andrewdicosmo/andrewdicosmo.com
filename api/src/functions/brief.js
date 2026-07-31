@@ -599,7 +599,8 @@ app.http('brief', {
         bookingsUrl: process.env.BOOKINGS_URL || '',
         resumeType: resumeSelection.kind,
         emailAccepted: delivery.resume === 'accepted',
-        ownerNotificationAccepted: delivery.owner === 'accepted'
+        ownerNotificationAccepted: delivery.owner === 'accepted',
+        contactEmail: replyTo || ''
       }
     };
   }
