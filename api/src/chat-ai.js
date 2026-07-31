@@ -69,6 +69,18 @@ function extractSources(response) {
   return sources.slice(0, 5);
 }
 
+function combinedUsage(responses) {
+  return responses.reduce((total, response) => ({
+    input_tokens: total.input_tokens + Number(response.usage?.input_tokens || 0),
+    output_tokens: total.output_tokens + Number(response.usage?.output_tokens || 0)
+  }), { input_tokens: 0, output_tokens: 0 });
+}
+
+function genericPricingRefusal(message, result) {
+  return /\b(rate|rates|cost|pricing|compensation|salary)\b/i.test(String(message || ''))
+    && /\b(?:cannot|can't|unable to) (?:assist|help)\b/i.test(String(result?.reply || ''));
+}
+
 async function runAssistant({ message, history, evidence, safetyIdentifier }) {
   const endpoint = String(process.env.AZURE_OPENAI_ENDPOINT || '').replace(/\/+$/, '');
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
@@ -105,19 +117,33 @@ async function runAssistant({ message, history, evidence, safetyIdentifier }) {
     options.tool_choice = 'auto';
   }
 
-  const response = await client.responses.create(options);
-  let parsed;
-  try {
-    parsed = JSON.parse(response.output_text || '');
-  } catch {
-    parsed = defaultResult(response.output_text || 'I could not prepare a reliable answer. Please try again.');
+  const responses = [await client.responses.create(options)];
+  let response = responses[0];
+  const parseResponse = (value) => {
+    try {
+      return normalizeResult(JSON.parse(value.output_text || ''));
+    } catch {
+      return normalizeResult(defaultResult(value.output_text || 'I could not prepare a reliable answer. Please try again.'));
+    }
+  };
+  let result = parseResponse(response);
+  if (webEnabled && genericPricingRefusal(message, result)) {
+    options.input[0] = {
+      role: 'system',
+      content: systemPrompt({ evidence, engineeringRequest: isEngineeringRequest(message), webEnabled: false })
+    };
+    delete options.tools;
+    delete options.tool_choice;
+    response = await client.responses.create(options);
+    responses.push(response);
+    result = parseResponse(response);
   }
   return {
-    result: normalizeResult(parsed),
+    result,
     mode: 'live',
-    usage: response.usage || {},
-    sources: extractSources(response),
-    webSearched: (response.output || []).some((item) => item.type === 'web_search_call')
+    usage: combinedUsage(responses),
+    sources: responses.flatMap(extractSources).filter((source, index, all) => all.findIndex((item) => item.url === source.url) === index).slice(0, 5),
+    webSearched: responses.some((item) => (item.output || []).some((output) => output.type === 'web_search_call'))
   };
 }
 
