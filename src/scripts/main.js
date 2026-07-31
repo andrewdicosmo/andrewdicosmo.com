@@ -170,7 +170,7 @@
     const d=document.getElementById(ids[k]);
     d.classList.toggle('sel',paths[k]);
     d.setAttribute('aria-pressed',paths[k]);
-    document.getElementById('dsel-'+k).textContent=paths[k]?'Selected':'Tap to select';
+    document.getElementById('dsel-'+k).textContent=paths[k]?'Selected':'Select';
     if(window.__track)window.__track('engagement_path_toggle',{path:k,selected:paths[k],w2:paths.w2,c2c:paths.c2c,cto:paths.cto});
     buildBrief();
   }
@@ -186,13 +186,13 @@
     const m=document.getElementById('bmsg');
     const ml=document.getElementById('bmsg-label');
     const resumeMatch=document.getElementById('resume-match-name');
-    const selected=[paths.w2?'Full-Time':'',paths.c2c?'Consulting':'',paths.cto?'Technology Leadership':''].filter(Boolean);
+    const selected=[paths.w2?'Full-Time Role':'',paths.c2c?'Consulting Project':'',paths.cto?'Technology Leadership':''].filter(Boolean);
     if(resumeMatch)resumeMatch.textContent=paths.cto?'Technology Executive Resume':'Engineering & Delivery Resume';
-    if(selected.length>1){t.textContent='Engagement Inquiry \u00b7 '+selected.join(' + ');m.placeholder='The role or mandate, priorities, timeline, and what you need to accomplish';if(ml)ml.textContent='Opportunity context \u00b7 required \u00b7 40+ characters';}
-    else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Full-Time';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 required \u00b7 40+ characters';}
-    else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, and what you are building';if(ml)ml.textContent='Project context \u00b7 required \u00b7 40+ characters';}
-    else if(paths.cto){t.textContent='Engagement Inquiry \u00b7 Technology Leadership';m.placeholder='The leadership mandate, team, priorities, timeline, and preferred working arrangement';if(ml)ml.textContent='Leadership context \u00b7 required \u00b7 40+ characters';}
-    else{t.textContent='Engagement Inquiry';}
+    if(selected.length>1){t.textContent='Your Inquiry \u00b7 '+selected.join(' + ');m.placeholder='Tell me what you need, your priorities, timing, and what a successful outcome would look like.';if(ml)ml.textContent='Tell me about the opportunity \u00b7 required';}
+    else if(paths.w2){t.textContent='Your Inquiry \u00b7 Full-Time Role';m.placeholder='Tell me about the role, team, timing, and what success would look like.';if(ml)ml.textContent='Tell me about the role \u00b7 required';}
+    else if(paths.c2c){t.textContent='Your Inquiry \u00b7 Consulting Project';m.placeholder='Tell me about the problem, desired outcome, timing, and any important constraints.';if(ml)ml.textContent='Tell me about the project \u00b7 required';}
+    else if(paths.cto){t.textContent='Your Inquiry \u00b7 Technology Leadership';m.placeholder='Tell me about the organization, leadership need, priorities, team, and timing.';if(ml)ml.textContent='Tell me about the leadership need \u00b7 required';}
+    else{t.textContent='How Would You Like to Work Together?';}
   }
   function startBrief(type){
     if(window.__track)window.__track('hero_cta_click',{path:type});
@@ -246,24 +246,24 @@
     }
     const hasContext=context.length>=40;
 
-    if(!paths.w2&&!paths.c2c&&!paths.cto)add('Select Full-Time, Consulting, Technology Leadership, or a combination.');
+    if(!paths.w2&&!paths.c2c&&!paths.cto)add('Select at least one way you would like to work together.');
     if(!name.value.trim())add('Enter your name.',name);
     if(!validEmail)add('Enter a valid email address.',email);
-    if(!company.value.trim())add('Enter your company.',company);
-    if(!role.value.trim())add('Enter your role or title.',role);
-    if(fileTooLarge)add('Keep the job requirement attachment under 5 MB.',reqWrap);
-    if(!validLink)add('Enter a valid job requirement URL.',jrLink);
+    if(!company.value.trim())add('Enter your company or organization.',company);
+    if(!role.value.trim())add('Enter your title or role.',role);
+    if(fileTooLarge)add('Keep the job description attachment under 5 MB.',reqWrap);
+    if(!validLink)add('Enter a valid link to the job posting.',jrLink);
 
     const selectedPathCount=Number(paths.w2)+Number(paths.c2c)+Number(paths.cto);
     if(paths.w2&&selectedPathCount===1&&!hasContext){
-      add('Describe the role or hiring need in at least 40 characters.',msg);
+      add('Please describe the role in at least 40 characters.',msg);
     }else if(paths.c2c&&selectedPathCount===1){
-      if(!specificChips.length)add('Select at least one specific work area.',workAreas);
-      if(!hasContext)add('Describe the project in at least 40 characters.',msg);
+      if(!specificChips.length)add('Select at least one type of help you need.',workAreas);
+      if(!hasContext)add('Please describe the project in at least 40 characters.',msg);
     }else if(paths.cto&&selectedPathCount===1&&!hasContext){
-      add('Describe the technology leadership need in at least 40 characters.',msg);
+      add('Please describe the leadership need in at least 40 characters.',msg);
     }else if(selectedPathCount>1&&!hasContext){
-      add('Describe the opportunity in at least 40 characters.',msg);
+      add('Please describe the opportunity in at least 40 characters.',msg);
     }
 
     showBriefErrors(errors);
@@ -303,7 +303,7 @@
       // otherwise the anchor would point at "#" and go nowhere
       sw.style.display=bookingsUrl?'block':'none';
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
-      if(successTitle)successTitle.textContent=executiveResume?'Technology Executive Resume Inbound':'Resume Inbound';
+      if(successTitle)successTitle.textContent=executiveResume?'Technology Executive Resume Sent':'Engineering & Delivery Resume Sent';
       if(successCopy)successCopy.textContent=executiveResume
         ?'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'
         :'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.';
@@ -345,7 +345,7 @@
       b.textContent=inp.files[0].name;b.classList.add('has');
       if(window.__track)window.__track('job_attachment_selected',{extension:ext,sizeBucket:inp.files[0].size>1024*1024?'1mb_plus':'under_1mb'});
     }
-    else{b.textContent='Attach PDF / DOC';b.classList.remove('has');}
+    else{b.textContent='Attach job description';b.classList.remove('has');}
   }
   window.jrPicked=jrPicked;
 

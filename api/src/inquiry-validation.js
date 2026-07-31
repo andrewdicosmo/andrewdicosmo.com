@@ -37,27 +37,27 @@ function validateInquiry(body = {}) {
   const missing = [];
 
   if (!paths.w2 && !paths.c2c && !paths.cto) {
-    missing.push('Select Full-Time, Consulting, Technology Leadership, or a combination.');
+    missing.push('Select at least one way you would like to work together.');
   }
   if (!name) missing.push('Enter your name.');
   if (!validEmail(email)) missing.push('Enter a valid email address.');
-  if (!company) missing.push('Enter your company.');
-  if (!role) missing.push('Enter your role or title.');
-  if (reqLinkInput && !reqLink) missing.push('Enter a valid job requirement URL.');
+  if (!company) missing.push('Enter your company or organization.');
+  if (!role) missing.push('Enter your title or role.');
+  if (reqLinkInput && !reqLink) missing.push('Enter a valid link to the job posting.');
   if (attachmentData.length >= MAX_ATTACHMENT_DATA_LENGTH) {
-    missing.push('Keep the job requirement attachment under 5 MB.');
+    missing.push('Keep the job description attachment under 5 MB.');
   }
 
   const selectedPathCount = Number(paths.w2) + Number(paths.c2c) + Number(paths.cto);
   if (paths.w2 && selectedPathCount === 1 && !hasContext) {
-    missing.push('Describe the role or hiring need in at least 40 characters.');
+    missing.push('Please describe the role in at least 40 characters.');
   } else if (paths.c2c && selectedPathCount === 1) {
-    if (!specificChips.length) missing.push('Select at least one specific work area.');
-    if (!hasContext) missing.push('Describe the project in at least 40 characters.');
+    if (!specificChips.length) missing.push('Select at least one type of help you need.');
+    if (!hasContext) missing.push('Please describe the project in at least 40 characters.');
   } else if (paths.cto && selectedPathCount === 1 && !hasContext) {
-    missing.push('Describe the technology leadership need in at least 40 characters.');
+    missing.push('Please describe the leadership need in at least 40 characters.');
   } else if (selectedPathCount > 1 && !hasContext) {
-    missing.push('Describe the opportunity in at least 40 characters.');
+    missing.push('Please describe the opportunity in at least 40 characters.');
   }
 
   return {

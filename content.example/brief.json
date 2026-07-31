@@ -1,45 +1,47 @@
 {
  "salary": [
   "Prefer to discuss",
-  "$175K to $200K",
-  "$200K to $250K",
-  "$250K plus",
-  "$300K plus · Executive"
+  "$175,000 to $200,000",
+  "$200,000 to $250,000",
+  "$250,000 or more",
+  "$300,000 or more · Executive"
  ],
  "leadershipArrangement": [
   "Prefer to discuss",
-  "Full-time W-2 leadership",
-  "Fractional or interim C2C",
-  "Open to W-2 or C2C"
+  "Full-time employment",
+  "Fractional or interim consulting",
+  "Open to employment or consulting"
  ],
  "budget": [
   "Not sure yet",
-  "Under $25K",
-  "$25K to $75K",
-  "$75K to $150K",
-  "$150K plus"
+  "Under $25,000",
+  "$25,000 to $75,000",
+  "$75,000 to $150,000",
+  "$150,000 or more"
  ],
  "term": [
   "Not sure yet",
-  "Short term \u00b7 under 3 months",
-  "Long term \u00b7 3 months plus",
-  "Ongoing"
+  "Less than 3 months",
+  "3 to 6 months",
+  "More than 6 months",
+  "Ongoing support"
  ],
  "chips": [
-  "AI / ML engineering",
+  "AI and machine learning",
   "Computer vision",
   "Cloud security",
   "Cloud architecture",
-  "Data platform",
-  "Shopify / e-commerce",
-  "Automation",
+  "Data platforms",
+  "E-commerce and Shopify",
+  "Workflow automation",
   "Not sure yet"
  ],
  "stage": [
-  "Just an idea",
-  "Scoping it now",
-  "In progress, need help",
-  "Built, needs a rescue"
+  "Not sure yet",
+  "Planning or exploring",
+  "Defining scope and requirements",
+  "Already underway and needs support",
+  "Existing system needs improvement"
  ],
  "availability": "<b>Availability:</b> update with your start timing.",
  "terms": "<b>Engagement terms:</b> discuss based on scope and fit.",

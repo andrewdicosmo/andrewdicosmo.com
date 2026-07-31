@@ -5,94 +5,107 @@ const firm = profile.firm;
 ---
 <section class="contact" id="contact">
   <h2 class="sec-title">Choose Your <span>Engagement</span></h2>
-  <div class="sec-sub">ONE INQUIRY · SELECT ONE OR MORE PATHS, AND IT BUILDS ITSELF</div>
+  <div class="sec-sub">SELECT ONE OR MORE OPTIONS · THE FORM ADAPTS TO YOUR NEEDS</div>
   <p class="engagement-note"><Fragment set:html={brief.availability} /> <span>·</span> <Fragment set:html={brief.terms} /></p>
 
   <div class="door-panel brief-panel" id="brief" style="margin-top:0;max-width:1100px">
-    <div class="dp-tag">Transmit · Engagement inquiry</div>
-    <h3 id="brief-title">Engagement Inquiry</h3>
+    <div class="dp-tag">Start here · Engagement inquiry</div>
+    <h3 id="brief-title">How Would You Like to Work Together?</h3>
 
-    <div class="step-lbl">01 · Path</div>
+    <div class="step-lbl">01 · Choose one or more options</div>
     <div class="path-row">
       <div class="pathcard" id="door-hire" onclick="toggleDoor('w2')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('w2')}" role="button" tabindex="0" aria-pressed="false">
-        <span class="dsel" id="dsel-w2">Tap to select</span>
-        <div class="pc-tag">Path 01 · Full-Time</div>
-        <h4>Leadership or Engineering</h4>
-        <p>CTO, VP Engineering, technology leadership, or senior hands-on engineering as a W-2 hire. Your selected path determines which resume lands in your inbox.</p>
+        <div class="pathcard-head">
+          <div class="pc-tag">Path 01 · Full-Time Role</div>
+          <span class="dsel" id="dsel-w2">Select</span>
+        </div>
+        <h4>Hire Me Full-Time</h4>
+        <p>For a permanent role in AI engineering, cloud, security, architecture, or hands-on technology delivery.</p>
+        <div class="path-resume"><span>Resume</span><b>Engineering &amp; Delivery</b></div>
       </div>
       <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('c2c')}" role="button" tabindex="0" aria-pressed="false">
-        <span class="dsel" id="dsel-c2c">Tap to select</span>
-        <div class="pc-tag">Path 02 · Consulting</div>
-        <h4>Work With Me, C2C</h4>
-        <p>You engage me, not a company. The work runs through my firm, <a href={firm.url} target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac-dim)">{firm.name.split(',')[0]}</a>: cloud, security, and AI engineering.</p>
+        <div class="pathcard-head">
+          <div class="pc-tag">Path 02 · Consulting Project</div>
+          <span class="dsel" id="dsel-c2c">Select</span>
+        </div>
+        <h4>Engage My Firm</h4>
+        <p>For a project or ongoing consulting engagement delivered directly through {firm.name.split(',')[0]}.</p>
+        <div class="path-resume"><span>Resume</span><b>Engineering &amp; Delivery</b></div>
       </div>
       <div class="pathcard" id="door-leadership" onclick="toggleDoor('cto')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('cto')}" role="button" tabindex="0" aria-pressed="false">
-        <span class="dsel" id="dsel-cto">Tap to select</span>
-        <div class="pc-tag">Path 03 · Technology Leadership</div>
-        <h4>Fractional / Interim</h4>
-        <p>Set the strategy and roadmap, establish engineering and governance practices, and lead delivery with hands-on depth. This path sends the Technology Executive resume.</p>
+        <div class="pathcard-head">
+          <div class="pc-tag">Path 03 · Technology Leadership</div>
+          <span class="dsel" id="dsel-cto">Select</span>
+        </div>
+        <h4>CTO / Technology Leadership</h4>
+        <p>For full-time, fractional, or interim leadership to set strategy, guide teams, strengthen governance, and improve delivery.</p>
+        <div class="path-resume"><span>Resume</span><b>Technology Executive</b></div>
       </div>
     </div>
 
-    <div class="brief-empty" id="brief-empty">Select a path above and <b>the inquiry builds itself</b></div>
+    <div class="brief-empty" id="brief-empty">Select one or more options above to continue.</div>
     <div class="cform" id="brief-form" style="display:none">
-      <div class="step-lbl" style="margin-top:2px">02 · Parameters</div>
+      <div class="step-lbl" style="margin-top:2px">02 · Opportunity details</div>
       <div class="fs" id="fs-w2">
+        <div class="form-path-title">Full-Time Role</div>
         <div class="f2" style="margin-bottom:10px">
-          <div><label>W-2 compensation range</label>
+          <div><label>Expected annual salary</label>
           <select>{brief.salary.map(o => <option>{o}</option>)}</select></div>
-          <div><label>Job details · link or file · optional but helpful</label>
+          <div><label>Job description · optional</label>
           <div class="fattach" id="job-requirement">
-            <input type="url" id="jr-link" placeholder="LINK TO THE JOB REQ">
+            <input type="url" id="jr-link" placeholder="PASTE A LINK TO THE JOB POSTING">
             <input type="file" id="jrfile" accept=".pdf,.doc,.docx" style="display:none" onchange="jrPicked(this)">
-            <button type="button" class="fbtn" id="jrbtn" onclick="document.getElementById('jrfile').click()">Attach PDF / DOC</button>
+            <button type="button" class="fbtn" id="jrbtn" onclick="document.getElementById('jrfile').click()">Attach job description</button>
           </div></div>
         </div>
       </div>
       <div class="fs" id="fs-c2c">
+        <div class="form-path-title">Consulting Project</div>
         <div class="f2" style="margin-bottom:10px">
-          <div><label>Estimated budget</label>
+          <div><label>Estimated project budget</label>
           <select>{brief.budget.map(o => <option>{o}</option>)}</select></div>
-          <div><label>Term</label>
+          <div><label>Expected project length</label>
           <select>{brief.term.map(o => <option>{o}</option>)}</select></div>
         </div>
-        <div style="margin-bottom:10px"><label>What kind of work · tap all that fit</label>
+        <div style="margin-bottom:10px"><label>What help do you need? · Select all that apply</label>
         <div class="pchips" id="work-areas">
           {brief.chips.map(c => <button type="button" class="pchip" onclick="this.classList.toggle('on')">{c}</button>)}
         </div></div>
-        <div style="max-width:340px"><label>Where the project stands</label>
+        <div style="max-width:440px"><label>Current project stage</label>
         <select>{brief.stage.map(o => <option>{o}</option>)}</select></div>
       </div>
       <div class="fs" id="fs-cto">
-        <div style="max-width:440px;margin-bottom:10px"><label>Leadership arrangement</label>
+        <div class="form-path-title">Technology Leadership</div>
+        <div style="max-width:440px;margin-bottom:10px"><label>Preferred leadership arrangement</label>
         <select>{brief.leadershipArrangement.map(o => <option>{o}</option>)}</select></div>
       </div>
-      <div class="step-lbl">03 · Transmit</div>
+      <div class="step-lbl">03 · About you</div>
       <div class="resume-match">
-        <span>Resume matched to this inquiry</span>
+        <span>Resume you will receive</span>
         <b id="resume-match-name">Engineering &amp; Delivery Resume</b>
       </div>
       <div class="f2">
-        <div><label>Name · required</label><input type="text" id="bname" placeholder="NAME"></div>
-        <div><label>Work email · required</label><input type="email" id="bemail" placeholder="EMAIL"></div>
+        <div><label>Your name · required</label><input type="text" id="bname" autocomplete="name" placeholder="YOUR NAME"></div>
+        <div><label>Email address · required</label><input type="email" id="bemail" autocomplete="email" placeholder="YOUR EMAIL"></div>
       </div>
       <div class="f2">
-        <div><label>Company · required</label><input type="text" id="bcompany" placeholder="COMPANY"></div>
-        <div><label>Your role · required</label><input type="text" id="brole" placeholder="ROLE / TITLE"></div>
+        <div><label>Company or organization · required</label><input type="text" id="bcompany" autocomplete="organization" placeholder="COMPANY OR ORGANIZATION"></div>
+        <div><label>Your title or role · required</label><input type="text" id="brole" autocomplete="organization-title" placeholder="YOUR TITLE OR ROLE"></div>
       </div>
       <div><label id="bmsg-label">Additional context</label>
-      <textarea id="bmsg" minlength="40" placeholder=""></textarea></div>
+      <textarea id="bmsg" minlength="40" aria-describedby="bmsg-help" placeholder=""></textarea>
+      <span class="field-help" id="bmsg-help">Please provide at least 40 characters so I have enough context to respond.</span></div>
       <div class="form-errors" id="brief-errors" role="alert" hidden></div>
-      <button class="door primary" type="button" onclick="sendBrief()">Transmit · Receive the resume</button>
-      <p class="form-note">A complete inquiry sends me your details and emails the <b>resume matched to your selected path</b>. I reply within one business day.</p>
+      <button class="door primary" type="button" onclick="sendBrief()">Send inquiry · Receive the resume</button>
+      <p class="form-note">After you submit the form, the <b>resume shown above</b> will be emailed to you. I respond personally within one business day.</p>
     </div>
     <div class="brief-success" id="brief-done">
-      <div class="bs-code">Transmission received</div>
-      <h4 id="brief-success-title">Resume Inbound</h4>
-      <p id="brief-success-copy">Check your inbox. The resume matched to your inquiry is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.</p>
+      <div class="bs-code">Inquiry received</div>
+      <h4 id="brief-success-title">Check Your Inbox</h4>
+      <p id="brief-success-copy">The resume selected for your inquiry is on its way. I will review your message and respond personally within one business day.</p>
       <div id="sched-wrap" style="display:none;margin-top:18px">
-        <p style="margin-bottom:12px">Your inquiry has <b style="color:var(--ac)">everything I need</b>. If you want to move fast, skip the email round trip and grab a time now.</p>
-        <a class="door primary" href="#" style="display:inline-block;text-decoration:none">Schedule a call · Pick a time</a>
+        <p style="margin-bottom:12px">Your inquiry includes everything I need. You can also schedule a call now.</p>
+        <a class="door primary" href="#" style="display:inline-block;text-decoration:none">Schedule a call</a>
       </div>
     </div>
   </div>
