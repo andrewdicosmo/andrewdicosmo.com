@@ -3,6 +3,7 @@
 import raw from '../data/sections/HERO.html?raw';
 import profile from '../data/profile.json';
 import logoRaw from '../assets/andrew-dicosmo-logo.svg?raw';
+import { stampOverlay } from '../lib/stampOverlay';
 const imgs = import.meta.glob('../data/assets/subject.webp', { eager: true, query: '?url', import: 'default' });
 const subject = Object.values(imgs)[0] || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500"><rect width="400" height="500" fill="%23222"/><text x="200" y="260" fill="%23888" font-family="monospace" font-size="16" text-anchor="middle">ADD subject.webp</text></svg>';
 const logoMark = logoRaw
@@ -13,10 +14,11 @@ const logoMark = logoRaw
 const availability = profile.availability || {};
 const status = availability.status === 'engaged' ? 'engaged' : 'available';
 const activeLabel = status === 'engaged' ? 'ENGAGED' : 'AVAILABLE';
-const availabilityLine = availability.line || (status === 'engaged' ? 'Future conversations welcome' : 'W-2 or C2C · Start quickly');
+const availabilityLine = availability.line || (status === 'engaged' ? 'Future conversations welcome' : 'W-2 or C2C · Flexible start date');
 const availableFrom = availability.availableFrom ? `<span class="status-window">${availability.availableFrom}</span>` : '';
 const html = raw
   .replace('<div class="file-tab">', `<div class="file-tab"><span class="file-logo" aria-hidden="true">${logoMark}</span>`)
+  .replace(/<div class="stamp">([^<]+)<\/div>/, (_match, label) => `<div class="stamp"><span>${label}</span>${stampOverlay('hero-stamp')}</div>`)
   .replaceAll('{{SUBJECT_SRC}}', subject)
   .replaceAll('{{AVAILABILITY_STATUS}}', status)
   .replaceAll('{{AVAILABLE_ACTIVE}}', status === 'available' ? 'active' : '')

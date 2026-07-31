@@ -56,15 +56,24 @@
   .subject .k.b{top:-4px;right:-4px;border-left:none;border-bottom:none}
   .subject .k.c{bottom:-4px;left:-4px;border-right:none;border-top:none}
   .subject .k.d{bottom:-4px;right:-4px;border-left:none;border-top:none}
-  .redact{background:var(--white);color:var(--white);border-radius:1px;padding:0 6px;cursor:pointer;transition:all .25s ease;user-select:none}
-  .redact.open{background:transparent;color:var(--ac);padding:0}
-  .availability-module{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border:1px solid var(--faint);background:color-mix(in srgb,var(--panel) 82%,var(--ac) 18%);width:100%}
-  .status-rail{display:flex;gap:6px}
-  .status-pill{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);border:1px solid var(--faint);padding:5px 8px;line-height:1}
-  .status-pill.active{color:var(--bg);background:var(--ac);border-color:var(--ac);box-shadow:0 0 18px color-mix(in srgb,var(--ac) 36%,transparent)}
-  .status-copy{font-size:10px;line-height:1.55;letter-spacing:.08em;color:var(--grey);text-transform:uppercase}
+  .redact{padding:0 5px;color:transparent;background:linear-gradient(177deg,transparent 0 10%,var(--white) 11% 87%,transparent 88%),linear-gradient(183deg,transparent 0 17%,color-mix(in srgb,var(--white) 84%,transparent) 18% 82%,transparent 83%);-webkit-box-decoration-break:clone;box-decoration-break:clone;cursor:pointer;transition:color .2s ease,background .2s ease;user-select:none}
+  .redact.open{background:transparent;color:var(--ac)}
+  .availability-module{display:flex;align-items:center;gap:12px;margin-top:15px;width:100%}
+  .status-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;flex:0 0 178px;min-height:30px;padding:3px;border:1px solid var(--ac-dim);border-radius:999px;background:var(--bg);overflow:hidden}
+  .status-option{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;letter-spacing:.1em;line-height:1;text-transform:uppercase;color:var(--grey);transition:color .2s ease}
+  .status-thumb{position:absolute;z-index:0;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:var(--ac);box-shadow:0 0 18px color-mix(in srgb,var(--ac) 36%,transparent);transition:transform .25s ease}
+  .availability-module[data-status="available"] .status-switch{border-color:color-mix(in srgb,var(--live) 64%,var(--faint))}
+  .availability-module[data-status="available"] .status-thumb{background:var(--live);box-shadow:0 0 18px color-mix(in srgb,var(--live) 38%,transparent)}
+  .availability-module[data-status="engaged"] .status-thumb{transform:translateX(100%)}
+  .availability-module[data-status="available"] .status-option:first-child,
+  .availability-module[data-status="engaged"] .status-option:nth-child(2){color:var(--bg)}
+  .status-copy{font-size:10px;line-height:1.55;letter-spacing:.08em;color:var(--white);text-transform:uppercase}
   .status-copy b{color:var(--white);font-weight:700}
   .status-window{display:block;color:var(--ac);margin-top:1px}
+  .stamp{position:relative;margin-top:22px;width:max-content;transform:rotate(-3deg);color:var(--stamp);font-weight:700;font-size:12px;letter-spacing:.22em;padding:9px 16px;text-transform:uppercase}
+  .stamp > span,.gift-stamp > span{position:relative;z-index:1}
+  .stamp-overlay{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);overflow:visible;pointer-events:none;color:var(--stamp)}
+  .stamp + .dossier-row{margin-top:22px}
   .doors{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
   .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-top:10px}
   .hero-actions .door{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;text-align:center}
@@ -397,7 +406,7 @@
   .gift{padding:78px 6vw;text-align:left;position:relative}
   /* match the 1100px panels used by the brief and demo sections */
   .gift-inner{max-width:1100px;border:1px dashed var(--ac-dim);padding:44px 46px;position:relative}
-  .gift-stamp{position:absolute;top:-16px;right:26px;transform:rotate(5deg);border:3px solid var(--stamp);color:var(--stamp);font-weight:700;font-size:11px;letter-spacing:.2em;padding:7px 14px;text-transform:uppercase;background:var(--bg)}
+  .gift-stamp{position:absolute;top:-16px;right:26px;transform:rotate(5deg);color:var(--stamp);font-weight:700;font-size:11px;letter-spacing:.2em;padding:7px 14px;text-transform:uppercase;background:var(--bg)}
   .gift h2{font-family:var(--disp);font-weight:700;font-size:clamp(26px,3.6vw,44px);text-transform:uppercase;line-height:1.1}
   .gift h2 span{color:var(--ac)}
   .gift p{margin-top:18px;font-size:13px;line-height:2;color:var(--grey);max-width:760px}
@@ -446,13 +455,14 @@
     .dossier-row{gap:14px;align-items:center}
     .subject{width:96px;padding:7px}
     .dossier{font-size:12px;line-height:1.75;letter-spacing:.02em}
-    .availability-module{width:100%;align-items:flex-start;gap:8px;margin-top:12px}
-    .status-rail{flex:0 0 auto;flex-direction:column;gap:5px}
-    .status-pill{font-size:8px;padding:5px 7px}
+    .availability-module{width:100%;align-items:stretch;flex-direction:column;gap:8px;margin-top:12px}
+    .status-switch{flex-basis:auto;width:100%;min-height:32px}
     .status-copy{font-size:9px;line-height:1.6}
     .doors{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
     .hero-actions{grid-template-columns:1fr;margin-top:10px}
     .door{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 12px;font-size:10px;letter-spacing:.08em;text-align:center}
+    .stamp{width:100%;margin-top:18px;padding:9px 10px;font-size:9px;letter-spacing:.14em;text-align:center;white-space:normal;transform:rotate(-2deg)}
+    .stamp + .dossier-row{margin-top:18px}
     .scene-head{gap:10px;padding:9px 10px;font-size:8px;line-height:1.5}
     .scene-head span:last-child{text-align:right}
     .view-modes{gap:6px;padding:8px 10px}
@@ -501,7 +511,7 @@
     .step-num{min-width:56px}
     .dc{margin-top:48px}
     .gift-inner{padding:32px 20px}
-    .gift-stamp{position:static;display:inline-block;margin:-48px 0 26px;transform:rotate(3deg);font-size:9px}
+    .gift-stamp{position:relative;display:inline-block;margin:-48px 0 26px;transform:rotate(3deg);font-size:9px}
     .lens{margin:14px 0 0;flex-wrap:wrap}
     .lb{min-height:32px;padding:5px 9px}
 

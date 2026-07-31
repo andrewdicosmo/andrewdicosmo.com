@@ -367,13 +367,28 @@
   // hover reveals on desktop; click covers touch, focus covers keyboard.
   // Most visitors never think to hover, so the bars also auto-declassify a
   // beat after the typewriter finishes, staggered so it plays as a reveal.
-  document.querySelectorAll('.redact').forEach((r,i)=>{
-    r.setAttribute('tabindex','0');
-    r.addEventListener('mouseenter',()=>r.classList.add('open'));
-    r.addEventListener('focus',()=>r.classList.add('open'));
-    r.addEventListener('click',()=>r.classList.toggle('open'));
-    setTimeout(()=>r.classList.add('open'), msg.length*34+900+i*400);
+  const redactions=[...document.querySelectorAll('.redact')];
+  const resetRedactions=()=>redactions.forEach(r=>{
+    r.classList.remove('open');
+    r.setAttribute('aria-expanded','false');
   });
+  redactions.forEach((r,i)=>{
+    r.setAttribute('tabindex','0');
+    r.setAttribute('role','button');
+    r.setAttribute('aria-expanded','false');
+    const reveal=()=>{
+      r.classList.add('open');
+      r.setAttribute('aria-expanded','true');
+    };
+    r.addEventListener('mouseenter',reveal);
+    r.addEventListener('focus',reveal);
+    r.addEventListener('click',()=>{
+      r.classList.toggle('open');
+      r.setAttribute('aria-expanded',String(r.classList.contains('open')));
+    });
+    setTimeout(reveal,msg.length*34+900+i*400);
+  });
+  setTimeout(resetRedactions,msg.length*34+12000);
 
   // ---- grid ----
   const grid=document.getElementById('grid');
@@ -406,7 +421,10 @@
       setTimeout(next,340);
     })();
   }
-  function resetPass(){targets.forEach(tg=>{document.getElementById(tg.b).classList.remove('lock');document.getElementById(tg.t).classList.remove('lock');if(tg.f)document.getElementById(tg.f).classList.remove('feat-hot');tg.done=false})}
+  function resetPass(){
+    targets.forEach(tg=>{document.getElementById(tg.b).classList.remove('lock');document.getElementById(tg.t).classList.remove('lock');if(tg.f)document.getElementById(tg.f).classList.remove('feat-hot');tg.done=false});
+    resetRedactions();
+  }
   // ---- imagery view modes ----
   const viewCfg={
     eo:  {sensor:'SENSOR  OPTICAL · EO',       layers:{Lndvi:false,Lvector:false,Lshadow:true, LshadowDrift:true, Lglint:true }},

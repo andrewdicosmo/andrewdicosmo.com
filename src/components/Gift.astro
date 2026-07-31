@@ -1,6 +1,9 @@
 ---
 import profile from '../data/profile.json';
 import raw from '../data/sections/GIFT.html?raw';
-const html = raw.replaceAll('{{REPO_URL}}', profile.repo);
+import { stampOverlay } from '../lib/stampOverlay';
+const html = raw
+  .replace(/<div class="gift-stamp">([^<]+)<\/div>/, (_match, label) => `<div class="gift-stamp"><span>${label}</span>${stampOverlay('gift-stamp')}</div>`)
+  .replaceAll('{{REPO_URL}}', profile.repo);
 ---
 <Fragment set:html={html} />
