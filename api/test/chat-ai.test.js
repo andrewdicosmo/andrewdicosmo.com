@@ -13,3 +13,11 @@ test('model contact output rejects malformed email addresses', () => {
   const result = normalizeResult({ reply: 'Hello', contact: { email: 'not-an-email' } });
   assert.equal(result.contact.email, null);
 });
+
+test('model replies are normalized for the plain-text chat interface', () => {
+  const result = normalizeResult({
+    reply: '**Current context**: see [Microsoft guidance](https://learn.microsoft.com/example).',
+    contact: {}
+  });
+  assert.equal(result.reply, 'Current context: see Microsoft guidance.');
+});

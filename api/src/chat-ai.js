@@ -45,7 +45,11 @@ function normalizeResult(value) {
   result.accuracyChallenge = { ...fallback.accuracyChallenge, ...(value?.accuracyChallenge || {}) };
   result.suggestions = Array.isArray(result.suggestions) ? result.suggestions.filter(Boolean).slice(0, 3) : [];
   result.evidenceIds = Array.isArray(result.evidenceIds) ? result.evidenceIds.filter(Boolean).slice(0, 5) : [];
-  result.reply = String(result.reply || fallback.reply).slice(0, 4000);
+  result.reply = String(result.reply || fallback.reply)
+    .replace(/\[([^\]]+)]\(https?:\/\/[^)]+\)/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .slice(0, 2800);
   return result;
 }
 
@@ -81,7 +85,7 @@ async function runAssistant({ message, history, evidence, safetyIdentifier }) {
     model: deployment,
     input,
     store: false,
-    max_output_tokens: 900,
+    max_output_tokens: 700,
     reasoning: { effort: 'low' },
     safety_identifier: safetyIdentifier,
     text: {
