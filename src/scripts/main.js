@@ -294,7 +294,7 @@
       reqLink:(jrLink&&jrLink.value.trim())||'', brief:(msg&&msg.value.trim())||'',
       analytics:window.__analyticsContext?window.__analyticsContext():undefined
     };
-    const finish=(bookingsUrl,resumeType)=>{
+    const finish=(bookingsUrl,resumeType,emailAccepted)=>{
       const sw=document.getElementById('sched-wrap');
       const executiveResume=resumeType==='executive';
       const successTitle=document.getElementById('brief-success-title');
@@ -303,10 +303,14 @@
       // otherwise the anchor would point at "#" and go nowhere
       sw.style.display=bookingsUrl?'block':'none';
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
-      if(successTitle)successTitle.textContent=executiveResume?'Technology Executive Resume Sent':'Engineering & Delivery Resume Sent';
-      if(successCopy)successCopy.textContent=executiveResume
-        ?'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'
-        :'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.';
+      if(successTitle)successTitle.textContent=emailAccepted
+        ?(executiveResume?'Technology Executive Resume Sent':'Engineering & Delivery Resume Sent')
+        :'Inquiry Received';
+      if(successCopy)successCopy.textContent=emailAccepted
+        ?(executiveResume
+          ?'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'
+          :'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.')
+        :'Your inquiry was saved, but the resume email could not be sent. Please email AD@andrewdicosmo.com directly.';
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
       if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,resumeType:resumeType||'standard',hasBookingUrl:!!bookingsUrl});
@@ -321,7 +325,7 @@
           if(!r.ok){const error=new Error(data.error||'Submission failed');error.messages=data.missing;throw error;}
           return data;
         })
-        .then(d=>finish(d&&d.bookingsUrl,d&&d.resumeType))
+        .then(d=>finish(d&&d.bookingsUrl,d&&d.resumeType,d&&d.emailAccepted))
         .catch(error=>{
           if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
           showBriefErrors(Array.isArray(error.messages)&&error.messages.length

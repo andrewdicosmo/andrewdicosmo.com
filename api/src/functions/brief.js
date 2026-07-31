@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { validateInquiry } = require('../inquiry-validation');
 const { selectResume } = require('../resume-selection');
+const { sendAcsMessage, sendGridMessage } = require('../email-delivery');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
@@ -483,10 +484,11 @@ app.http('brief', {
     };
 
     // 1) store the lead
+    let leadTable = null;
     if (conn) {
       try {
-        const table = TableClient.fromConnectionString(conn, process.env.LEADS_TABLE || 'leads');
-        await table.createTable().catch(() => {});
+        leadTable = TableClient.fromConnectionString(conn, process.env.LEADS_TABLE || 'leads');
+        await leadTable.createTable().catch(() => {});
         // 2) attachment to blob, reference on the lead
         if (body.attachment && body.attachment.data && body.attachment.data.length < 7_500_000) {
           const svc = BlobServiceClient.fromConnectionString(conn);
@@ -497,7 +499,7 @@ app.http('brief', {
           await container.getBlockBlobClient(blobName).uploadData(Buffer.from(body.attachment.data, 'base64'));
           lead.attachmentBlob = blobName;
         }
-        await table.createEntity(lead);
+        await leadTable.createEntity(lead);
       } catch (e) { context.error('storage failed', e); }
     } else context.warn('STORAGE_CONNECTION_STRING not set; lead not persisted');
 
@@ -513,6 +515,11 @@ app.http('brief', {
       replyEmail: replyTo,
       linkedinUrl: process.env.LINKEDIN_URL,
       resumeLabel: resumeSelection.label
+    };
+    const delivery = {
+      provider: acs ? 'acs' : (sg ? 'sendgrid' : 'not_configured'),
+      resume: 'not_configured',
+      owner: to ? 'not_configured' : 'not_requested'
     };
     if ((acs || sg) && from) {
       try {
@@ -549,58 +556,50 @@ app.http('brief', {
 
         if (acs) {
           const client = new EmailClient(acs);
-          const sendAcs = async (msg) => {
-            const poller = await client.beginSend({
-              senderAddress: from,
-              content: msg.html
-                ? { subject: msg.subject, plainText: msg.text, html: msg.html }
-                : { subject: msg.subject, plainText: msg.text },
-              recipients: { to: [{ address: msg.recipient, displayName: msg.recipientName }] },
-              replyTo: msg.replyTo ? [{ address: msg.replyTo, displayName: msg.replyToName }] : undefined,
-              attachments: msg.attachments.map((a) => ({
-                name: a.filename,
-                contentType: a.type,
-                contentInBase64: a.content,
-                contentId: a.contentId
-              }))
-            });
-            await poller.pollUntilDone();
-          };
-          await sendAcs(submitterMessage);
-          if (ownerMessage) await sendAcs(ownerMessage);
+          delivery.resumeMessageId = await sendAcsMessage(client, from, submitterMessage);
+          delivery.resume = 'accepted';
+          if (ownerMessage) {
+            delivery.ownerMessageId = await sendAcsMessage(client, from, ownerMessage);
+            delivery.owner = 'accepted';
+          }
         } else {
-          const sendGrid = (msg) => fetch('https://api.sendgrid.com/v3/mail/send', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${sg}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              personalizations: [{ to: [{ email: msg.recipient, name: msg.recipientName }] }],
-              from: { email: from, name: senderName },
-              reply_to: msg.replyTo ? { email: msg.replyTo, name: msg.replyToName } : undefined,
-              subject: msg.subject,
-              content: compact([
-                { type: 'text/plain', value: msg.text },
-                msg.html ? { type: 'text/html', value: msg.html } : null
-              ]),
-              attachments: msg.attachments.map((a) => ({
-                content: a.content,
-                filename: a.filename,
-                type: a.type,
-                disposition: a.disposition,
-                content_id: a.content_id
-              }))
-            })
-          });
-          await sendGrid(submitterMessage);
-          if (ownerMessage) await sendGrid(ownerMessage);
+          delivery.resumeMessageId = await sendGridMessage(fetch, sg, from, senderName, submitterMessage);
+          delivery.resume = 'accepted';
+          if (ownerMessage) {
+            delivery.ownerMessageId = await sendGridMessage(fetch, sg, from, senderName, ownerMessage);
+            delivery.owner = 'accepted';
+          }
         }
-      } catch (e) { context.error('mail failed', e); }
+      } catch (e) {
+        if (delivery.resume !== 'accepted') delivery.resume = 'failed';
+        else if (delivery.owner !== 'accepted' && delivery.owner !== 'not_requested') delivery.owner = 'failed';
+        delivery.error = clean(e?.message).slice(0, 1000);
+        context.error('mail failed', e);
+      }
     } else context.warn('Mail not configured; no mail sent');
+
+    if (leadTable) {
+      try {
+        await leadTable.updateEntity({
+          partitionKey: lead.partitionKey,
+          rowKey: lead.rowKey,
+          emailProvider: delivery.provider,
+          resumeEmailStatus: delivery.resume,
+          ownerEmailStatus: delivery.owner,
+          resumeMessageId: delivery.resumeMessageId || '',
+          ownerMessageId: delivery.ownerMessageId || '',
+          emailError: delivery.error || ''
+        }, 'Merge');
+      } catch (e) { context.error('delivery status storage failed', e); }
+    }
 
     return {
       jsonBody: {
         ok: true,
         bookingsUrl: process.env.BOOKINGS_URL || '',
-        resumeType: resumeSelection.kind
+        resumeType: resumeSelection.kind,
+        emailAccepted: delivery.resume === 'accepted',
+        ownerNotificationAccepted: delivery.owner === 'accepted'
       }
     };
   }
