@@ -57,7 +57,7 @@
   .subject .k.d{bottom:-4px;right:-4px;border-left:none;border-top:none}
   .redact{background:var(--white);color:var(--white);border-radius:1px;padding:0 6px;cursor:pointer;transition:all .25s ease;user-select:none}
   .redact.open{background:transparent;color:var(--ac);padding:0}
-  .availability-module{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border:1px solid var(--faint);background:color-mix(in srgb,var(--panel) 82%,var(--ac) 18%);width:max-content;max-width:100%}
+  .availability-module{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border:1px solid var(--faint);background:color-mix(in srgb,var(--panel) 82%,var(--ac) 18%);width:100%}
   .status-rail{display:flex;gap:6px}
   .status-pill{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);border:1px solid var(--faint);padding:5px 8px;line-height:1}
   .status-pill.active{color:var(--bg);background:var(--ac);border-color:var(--ac);box-shadow:0 0 18px color-mix(in srgb,var(--ac) 36%,transparent)}
@@ -66,7 +66,8 @@
   .status-window{display:block;color:var(--ac);margin-top:1px}
   .stamp{margin-top:26px;width:max-content;transform:rotate(-4deg);border:3px solid var(--stamp);color:var(--stamp);font-weight:700;font-size:12px;letter-spacing:.22em;padding:9px 16px;text-transform:uppercase;opacity:.85}
   .doors{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
-  .hero-actions{justify-content:center}
+  .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-top:10px}
+  .hero-actions .door{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;text-align:center}
   .door{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:15px 28px;border:1px solid var(--ac-dim);color:var(--white);background:transparent;cursor:pointer;transition:all .18s ease;text-decoration:none;display:inline-block}
   .door:hover{border-color:var(--ac);color:var(--ac)}
   .door.primary{background:var(--ac);border-color:var(--ac);color:var(--bg)}
@@ -427,6 +428,7 @@
     .status-pill{font-size:8px;padding:5px 7px}
     .status-copy{font-size:9px;line-height:1.6}
     .doors{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+    .hero-actions{grid-template-columns:1fr;margin-top:10px}
     .door{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 12px;font-size:10px;letter-spacing:.08em;text-align:center}
     .stamp{width:100%;margin-top:22px;padding:9px 10px;font-size:9px;letter-spacing:.14em;text-align:center;white-space:normal}
 
