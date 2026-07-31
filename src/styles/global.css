@@ -394,7 +394,6 @@
   .gift p b{color:var(--white)}
   .gift .doors{margin-top:28px}
 
-  /* ============ DEBRIEF ============ */
   .lens{display:inline-flex;gap:8px;align-items:center;margin-left:18px}
   .lens>span{font-size:10px;letter-spacing:.16em;color:var(--grey)}
   .lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;padding:4px 10px;border:1px solid var(--faint);background:transparent;color:var(--grey);cursor:pointer;text-transform:uppercase;transition:all .15s ease}
@@ -403,8 +402,6 @@
   .aud{font-size:8.5px;font-weight:700;letter-spacing:.14em;padding:2px 7px;border:1px solid var(--faint);color:var(--grey);text-transform:uppercase;white-space:nowrap}
   .dimmed{opacity:.22;filter:grayscale(.6);transition:opacity .3s ease,filter .3s ease}
   .phase,.op{transition:opacity .3s ease,filter .3s ease}
-  .debrief{margin:0 6vw;padding:48px 0 64px;font-size:12.5px;line-height:2;color:var(--grey);max-width:860px}
-  .debrief b{color:var(--ac)}
 
   @media (max-width:900px){
     .hero{grid-template-columns:1fr;padding-top:90px}
@@ -447,7 +444,6 @@
     .proof-card{padding:20px}
     .proof-card h3{font-size:18px}
     .proof-head p,.proof-card p{font-size:12.5px;line-height:1.8}
-    .debrief{margin:0 20px;padding:40px 0 54px;font-size:12px;line-height:1.9}
     .spine{left:14px}
     .spine-fill{left:14px}
     .phase{padding:0 0 50px 48px}
@@ -496,4 +492,3 @@
      big displays. Grow the inline gutters once the viewport passes ~1520px so
      the content band stays centered instead. max() is a no-op below that. */
   .hero,.proof,.tl,.caps,.demo,.contact,.gift{padding-inline:max(6vw,calc((100vw - 1360px)/2))}
-  .debrief{margin-inline:max(6vw,calc((100vw - 1360px)/2))}

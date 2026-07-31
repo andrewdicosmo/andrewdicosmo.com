@@ -1,7 +1,0 @@
----
-import profile from '../data/profile.json';
-import raw from '../data/sections/DEBRIEF.html?raw';
-const channels = profile.channels.map(c => `<a href="${c.url}">${c.label}</a>`).join(' · ');
-const html = raw.replaceAll('{{CHANNELS}}', channels);
----
-<Fragment set:html={html} />
