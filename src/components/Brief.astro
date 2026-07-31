@@ -18,19 +18,19 @@ const firm = profile.firm;
         <span class="dsel" id="dsel-w2">Tap to select</span>
         <div class="pc-tag">Path 01 · Full-Time</div>
         <h4>Leadership or Engineering</h4>
-        <p>CTO, VP Engineering, technology leadership, or senior hands-on engineering as a W-2 hire. The resume lands in your inbox when you transmit.</p>
+        <p>CTO, VP Engineering, technology leadership, or senior hands-on engineering as a W-2 hire. Your selected path determines which resume lands in your inbox.</p>
       </div>
       <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('c2c')}" role="button" tabindex="0" aria-pressed="false">
         <span class="dsel" id="dsel-c2c">Tap to select</span>
         <div class="pc-tag">Path 02 · Consulting</div>
         <h4>Work With Me, C2C</h4>
-        <p>You engage me, not a company. The work runs through my firm, <a href={firm.url} onclick="event.stopPropagation()" style="color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac-dim)">{firm.name.split(',')[0]}</a>: cloud, security, and AI engineering.</p>
+        <p>You engage me, not a company. The work runs through my firm, <a href={firm.url} target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac-dim)">{firm.name.split(',')[0]}</a>: cloud, security, and AI engineering.</p>
       </div>
       <div class="pathcard" id="door-leadership" onclick="toggleDoor('cto')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('cto')}" role="button" tabindex="0" aria-pressed="false">
         <span class="dsel" id="dsel-cto">Tap to select</span>
         <div class="pc-tag">Path 03 · Technology Leadership</div>
         <h4>Fractional / Interim</h4>
-        <p>Set the strategy and roadmap, establish engineering and governance practices, and lead delivery with hands-on depth. W-2 and C2C arrangements are supported.</p>
+        <p>Set the strategy and roadmap, establish engineering and governance practices, and lead delivery with hands-on depth. This path sends the Technology Executive resume.</p>
       </div>
     </div>
 
@@ -68,6 +68,10 @@ const firm = profile.firm;
         <select>{brief.leadershipArrangement.map(o => <option>{o}</option>)}</select></div>
       </div>
       <div class="step-lbl">03 · Transmit</div>
+      <div class="resume-match">
+        <span>Resume matched to this inquiry</span>
+        <b id="resume-match-name">Engineering &amp; Delivery Resume</b>
+      </div>
       <div class="f2">
         <div><label>Name · required</label><input type="text" id="bname" placeholder="NAME"></div>
         <div><label>Work email · required</label><input type="email" id="bemail" placeholder="EMAIL"></div>
@@ -80,12 +84,12 @@ const firm = profile.firm;
       <textarea id="bmsg" minlength="40" placeholder=""></textarea></div>
       <div class="form-errors" id="brief-errors" role="alert" hidden></div>
       <button class="door primary" type="button" onclick="sendBrief()">Transmit · Receive the resume</button>
-      <p class="form-note">A complete inquiry sends me your details and sends <b>the resume (PDF)</b> to your email. I reply within one business day.</p>
+      <p class="form-note">A complete inquiry sends me your details and emails the <b>resume matched to your selected path</b>. I reply within one business day.</p>
     </div>
     <div class="brief-success" id="brief-done">
       <div class="bs-code">Transmission received</div>
-      <h4>Resume Inbound</h4>
-      <p>Check your inbox. The ATS friendly resume is on its way, and I will follow up on your inquiry within one business day. If it does not arrive, check spam or write me directly.</p>
+      <h4 id="brief-success-title">Resume Inbound</h4>
+      <p id="brief-success-copy">Check your inbox. The resume matched to your inquiry is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.</p>
       <div id="sched-wrap" style="display:none;margin-top:18px">
         <p style="margin-bottom:12px">Your inquiry has <b style="color:var(--ac)">everything I need</b>. If you want to move fast, skip the email round trip and grab a time now.</p>
         <a class="door primary" href="#" style="display:inline-block;text-decoration:none">Schedule a call · Pick a time</a>

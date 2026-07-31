@@ -5,6 +5,7 @@ const { EmailClient } = require('@azure/communication-email');
 const fs = require('node:fs');
 const path = require('node:path');
 const { validateInquiry } = require('../inquiry-validation');
+const { selectResume } = require('../resume-selection');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
@@ -261,8 +262,9 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   const company = clean(lead.company);
   const role = clean(lead.role);
   const selectedPathCount = Number(paths.w2) + Number(paths.c2c) + Number(paths.cto);
-  const attachmentMessage = paths.cto && selectedPathCount === 1
-    ? "I've attached my resume for background on my technology leadership and hands-on delivery experience."
+  const executiveResume = options.resumeLabel === 'Technology Executive Resume';
+  const attachmentMessage = executiveResume
+    ? "I've attached my Technology Executive resume for background on my leadership and hands-on delivery experience."
     : paths.w2 && selectedPathCount === 1
     ? "I've attached my resume for your review and to share with the hiring team if helpful."
     : paths.c2c && selectedPathCount === 1
@@ -461,6 +463,7 @@ app.http('brief', {
     body = { ...body, ...validation.normalized, complete: true };
     const { name, email, company, role, paths, brief, reqLink, chips } = validation.normalized;
     const analytics = getLeadAnalytics(body);
+    const resumeSelection = selectResume(paths, process.env);
 
     const conn = process.env.STORAGE_CONNECTION_STRING;
     const lead = {
@@ -473,6 +476,7 @@ app.http('brief', {
       chips: JSON.stringify(chips),
       reqLink,
       brief,
+      resumeType: resumeSelection.kind,
       complete: true,
       ua: request.headers.get('user-agent') || '',
       ...Object.fromEntries(Object.entries(analytics).filter(([, value]) => value))
@@ -507,23 +511,26 @@ app.http('brief', {
     const submitterReplyOptions = {
       bookingUrl: process.env.BOOKINGS_URL,
       replyEmail: replyTo,
-      linkedinUrl: process.env.LINKEDIN_URL
+      linkedinUrl: process.env.LINKEDIN_URL,
+      resumeLabel: resumeSelection.label
     };
     if ((acs || sg) && from) {
       try {
         let resumeAttachment = null;
         const emailLogoAttachment = getEmailLogoAttachment();
-        if (process.env.RESUME_BLOB_URL) {
-          const pdf = await fetch(process.env.RESUME_BLOB_URL);
+        if (resumeSelection.url) {
+          const pdf = await fetch(resumeSelection.url);
           if (pdf.ok) resumeAttachment = {
             content: Buffer.from(await pdf.arrayBuffer()).toString('base64'),
-            filename: 'Andrew_DiCosmo_Resume.pdf', type: 'application/pdf', disposition: 'attachment'
+            filename: resumeSelection.filename, type: 'application/pdf', disposition: 'attachment'
           };
         }
         const submitterMessage = {
           recipient: email,
           recipientName: name,
-          subject: 'Andrew DiCosmo | Resume and next steps',
+          subject: resumeSelection.kind === 'executive'
+            ? 'Andrew DiCosmo | Technology Executive resume and next steps'
+            : 'Andrew DiCosmo | Resume and next steps',
           text: formatSubmitterReplyText(lead, body, submitterReplyOptions),
           html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
           replyTo,
@@ -589,6 +596,12 @@ app.http('brief', {
       } catch (e) { context.error('mail failed', e); }
     } else context.warn('Mail not configured; no mail sent');
 
-    return { jsonBody: { ok: true, bookingsUrl: process.env.BOOKINGS_URL || '' } };
+    return {
+      jsonBody: {
+        ok: true,
+        bookingsUrl: process.env.BOOKINGS_URL || '',
+        resumeType: resumeSelection.kind
+      }
+    };
   }
 });

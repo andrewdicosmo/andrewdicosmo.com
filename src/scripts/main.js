@@ -185,7 +185,9 @@
     const t=document.getElementById('brief-title');
     const m=document.getElementById('bmsg');
     const ml=document.getElementById('bmsg-label');
+    const resumeMatch=document.getElementById('resume-match-name');
     const selected=[paths.w2?'Full-Time':'',paths.c2c?'Consulting':'',paths.cto?'Technology Leadership':''].filter(Boolean);
+    if(resumeMatch)resumeMatch.textContent=paths.cto?'Technology Executive Resume':'Engineering & Delivery Resume';
     if(selected.length>1){t.textContent='Engagement Inquiry \u00b7 '+selected.join(' + ');m.placeholder='The role or mandate, priorities, timeline, and what you need to accomplish';if(ml)ml.textContent='Opportunity context \u00b7 required \u00b7 40+ characters';}
     else if(paths.w2){t.textContent='Engagement Inquiry \u00b7 Full-Time';m.placeholder='The role, team, timeline, and what you are building';if(ml)ml.textContent='Role or hiring context \u00b7 required \u00b7 40+ characters';}
     else if(paths.c2c){t.textContent='Engagement Inquiry \u00b7 Consulting';m.placeholder='The problem, scope, timeline, and what you are building';if(ml)ml.textContent='Project context \u00b7 required \u00b7 40+ characters';}
@@ -292,15 +294,22 @@
       reqLink:(jrLink&&jrLink.value.trim())||'', brief:(msg&&msg.value.trim())||'',
       analytics:window.__analyticsContext?window.__analyticsContext():undefined
     };
-    const finish=(bookingsUrl)=>{
+    const finish=(bookingsUrl,resumeType)=>{
       const sw=document.getElementById('sched-wrap');
+      const executiveResume=resumeType==='executive';
+      const successTitle=document.getElementById('brief-success-title');
+      const successCopy=document.getElementById('brief-success-copy');
       // only offer the scheduler when a bookings page actually exists;
       // otherwise the anchor would point at "#" and go nowhere
       sw.style.display=bookingsUrl?'block':'none';
       if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
+      if(successTitle)successTitle.textContent=executiveResume?'Technology Executive Resume Inbound':'Resume Inbound';
+      if(successCopy)successCopy.textContent=executiveResume
+        ?'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'
+        :'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.';
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
-      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasBookingUrl:!!bookingsUrl});
+      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,resumeType:resumeType||'standard',hasBookingUrl:!!bookingsUrl});
       goDoor('brief');
     };
     const send=(fileB64,fileName)=>{
@@ -312,7 +321,7 @@
           if(!r.ok){const error=new Error(data.error||'Submission failed');error.messages=data.missing;throw error;}
           return data;
         })
-        .then(d=>finish(d&&d.bookingsUrl))
+        .then(d=>finish(d&&d.bookingsUrl,d&&d.resumeType))
         .catch(error=>{
           if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
           showBriefErrors(Array.isArray(error.messages)&&error.messages.length
@@ -405,17 +414,41 @@
     gis: {sensor:'SENSOR  SAR + VECTOR · GIS', layers:{Lndvi:false,Lvector:true, Lshadow:false,LshadowDrift:false,Lglint:false}}
   };
   const hudSensor=document.getElementById('hudSensor');
-  function setView(m){
+  const viewButtons=[...document.querySelectorAll('.vm')];
+  let viewTourTimer=null;
+  function stopViewTour(){
+    if(viewTourTimer)clearTimeout(viewTourTimer);
+    viewTourTimer=null;
+  }
+  function setView(m,source='manual'){
     const cfg=viewCfg[m];
     Object.entries(cfg.layers).forEach(([id,on])=>{
       const el=document.getElementById(id);
       if(el)el.style.display=on?'':'none';
     });
     hudSensor.textContent=cfg.sensor;
-    document.querySelectorAll('.vm').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+    viewButtons.forEach(b=>{
+      const active=b.dataset.m===m;
+      b.classList.toggle('on',active);
+      b.setAttribute('aria-pressed',String(active));
+    });
+    if(source==='manual'&&window.__track)window.__track('hero_view_selected',{view:m});
   }
-  document.querySelectorAll('.vm').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.m)));
-  setView('eo');
+  viewButtons.forEach(b=>b.addEventListener('click',()=>{
+    stopViewTour();
+    setView(b.dataset.m);
+  }));
+  setView('eo','initial');
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const guidedViews=['ndvi','gis','eo'];
+    let guidedIndex=0;
+    const advanceViewTour=()=>{
+      if(guidedIndex>=guidedViews.length){stopViewTour();return;}
+      setView(guidedViews[guidedIndex++],'tour');
+      viewTourTimer=setTimeout(advanceViewTour,3200);
+    };
+    viewTourTimer=setTimeout(advanceViewTour,2600);
+  }
 
   // ---- HUD: ticking timestamp ----
   const hudTime=document.getElementById('hudTime');
