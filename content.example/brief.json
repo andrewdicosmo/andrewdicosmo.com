@@ -27,13 +27,14 @@
   "Ongoing support"
  ],
  "chips": [
-  "AI and machine learning",
-  "Computer vision",
-  "Cloud security",
-  "Cloud architecture",
-  "Data platforms",
-  "E-commerce and Shopify",
-  "Workflow automation",
+  "Production AI systems",
+  "Computer vision and intelligent document processing",
+  "Cloud platform architecture and modernization",
+  "Security, compliance, and AI governance",
+  "Enterprise data platforms and API integration",
+  "Production system assessment, recovery, and scaling",
+  "Technology strategy and roadmap",
+  "Engineering delivery leadership",
   "Not sure yet"
  ],
  "stage": [
