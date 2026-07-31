@@ -6,7 +6,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { validateInquiry } = require('../inquiry-validation');
 const { selectResume } = require('../resume-selection');
-const { sendAcsMessage, sendGridMessage } = require('../email-delivery');
+const {
+  deliverMessagesIndependently,
+  sendAcsMessage,
+  sendGridMessage
+} = require('../email-delivery');
 
 const clean = (value) => String(value || '').trim();
 const compact = (items) => items.filter(Boolean);
@@ -554,27 +558,36 @@ app.http('brief', {
           attachments: compact([emailLogoAttachment])
         } : null;
 
-        if (acs) {
-          const client = new EmailClient(acs);
-          delivery.resumeMessageId = await sendAcsMessage(client, from, submitterMessage);
-          delivery.resume = 'accepted';
-          if (ownerMessage) {
-            delivery.ownerMessageId = await sendAcsMessage(client, from, ownerMessage);
-            delivery.owner = 'accepted';
+        const sendMessage = acs
+          ? (() => {
+              const client = new EmailClient(acs);
+              return (message) => sendAcsMessage(client, from, message);
+            })()
+          : (message) => sendGridMessage(fetch, sg, from, senderName, message);
+        const messages = [
+          { key: 'resume', message: submitterMessage },
+          { key: 'owner', message: ownerMessage }
+        ].filter(({ message }) => message);
+
+        const results = await deliverMessagesIndependently(sendMessage, messages);
+        const errors = [];
+        results.forEach((result) => {
+          if (result.status === 'accepted') {
+            delivery[result.key] = 'accepted';
+            delivery[`${result.key}MessageId`] = result.messageId;
+            return;
           }
-        } else {
-          delivery.resumeMessageId = await sendGridMessage(fetch, sg, from, senderName, submitterMessage);
-          delivery.resume = 'accepted';
-          if (ownerMessage) {
-            delivery.ownerMessageId = await sendGridMessage(fetch, sg, from, senderName, ownerMessage);
-            delivery.owner = 'accepted';
-          }
-        }
+          delivery[result.key] = 'failed';
+          const error = clean(result.error?.message).slice(0, 900);
+          errors.push(`${result.key}: ${error || 'unknown delivery error'}`);
+          context.error(`${result.key} mail failed`, result.error);
+        });
+        if (errors.length) delivery.error = errors.join(' | ').slice(0, 1000);
       } catch (e) {
-        if (delivery.resume !== 'accepted') delivery.resume = 'failed';
-        else if (delivery.owner !== 'accepted' && delivery.owner !== 'not_requested') delivery.owner = 'failed';
+        delivery.resume = 'failed';
+        if (ownerMessage) delivery.owner = 'failed';
         delivery.error = clean(e?.message).slice(0, 1000);
-        context.error('mail failed', e);
+        context.error('mail setup failed', e);
       }
     } else context.warn('Mail not configured; no mail sent');
 

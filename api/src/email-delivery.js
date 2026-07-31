@@ -58,4 +58,14 @@ async function sendGridMessage(fetchImpl, apiKey, from, senderName, message) {
   return response.headers.get('x-message-id') || '';
 }
 
-module.exports = { sendAcsMessage, sendGridMessage };
+async function deliverMessagesIndependently(sendMessage, messages) {
+  return Promise.all(messages.map(async ({ key, message }) => {
+    try {
+      return { key, status: 'accepted', messageId: await sendMessage(message) };
+    } catch (error) {
+      return { key, status: 'failed', error };
+    }
+  }));
+}
+
+module.exports = { deliverMessagesIndependently, sendAcsMessage, sendGridMessage };

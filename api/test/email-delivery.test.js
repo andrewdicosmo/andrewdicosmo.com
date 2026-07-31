@@ -1,6 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { sendAcsMessage, sendGridMessage } = require('../src/email-delivery');
+const {
+  deliverMessagesIndependently,
+  sendAcsMessage,
+  sendGridMessage
+} = require('../src/email-delivery');
 
 const message = {
   recipient: 'person@example.com',
@@ -44,4 +48,21 @@ test('rejects a non-success SendGrid response', async () => {
     sendGridMessage(fetchImpl, 'key', 'sender@example.com', 'Sender', message),
     /SendGrid email delivery failed \(401\): Unauthorized/
   );
+});
+
+test('attempts owner notification when resume delivery fails', async () => {
+  const attempted = [];
+  const results = await deliverMessagesIndependently(async (outbound) => {
+    attempted.push(outbound.recipient);
+    if (outbound.recipient === 'submitter@example.com') throw new Error('Resume rejected');
+    return 'owner-message-id';
+  }, [
+    { key: 'resume', message: { recipient: 'submitter@example.com' } },
+    { key: 'owner', message: { recipient: 'owner@example.com' } }
+  ]);
+
+  assert.deepEqual(attempted, ['submitter@example.com', 'owner@example.com']);
+  assert.equal(results[0].status, 'failed');
+  assert.equal(results[1].status, 'accepted');
+  assert.equal(results[1].messageId, 'owner-message-id');
 });
