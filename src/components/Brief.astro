@@ -96,7 +96,7 @@ const firm = profile.firm;
       <textarea id="bmsg" minlength="40" aria-describedby="bmsg-help" placeholder=""></textarea>
       <span class="field-help" id="bmsg-help">Please provide at least 40 characters so I have enough context to respond.</span></div>
       <div class="form-errors" id="brief-errors" role="alert" hidden></div>
-      <button class="door primary" type="button" onclick="sendBrief()">Send inquiry · Receive the resume</button>
+      <button class="door primary" id="brief-submit" type="button" onclick="sendBrief()">Send inquiry · Receive the resume</button>
       <p class="form-note">After you submit the form, the <b>resume shown above</b> will be emailed to you. I respond personally within one business day.</p>
     </div>
     <div class="brief-success" id="brief-done">

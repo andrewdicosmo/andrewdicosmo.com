@@ -526,6 +526,7 @@ app.http('brief', {
       owner: to ? 'not_configured' : 'not_requested'
     };
     if ((acs || sg) && from) {
+      let ownerMessage = null;
       try {
         let resumeAttachment = null;
         const emailLogoAttachment = getEmailLogoAttachment();
@@ -548,7 +549,7 @@ app.http('brief', {
           replyToName: senderName,
           attachments: compact([emailLogoAttachment, resumeAttachment])
         };
-        const ownerMessage = to ? {
+        ownerMessage = to ? {
           recipient: to,
           subject: formatOwnerSubject(lead, body),
           text: formatOwnerInquiry(lead, body),

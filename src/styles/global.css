@@ -81,6 +81,7 @@
   .door:hover{border-color:var(--ac);color:var(--ac)}
   .door.primary{background:var(--ac);border-color:var(--ac);color:var(--bg)}
   .door.primary:hover{filter:brightness(1.2)}
+  .door:disabled{opacity:.55;cursor:wait;filter:none}
 
   /* ============ PANELS (shared by both animations) ============ */
   .scene-wrap{border:1px solid var(--faint);background:var(--panel);position:relative}

@@ -206,6 +206,15 @@
     setTimeout(()=>document.getElementById('bname').focus({preventScroll:true}),600);
   }
   window.startBrief=startBrief;
+  let briefSending=false;
+  function setBriefSending(sending){
+    briefSending=sending;
+    const button=document.getElementById('brief-submit');
+    if(!button)return;
+    button.disabled=sending;
+    button.textContent=sending?'Sending inquiry...':'Send inquiry · Receive the resume';
+    button.setAttribute('aria-busy',String(sending));
+  }
   document.querySelectorAll('[data-brief-path]').forEach(button=>{
     button.addEventListener('click',()=>startBrief(button.dataset.briefPath));
   });
@@ -286,6 +295,7 @@
     return {ok:!errors.length,name,email,company,role,msg,jrFile,jrLink,selectedChips};
   }
   function sendBrief(){
+    if(briefSending)return;
     const form=document.getElementById('brief-form');
     const validation=validateBrief(form);
     if(!validation.ok)return;
@@ -338,11 +348,12 @@
     };
     const send=(fileB64,fileName)=>{
       if(fileB64){payload.attachment={name:fileName,data:fileB64};}
+      setBriefSending(true);
       if(window.__track)window.__track('inquiry_submit_attempt',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasAttachment:!!fileB64,hasJobLink:!!payload.reqLink});
       fetch((window.__SITE&&window.__SITE.apiEndpoint)||'/api/brief',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
         .then(async r=>{
           const data=await r.json().catch(()=>({}));
-          if(!r.ok){const error=new Error(data.error||'Submission failed');error.messages=data.missing;throw error;}
+          if(!r.ok){const error=new Error(data.error||'Submission failed');error.messages=data.missing;error.status=r.status;throw error;}
           return data;
         })
         .then(d=>finish(d&&d.bookingsUrl,d&&d.resumeType,d&&d.emailAccepted,d&&d.contactEmail))
@@ -350,8 +361,11 @@
           if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
           showBriefErrors(Array.isArray(error.messages)&&error.messages.length
             ?error.messages
-            :['The inquiry could not be sent. Please review the fields and try again.']);
-        });
+            :[Number(error.status)>=500||!error.status
+              ?'The inquiry service had a temporary error. Your information may already be saved; wait a moment before trying again.'
+              :'The inquiry could not be sent. Please review the fields and try again.']);
+        })
+        .finally(()=>setBriefSending(false));
     };
     if(jrFile&&jrFile.files&&jrFile.files[0]&&jrFile.files[0].size<5*1024*1024){
       const rd=new FileReader();
