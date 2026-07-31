@@ -4,8 +4,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/use-example-content.mjs",
-    "prebuild": "node scripts/use-example-content.mjs",
+    "prepare:content": "node scripts/use-example-content.mjs && node scripts/build-chat-knowledge.mjs",
+    "predev": "npm run prepare:content",
+    "prebuild": "npm run prepare:content",
     "dev": "astro dev",
     "build": "astro build && node -e \"require('node:fs').copyFileSync('staticwebapp.config.json','dist/staticwebapp.config.json')\"",
     "preview": "astro preview"

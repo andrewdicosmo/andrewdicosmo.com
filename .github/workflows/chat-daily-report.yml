@@ -1,0 +1,27 @@
+name: AI Assistant daily report
+
+on:
+  schedule:
+    # The endpoint sends only when it is 8:00 AM in America/Chicago. Running
+    # at both UTC offsets handles daylight-saving time without manual edits.
+    - cron: '0 13 * * *'
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request protected daily report
+        env:
+          CHAT_REPORT_URL: ${{ secrets.CHAT_REPORT_URL }}
+          CHAT_REPORT_SECRET: ${{ secrets.CHAT_REPORT_SECRET }}
+        run: |
+          test -n "$CHAT_REPORT_URL"
+          test -n "$CHAT_REPORT_SECRET"
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${CHAT_REPORT_SECRET}" \
+            --header "Content-Type: application/json" \
+            --data '{}' \
+            "$CHAT_REPORT_URL"

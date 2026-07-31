@@ -98,6 +98,11 @@
       const destination=new URL(rawHref,window.location.href);
       const isHttp=destination.protocol==='http:'||destination.protocol==='https:';
       const isPortfolioDomain=['andrewdicosmo.com','www.andrewdicosmo.com'].includes(destination.hostname);
+      if(destination.protocol==='mailto:'||destination.protocol==='tel:'){
+        link.addEventListener('click',()=>window.__track&&window.__track('contact_click',{
+          method:destination.protocol.slice(0,-1)
+        }));
+      }
       if(isHttp&&(isPortfolioDomain||destination.origin!==window.location.origin)){
         link.target='_blank';
         link.rel='noopener noreferrer';
@@ -204,6 +209,12 @@
   document.querySelectorAll('[data-brief-path]').forEach(button=>{
     button.addEventListener('click',()=>startBrief(button.dataset.briefPath));
   });
+  const inquiryForm=document.getElementById('brief-form');
+  if(inquiryForm){
+    inquiryForm.addEventListener('focusin',()=>{
+      if(window.__track)window.__track('inquiry_form_started',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto});
+    },{once:true});
+  }
   function showBriefErrors(messages){
     const box=document.getElementById('brief-errors');
     if(!box)return;
@@ -302,7 +313,16 @@
       // only offer the scheduler when a bookings page actually exists;
       // otherwise the anchor would point at "#" and go nowhere
       sw.style.display=bookingsUrl?'block':'none';
-      if(bookingsUrl){const a=sw.querySelector('a');if(a)a.href=bookingsUrl;}
+      if(bookingsUrl){
+        const a=sw.querySelector('a');
+        if(a){
+          a.href=bookingsUrl;
+          if(!a.dataset.bookingTracked){
+            a.dataset.bookingTracked='true';
+            a.addEventListener('click',()=>window.__track&&window.__track('booking_click'));
+          }
+        }
+      }
       if(successTitle)successTitle.textContent=emailAccepted
         ?(executiveResume?'Technology Executive Resume Sent':'Engineering & Delivery Resume Sent')
         :'Inquiry Received';

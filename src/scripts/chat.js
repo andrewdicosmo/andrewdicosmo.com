@@ -1,0 +1,217 @@
+(function(){
+  const shell=document.querySelector('.chat-shell');
+  const launcher=document.getElementById('chat-launcher');
+  const panel=document.getElementById('chat-panel');
+  const closeButton=document.getElementById('chat-close');
+  const messages=document.getElementById('chat-messages');
+  const choices=document.getElementById('chat-choices');
+  const form=document.getElementById('chat-form');
+  const input=document.getElementById('chat-input');
+  const sendButton=form&&form.querySelector('.chat-send');
+  const status=document.getElementById('chat-status');
+  const privacyOpen=document.getElementById('chat-privacy-open');
+  const privacyClose=document.getElementById('chat-privacy-close');
+  const privacy=document.getElementById('chat-privacy');
+  if(!shell||!launcher||!panel||!messages||!choices||!form||!input)return;
+
+  const starters=[
+    "I'm hiring for a role",
+    'I need help with a project',
+    "I'm looking for technology leadership",
+    "I want to learn about Andrew's experience",
+    'I want to compare Andrew with a job description',
+    "I'm exploring the website template",
+    'I have another question'
+  ];
+  let initialized=false;
+  let busy=false;
+  let userTurns=0;
+  let sessionId='';
+  let sessionToken='';
+  try{
+    sessionId=sessionStorage.getItem('ad_chat_session')||'';
+    sessionToken=sessionStorage.getItem('ad_chat_token')||'';
+  }catch{}
+
+  function track(event,props){
+    if(typeof window.__track==='function')window.__track(event,props||{});
+  }
+
+  function setStatus(text,active){
+    status.lastChild.textContent=' '+text;
+    status.classList.toggle('active',Boolean(active));
+  }
+
+  function addMessage(role,text,meta){
+    const article=document.createElement('article');
+    article.className=`chat-message ${role}`;
+    const label=document.createElement('span');
+    label.className='chat-message-label';
+    label.textContent=role==='assistant'?"Andrew's AI Assistant":'You';
+    const copy=document.createElement('div');
+    copy.className='chat-message-copy';
+    copy.textContent=text;
+    article.append(label,copy);
+
+    const evidence=Array.isArray(meta&&meta.evidence)?meta.evidence:[];
+    const sources=Array.isArray(meta&&meta.sources)?meta.sources:[];
+    if(evidence.length||sources.length){
+      const refs=document.createElement('div');
+      refs.className='chat-refs';
+      evidence.forEach(item=>{
+        const link=document.createElement('a');
+        link.className='chat-ref';
+        link.href=item.anchor||'#top';
+        link.textContent=`Evidence // ${item.title}`;
+        link.addEventListener('click',()=>closeChat(false));
+        refs.append(link);
+      });
+      sources.forEach(item=>{
+        const link=document.createElement('a');
+        link.className='chat-ref web';
+        link.href=item.url;
+        link.target='_blank';
+        link.rel='noopener noreferrer';
+        link.textContent=item.title||'Web source';
+        refs.append(link);
+      });
+      article.append(refs);
+    }
+    messages.append(article);
+    messages.scrollTop=messages.scrollHeight;
+  }
+
+  function showChoices(items,starterMode){
+    choices.replaceChildren();
+    (items||[]).forEach(text=>{
+      const button=document.createElement('button');
+      button.type='button';
+      button.textContent=text;
+      button.className=starterMode?'chat-choice starter':'chat-choice';
+      button.addEventListener('click',()=>send(text));
+      choices.append(button);
+    });
+    choices.hidden=!choices.children.length;
+  }
+
+  function initialize(){
+    if(initialized)return;
+    initialized=true;
+    addMessage('assistant',"You're chatting with Andrew's AI Assistant. How can I help you today?");
+    showChoices(starters,true);
+  }
+
+  function openChat(){
+    initialize();
+    panel.hidden=false;
+    shell.dataset.chatState='open';
+    launcher.setAttribute('aria-expanded','true');
+    document.body.classList.add('chat-open');
+    requestAnimationFrame(()=>input.focus({preventScroll:true}));
+    track('chat_open');
+  }
+
+  function closeChat(returnFocus=true){
+    panel.hidden=true;
+    shell.dataset.chatState='closed';
+    launcher.setAttribute('aria-expanded','false');
+    document.body.classList.remove('chat-open');
+    hidePrivacy();
+    if(returnFocus)launcher.focus({preventScroll:true});
+  }
+
+  function showPrivacy(){
+    privacy.hidden=false;
+    privacyOpen.setAttribute('aria-expanded','true');
+  }
+  function hidePrivacy(){
+    privacy.hidden=true;
+    privacyOpen.setAttribute('aria-expanded','false');
+  }
+
+  function fallbackReply(){
+    return "This public clone is running the safe template demonstration. Connect your own Azure AI deployment and private content to enable grounded answers; Andrew's data and credentials are not included in the repository.";
+  }
+
+  async function send(raw){
+    const message=String(raw||'').trim().slice(0,1200);
+    if(!message||busy)return;
+    busy=true;
+    userTurns+=1;
+    addMessage('user',message);
+    showChoices([]);
+    input.value='';
+    input.style.height='auto';
+    input.disabled=true;
+    sendButton.disabled=true;
+    setStatus('Reviewing approved evidence...',true);
+    track('chat_message_sent',{turn:userTurns,hasSession:Boolean(sessionId)});
+    if(userTurns===2)track('chat_two_questions');
+
+    try{
+      const endpoint=(window.__SITE&&window.__SITE.chatEndpoint)||'/api/chat';
+      const requestChat=()=>fetch(endpoint,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message,sessionId,sessionToken,website:''})
+      });
+      let response=await requestChat();
+      let data=await response.json().catch(()=>({}));
+      if(response.status===401&&sessionId){
+        sessionId='';
+        sessionToken='';
+        try{
+          sessionStorage.removeItem('ad_chat_session');
+          sessionStorage.removeItem('ad_chat_token');
+        }catch{}
+        response=await requestChat();
+        data=await response.json().catch(()=>({}));
+      }
+      const templateDemo=response.status===404;
+      if(data.sessionId&&data.sessionToken){
+        sessionId=data.sessionId;
+        sessionToken=data.sessionToken;
+        try{
+          sessionStorage.setItem('ad_chat_session',sessionId);
+          sessionStorage.setItem('ad_chat_token',sessionToken);
+        }catch{}
+      }
+      const reply=data.reply||(templateDemo||response.ok?fallbackReply():'The AI channel is temporarily unavailable. Please try again shortly.');
+      addMessage('assistant',reply,{evidence:data.evidence,sources:data.sources});
+      showChoices(data.suggestions||[]);
+      setStatus(data.mode==='mock'||templateDemo?'Template demo mode':'Secure channel ready',false);
+      if(data.resumeSent)track('chat_resume_sent',{resumeSent:true});
+      if(data.intent==='job_fit')track('chat_job_fit_analyzed',{analyzed:true});
+      if(!response.ok)track('chat_request_failed',{status:response.status});
+    }catch{
+      addMessage('assistant',fallbackReply());
+      setStatus('Template demo mode',false);
+      track('chat_request_failed',{status:0});
+    }finally{
+      busy=false;
+      input.disabled=false;
+      sendButton.disabled=false;
+      input.focus({preventScroll:true});
+    }
+  }
+
+  launcher.addEventListener('click',openChat);
+  closeButton.addEventListener('click',()=>closeChat());
+  privacyOpen.addEventListener('click',()=>privacy.hidden?showPrivacy():hidePrivacy());
+  privacyClose.addEventListener('click',hidePrivacy);
+  form.addEventListener('submit',event=>{event.preventDefault();send(input.value);});
+  input.addEventListener('input',()=>{
+    input.style.height='auto';
+    input.style.height=`${Math.min(input.scrollHeight,120)}px`;
+  });
+  input.addEventListener('keydown',event=>{
+    if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send(input.value);}
+  });
+  document.addEventListener('pointerdown',event=>{
+    if(!privacy.hidden&&!privacy.contains(event.target)&&event.target!==privacyOpen)hidePrivacy();
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&!privacy.hidden){hidePrivacy();privacyOpen.focus();return;}
+    if(event.key==='Escape'&&!panel.hidden)closeChat();
+  });
+})();
