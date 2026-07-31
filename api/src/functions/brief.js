@@ -160,7 +160,7 @@ function formatOwnerInquiryHtml(lead, body) {
     clean(lead.role) ? ['Role or title', clean(lead.role)] : null,
     paths ? ['Engagement path', paths] : null
   ]);
-  const detailRows = [...contactRows, ...fields].map(([label, value]) => `
+  const detailRows = [...contactRows, ...fields.map((field) => [field.label, field.value])].map(([label, value]) => `
                     <tr>
                       <td class="detail-row" style="padding:10px 0;border-bottom:1px solid #e7edf2;">
                         <div class="muted" style="color:#66727c;font-size:11px;line-height:1.4;text-transform:uppercase;letter-spacing:0.6px;">${escapeHtml(label)}</div>
@@ -619,3 +619,5 @@ app.http('brief', {
     };
   }
 });
+
+module.exports = { formatOwnerInquiryHtml, formatSubmitterReplyHtml };
