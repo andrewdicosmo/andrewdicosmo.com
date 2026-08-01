@@ -70,15 +70,15 @@ function formatTranscriptHtml(session, visitorName = 'Visitor') {
     const assistant = item.role === 'assistant';
     const alignment = assistant ? 'right' : 'left';
     const label = assistant ? "Andrew's AI Assistant" : visitorName;
-    const background = assistant ? '#0a84ff' : '#e9e9eb';
-    const color = assistant ? '#ffffff' : '#111111';
+    const background = assistant ? '#0a84ff' : '#26252a';
+    const color = '#ffffff';
     const radius = assistant ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
     const timestamp = messageTime(item.at);
     const message = escapeHtml(clean(item.text)).replace(/\r?\n/g, '<br>');
 
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 14px;"><tr><td align="${alignment}">
       <div style="max-width:82%;display:inline-block;text-align:left;">
-        <div style="margin:0 6px 4px;color:#7b8790;font-size:10px;line-height:1.3;">${escapeHtml(label)}${timestamp ? ` &middot; ${escapeHtml(timestamp)}` : ''}</div>
+        <div style="margin:0 6px 4px;color:#8e8e93;font-size:10px;line-height:1.3;">${escapeHtml(label)}${timestamp ? ` &middot; ${escapeHtml(timestamp)}` : ''}</div>
         <div style="display:inline-block;padding:10px 14px;background:${background};color:${color};border-radius:${radius};font-size:14px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;">${message}</div>
       </div>
     </td></tr></table>`;
@@ -114,7 +114,7 @@ function ownerMessage(session, kind) {
     recipientName: 'Andrew DiCosmo',
     subject,
     text: `${title}\n\nConversation ID: ${session.rowKey}\nName: ${name}\nEmail: ${session.email || ''}\nCompany: ${company}\nRole: ${session.role || ''}\nIntent: ${intent}\nPreferred time: ${session.preferredTime || ''} ${session.timezone || ''}\n\nConversation\n${transcriptText(session)}`,
-    html: emailShell(title, `<table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:20px;">${details}</table><div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;margin-bottom:12px;">Conversation transcript</div><div style="padding:18px 14px 4px;background:#f7f7f8;border-radius:12px;">${transcript}</div>`),
+    html: emailShell(title, `<table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:20px;">${details}</table><div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;margin-bottom:12px;">Conversation transcript</div><div style="padding:18px 14px 4px;background:#000000;border-radius:12px;">${transcript}</div>`),
     replyTo: session.email || process.env.MAIL_REPLY_TO || process.env.MAIL_TO,
     replyToName: name,
     attachments: [logoAttachment()].filter(Boolean)

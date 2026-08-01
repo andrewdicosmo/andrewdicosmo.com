@@ -17,8 +17,9 @@ test('renders owner transcript as readable left and right message bubbles', () =
   const html = formatTranscriptHtml(session, session.name);
   assert.match(html, /align="left"/);
   assert.match(html, /align="right"/);
-  assert.match(html, /background:#e9e9eb/);
+  assert.match(html, /background:#26252a/);
   assert.match(html, /background:#0a84ff/);
+  assert.match(html, /color:#ffffff/);
   assert.match(html, /Taylor/);
   assert.match(html, /Andrew&#39;s AI Assistant/);
   assert.match(html, /Jul 31/);
@@ -28,6 +29,7 @@ test('renders owner transcript as readable left and right message bubbles', () =
 test('uses the message thread in the complete owner notification', () => {
   const message = ownerMessage(session, 'lead');
   assert.match(message.html, /Conversation transcript/);
+  assert.match(message.html, /background:#000000/);
   assert.match(message.html, /Can Andrew lead our AI program\?/);
   assert.match(message.text, /Visitor: Can Andrew lead our AI program\?/);
 });
