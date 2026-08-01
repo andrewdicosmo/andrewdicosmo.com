@@ -103,6 +103,10 @@
     showChoices(starters,true);
   }
 
+  function setEndVisible(visible){
+    endButton.hidden=!visible;
+  }
+
   function endConversation(){
     const endedTurns=userTurns;
     const hadSession=Boolean(sessionId);
@@ -122,6 +126,7 @@
     input.style.height='auto';
     input.disabled=false;
     sendButton.disabled=false;
+    setEndVisible(false);
     setStatus('New conversation ready',false);
     track('chat_end',{turns:endedTurns,hadSession});
     initialize();
@@ -166,6 +171,7 @@
     busy=true;
     const sendEpoch=conversationEpoch;
     userTurns+=1;
+    setEndVisible(true);
     addMessage('user',message);
     showChoices([]);
     input.value='';

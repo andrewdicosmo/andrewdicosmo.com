@@ -10,9 +10,12 @@
         <span class="chat-kicker">Comms link // Online</span>
         <h2 id="chat-title">Andrew's AI Assistant</h2>
       </div>
-      <button class="chat-icon-button" id="chat-close" type="button" aria-label="Close AI Assistant" title="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+      <div class="chat-header-actions">
+        <button class="chat-end-button" id="chat-end" type="button" hidden>End conversation</button>
+        <button class="chat-icon-button" id="chat-close" type="button" aria-label="Close AI Assistant" title="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
     </header>
 
     <div class="chat-status" id="chat-status" role="status" aria-live="polite">
@@ -32,10 +35,7 @@
 
     <footer class="chat-footer">
       <span>AI responses may need verification.</span>
-      <div class="chat-footer-actions">
-        <button type="button" id="chat-end">End conversation</button>
-        <button type="button" id="chat-privacy-open" aria-expanded="false">Privacy</button>
-      </div>
+      <button type="button" id="chat-privacy-open" aria-expanded="false">Privacy</button>
       <div class="chat-privacy" id="chat-privacy" role="dialog" aria-label="Chat privacy" hidden>
         <button type="button" id="chat-privacy-close" aria-label="Close privacy notice">&times;</button>
         Chats may be reviewed by Andrew, processed by Azure AI and web search, and automatically deleted after 30 days.
