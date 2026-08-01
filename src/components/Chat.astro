@@ -29,9 +29,11 @@
       <label class="sr-only" for="chat-input">Message Andrew's AI Assistant</label>
       <input type="file" id="chat-file" accept=".txt,.md,.pdf,.doc,.docx" hidden />
       <button type="button" class="chat-attach" id="chat-attach" aria-label="Attach job requirement" title="Attach job requirement">
-        <span aria-hidden="true">JD</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <path d="M21.4 11.6 12 21a6 6 0 0 1-8.5-8.5l9.7-9.7a4.2 4.2 0 0 1 6 6L9.6 18.4a2.4 2.4 0 0 1-3.4-3.4l8.7-8.7" />
+        </svg>
       </button>
-      <textarea id="chat-input" rows="1" maxlength="1200" placeholder="Ask about Andrew's experience..." required></textarea>
+      <textarea id="chat-input" rows="1" maxlength="1200" placeholder="Ask about Andrew..." data-placeholder-desktop="Ask about Andrew's experience..." data-placeholder-mobile="Ask Andrew..." required></textarea>
       <button type="submit" class="chat-send" aria-label="Send message" title="Send">
         <span aria-hidden="true">&#8593;</span>
       </button>
