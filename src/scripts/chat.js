@@ -9,10 +9,11 @@
   const input=document.getElementById('chat-input');
   const sendButton=form&&form.querySelector('.chat-send');
   const status=document.getElementById('chat-status');
+  const endButton=document.getElementById('chat-end');
   const privacyOpen=document.getElementById('chat-privacy-open');
   const privacyClose=document.getElementById('chat-privacy-close');
   const privacy=document.getElementById('chat-privacy');
-  if(!shell||!launcher||!panel||!messages||!choices||!form||!input)return;
+  if(!shell||!launcher||!panel||!messages||!choices||!form||!input||!endButton)return;
 
   const starters=[
     "I'm hiring for a role",
@@ -28,6 +29,7 @@
   let userTurns=0;
   let sessionId='';
   let sessionToken='';
+  let conversationEpoch=0;
   try{
     sessionId=sessionStorage.getItem('ad_chat_session')||'';
     sessionToken=sessionStorage.getItem('ad_chat_token')||'';
@@ -101,6 +103,31 @@
     showChoices(starters,true);
   }
 
+  function endConversation(){
+    const endedTurns=userTurns;
+    const hadSession=Boolean(sessionId);
+    conversationEpoch+=1;
+    sessionId='';
+    sessionToken='';
+    userTurns=0;
+    initialized=false;
+    busy=false;
+    try{
+      sessionStorage.removeItem('ad_chat_session');
+      sessionStorage.removeItem('ad_chat_token');
+    }catch{}
+    hidePrivacy();
+    messages.replaceChildren();
+    input.value='';
+    input.style.height='auto';
+    input.disabled=false;
+    sendButton.disabled=false;
+    setStatus('New conversation ready',false);
+    track('chat_end',{turns:endedTurns,hadSession});
+    initialize();
+    input.focus({preventScroll:true});
+  }
+
   function openChat(){
     initialize();
     panel.hidden=false;
@@ -137,6 +164,7 @@
     const message=String(raw||'').trim().slice(0,1200);
     if(!message||busy)return;
     busy=true;
+    const sendEpoch=conversationEpoch;
     userTurns+=1;
     addMessage('user',message);
     showChoices([]);
@@ -157,6 +185,7 @@
       });
       let response=await requestChat();
       let data=await response.json().catch(()=>({}));
+      if(sendEpoch!==conversationEpoch)return;
       if(response.status===401&&sessionId){
         sessionId='';
         sessionToken='';
@@ -176,6 +205,7 @@
           sessionStorage.setItem('ad_chat_token',sessionToken);
         }catch{}
       }
+      if(sendEpoch!==conversationEpoch)return;
       const reply=data.reply||(templateDemo||response.ok?fallbackReply():'The AI channel is temporarily unavailable. Please try again shortly.');
       addMessage('assistant',reply,{evidence:data.evidence,sources:data.sources});
       showChoices(data.suggestions||[]);
@@ -185,10 +215,12 @@
       if(data.blockedOn)track('chat_information_gate',{field:data.blockedOn,turn:userTurns});
       if(!response.ok)track('chat_request_failed',{status:response.status});
     }catch{
+      if(sendEpoch!==conversationEpoch)return;
       addMessage('assistant',fallbackReply());
       setStatus('Template demo mode',false);
       track('chat_request_failed',{status:0});
     }finally{
+      if(sendEpoch!==conversationEpoch)return;
       busy=false;
       input.disabled=false;
       sendButton.disabled=false;
@@ -198,6 +230,7 @@
 
   launcher.addEventListener('click',openChat);
   closeButton.addEventListener('click',()=>closeChat());
+  endButton.addEventListener('click',endConversation);
   privacyOpen.addEventListener('click',()=>privacy.hidden?showPrivacy():hidePrivacy());
   privacyClose.addEventListener('click',hidePrivacy);
   form.addEventListener('submit',event=>{event.preventDefault();send(input.value);});
