@@ -280,7 +280,7 @@
         ? 'This conversation has reached its message limit. Use End conversation to start a fresh chat, or use the inquiry section if you want Andrew to follow up.'
         : (templateDemo||response.ok?fallbackReply():'The AI channel is temporarily unavailable. Please try again shortly.'));
       addMessage('assistant',reply,{evidence:data.evidence,sources:data.sources});
-      showChoices(data.suggestions||[]);
+      showChoices(data.blockedOn||data.attachmentPending?[]:data.suggestions||[]);
       setStatus(data.mode==='mock'||templateDemo?'Template demo mode':'Secure channel ready',false);
       if(data.resumeSent)track('chat_resume_sent',{resumeSent:true});
       if(data.intent==='job_fit')track('chat_job_fit_analyzed',{analyzed:true});

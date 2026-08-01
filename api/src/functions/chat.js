@@ -24,6 +24,7 @@ const clean = (value, max = 1200) => String(value || '').trim().replace(/\u0000/
 const userTextWithAttachment = (message, decoded) => decoded
   ? `${message}\n\n[Attached job requirement: ${decoded.name}]`
   : message;
+const wantsReferences = (message) => /\b(source|sources|evidence|proof|citation|citations|reference|references|link|links|where did|back that up|show me where)\b/i.test(String(message || ''));
 
 app.http('chat', {
   methods: ['POST'],
@@ -104,7 +105,7 @@ app.http('chat', {
             sessionId: session.rowKey,
             sessionToken: opened.token,
             reply: contactGate.reply,
-            suggestions: ['Share name, email, company, and role', 'Ask a general question instead'],
+            suggestions: [],
             evidence: [],
             sources: [],
             intent: 'job_fit',
@@ -236,6 +237,7 @@ app.http('chat', {
         .map((id) => evidenceById.get(id))
         .filter(Boolean)
         .map((item) => ({ id: item.id, title: item.title, anchor: item.anchor }));
+      const showReferences = wantsReferences(message);
 
       appendMessage(session, 'assistant', result.reply, {
         evidenceIds: selectedEvidence.map((item) => item.id),
@@ -255,8 +257,8 @@ app.http('chat', {
           sessionToken: opened.token,
           reply: result.reply,
           suggestions: result.suggestions,
-          evidence: selectedEvidence,
-          sources: ai.sources,
+          evidence: showReferences ? selectedEvidence : [],
+          sources: showReferences ? ai.sources : [],
           intent: result.intent,
           stage: result.stage,
           resumeSent: notifications.sent.includes('resume'),
