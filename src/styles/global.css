@@ -425,6 +425,8 @@
   .footer-subject{color:var(--grey);margin-top:3px}
   .footer-links{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px}
   .footer-links a{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--faint);background:rgba(255,255,255,.02);color:var(--grey);font-family:var(--mono);font-size:10px;font-weight:800;line-height:1;letter-spacing:.02em;text-decoration:none}
+  .footer-links svg,.footer-links img{display:block;width:18px;height:18px}
+  .footer-links img{object-fit:contain}
   .footer-links a:hover,.footer-links a:focus-visible{border-color:var(--ac-dim);background:rgba(83,215,255,.08);color:var(--ac);outline:0}
   .footer-meta{display:flex;justify-content:space-between;gap:20px;margin-top:24px;padding-top:14px;border-top:1px solid var(--faint);color:var(--grey);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase}
 
