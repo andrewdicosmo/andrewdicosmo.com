@@ -71,26 +71,32 @@ function formatTranscriptHtml(session, visitorName = 'Visitor') {
     const alignment = assistant ? 'right' : 'left';
     const label = assistant ? "Andrew's AI Assistant" : visitorName;
     const background = assistant ? '#0a84ff' : '#26252a';
-    const color = '#ffffff';
     const radius = assistant ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
     const timestamp = messageTime(item.at);
     const message = escapeHtml(clean(item.text)).replace(/\r?\n/g, '<br>');
 
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 14px;"><tr><td align="${alignment}">
-      <div style="max-width:82%;display:inline-block;text-align:left;">
-        <div style="margin:0 6px 4px;color:#8e8e93;font-size:10px;line-height:1.3;">${escapeHtml(label)}${timestamp ? ` &middot; ${escapeHtml(timestamp)}` : ''}</div>
-        <div style="display:inline-block;padding:10px 14px;background:${background};color:${color};border-radius:${radius};font-size:14px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;">${message}</div>
-      </div>
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" style="margin:0 0 14px;background-color:#000000;"><tr><td align="${alignment}" style="color:#ffffff;">
+      <table role="presentation" cellpadding="0" cellspacing="0" align="${alignment}" style="max-width:82%;">
+        <tr><td style="padding:0 6px 4px;color:#8e8e93 !important;-webkit-text-fill-color:#8e8e93;font-size:10px;line-height:1.3;">${escapeHtml(label)}${timestamp ? ` &middot; ${escapeHtml(timestamp)}` : ''}</td></tr>
+        <tr><td bgcolor="${background}" style="padding:10px 14px;background-color:${background} !important;color:#ffffff !important;-webkit-text-fill-color:#ffffff;border-radius:${radius};font-size:14px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;"><span style="color:#ffffff !important;-webkit-text-fill-color:#ffffff;">${message}</span></td></tr>
+      </table>
     </td></tr></table>`;
   }).join('');
 }
 
-function emailShell(title, body) {
-  return `<!doctype html><html lang="en"><body style="margin:0;background:#f4f7f9;font-family:Arial,Helvetica,sans-serif;color:#16222b;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:28px 12px;background:#f4f7f9;"><tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#fff;border:1px solid #dfe7ee;border-radius:8px;overflow:hidden;">
-        <tr><td style="padding:20px 26px;background:#16222b;"><table role="presentation"><tr><td style="padding-right:14px;"><img src="cid:ad-monogram" width="54" height="36" alt="AD" style="display:block"></td><td><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div><div style="margin-top:5px;font-size:23px;color:#fff;font-weight:800;">${escapeHtml(title)}</div></td></tr></table></td></tr>
-        <tr><td style="padding:26px;font-size:14px;line-height:1.7;">${body}</td></tr>
+function emailShell(title, body, theme = 'light') {
+  const dark = theme === 'dark';
+  const canvas = dark ? '#000000' : '#f4f7f9';
+  const card = dark ? '#000000' : '#ffffff';
+  const header = dark ? '#111111' : '#16222b';
+  const border = dark ? '#38383a' : '#dfe7ee';
+  const text = dark ? '#ffffff' : '#16222b';
+  const colorMeta = dark ? '<meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark">' : '';
+  return `<!doctype html><html lang="en"><head>${colorMeta}</head><body bgcolor="${canvas}" style="margin:0;background-color:${canvas} !important;color:${text} !important;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${canvas}" style="padding:28px 12px;background-color:${canvas} !important;"><tr><td align="center" bgcolor="${canvas}" style="background-color:${canvas} !important;color:${text} !important;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${card}" style="max-width:640px;background-color:${card} !important;border:1px solid ${border};border-radius:8px;overflow:hidden;color:${text} !important;">
+        <tr><td bgcolor="${header}" style="padding:20px 26px;background-color:${header} !important;"><table role="presentation"><tr><td style="padding-right:14px;"><img src="cid:ad-monogram" width="54" height="36" alt="AD" style="display:block"></td><td><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9fb7c9 !important;-webkit-text-fill-color:#9fb7c9;font-weight:700;">AndrewDiCosmo.com</div><div style="margin-top:5px;font-size:23px;color:#ffffff !important;-webkit-text-fill-color:#ffffff;font-weight:800;">${escapeHtml(title)}</div></td></tr></table></td></tr>
+        <tr><td bgcolor="${card}" style="padding:26px;background-color:${card} !important;color:${text} !important;-webkit-text-fill-color:${text};font-size:14px;line-height:1.7;">${body}</td></tr>
       </table>
     </td></tr></table>
   </body></html>`;
@@ -107,14 +113,14 @@ function ownerMessage(session, kind) {
     ['Name', name], ['Email', session.email], ['Company', company], ['Role', session.role],
     ['Intent', intent], ['Preferred time', session.preferredTime], ['Timezone', session.timezone],
     ['Conversation ID', session.rowKey]
-  ].filter(([, value]) => value).map(([label, value]) => `<tr><td style="padding:8px 12px 8px 0;color:#66727c;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 0;font-weight:700;">${escapeHtml(value)}</td></tr>`).join('');
+  ].filter(([, value]) => value).map(([label, value]) => `<tr><td style="padding:8px 12px 8px 0;color:#8e8e93 !important;-webkit-text-fill-color:#8e8e93;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 0;color:#ffffff !important;-webkit-text-fill-color:#ffffff;font-weight:700;">${escapeHtml(value)}</td></tr>`).join('');
   const transcript = formatTranscriptHtml(session, name);
   return {
     recipient: process.env.MAIL_TO,
     recipientName: 'Andrew DiCosmo',
     subject,
     text: `${title}\n\nConversation ID: ${session.rowKey}\nName: ${name}\nEmail: ${session.email || ''}\nCompany: ${company}\nRole: ${session.role || ''}\nIntent: ${intent}\nPreferred time: ${session.preferredTime || ''} ${session.timezone || ''}\n\nConversation\n${transcriptText(session)}`,
-    html: emailShell(title, `<table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:20px;">${details}</table><div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;margin-bottom:12px;">Conversation transcript</div><div style="padding:18px 14px 4px;background:#000000;border-radius:12px;">${transcript}</div>`),
+    html: emailShell(title, `<table role="presentation" width="100%" bgcolor="#000000" style="background-color:#000000 !important;border-top:3px solid #0a84ff;margin-bottom:20px;color:#ffffff !important;">${details}</table><div style="color:#ffffff !important;-webkit-text-fill-color:#ffffff;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;margin-bottom:12px;">Conversation transcript</div><div style="padding:18px 14px 4px;background-color:#000000 !important;border:1px solid #38383a;border-radius:12px;color:#ffffff !important;">${transcript}</div>`, 'dark'),
     replyTo: session.email || process.env.MAIL_REPLY_TO || process.env.MAIL_TO,
     replyToName: name,
     attachments: [logoAttachment()].filter(Boolean)
