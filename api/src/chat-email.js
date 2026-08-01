@@ -78,7 +78,7 @@ function formatTranscriptHtml(session, visitorName = 'Visitor') {
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" style="margin:0 0 14px;background-color:#000000;"><tr><td align="${alignment}" style="color:#ffffff;">
       <table role="presentation" cellpadding="0" cellspacing="0" align="${alignment}" style="max-width:82%;">
         <tr><td style="padding:0 6px 4px;color:#8e8e93 !important;-webkit-text-fill-color:#8e8e93;font-size:10px;line-height:1.3;">${escapeHtml(label)}${timestamp ? ` &middot; ${escapeHtml(timestamp)}` : ''}</td></tr>
-        <tr><td bgcolor="${background}" style="padding:10px 14px;background-color:${background} !important;color:#ffffff !important;-webkit-text-fill-color:#ffffff;border-radius:${radius};font-size:14px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;"><span style="color:#ffffff !important;-webkit-text-fill-color:#ffffff;">${message}</span></td></tr>
+        <tr><td bgcolor="${background}" style="padding:11px 15px;background-color:${background} !important;color:#ffffff !important;-webkit-text-fill-color:#ffffff;border-radius:${radius};font-size:16px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;"><span style="color:#ffffff !important;-webkit-text-fill-color:#ffffff;font-size:16px;">${message}</span></td></tr>
       </table>
     </td></tr></table>`;
   }).join('');
@@ -113,7 +113,7 @@ function ownerMessage(session, kind) {
     ['Name', name], ['Email', session.email], ['Company', company], ['Role', session.role],
     ['Intent', intent], ['Preferred time', session.preferredTime], ['Timezone', session.timezone],
     ['Conversation ID', session.rowKey]
-  ].filter(([, value]) => value).map(([label, value]) => `<tr><td style="padding:8px 12px 8px 0;color:#8e8e93 !important;-webkit-text-fill-color:#8e8e93;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 0;color:#ffffff !important;-webkit-text-fill-color:#ffffff;font-weight:700;">${escapeHtml(value)}</td></tr>`).join('');
+  ].filter(([, value]) => value).map(([label, value]) => `<tr><td style="padding:3px 10px 3px 0;color:#8e8e93 !important;-webkit-text-fill-color:#8e8e93;vertical-align:top;white-space:nowrap;">${escapeHtml(label)}:</td><td style="padding:3px 0;color:#ffffff !important;-webkit-text-fill-color:#ffffff;font-weight:700;">${escapeHtml(value)}</td></tr>`).join('');
   const transcript = formatTranscriptHtml(session, name);
   return {
     recipient: process.env.MAIL_TO,

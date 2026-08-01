@@ -7,6 +7,7 @@ const session = {
   name: 'Taylor',
   email: 'taylor@example.com',
   intent: 'hiring',
+  preferredTime: 'Weekday evenings',
   transcript: JSON.stringify([
     { role: 'user', text: 'Can Andrew lead our AI program?', at: '2026-07-31T22:30:00.000Z' },
     { role: 'assistant', text: 'Yes. What outcome matters most?\nDelivery, governance, or both?', at: '2026-07-31T22:31:00.000Z' }
@@ -23,6 +24,7 @@ test('renders owner transcript as readable left and right message bubbles', () =
   assert.match(html, /bgcolor="#0a84ff"/);
   assert.match(html, /color:#ffffff !important/);
   assert.match(html, /-webkit-text-fill-color:#ffffff/);
+  assert.match(html, /font-size:16px/);
   assert.match(html, /Taylor/);
   assert.match(html, /Andrew&#39;s AI Assistant/);
   assert.match(html, /Jul 31/);
@@ -34,6 +36,9 @@ test('uses the message thread in the complete owner notification', () => {
   assert.match(message.html, /Conversation transcript/);
   assert.match(message.html, /<body bgcolor="#000000"/);
   assert.match(message.html, /background-color:#000000 !important/);
+  assert.match(message.html, /Name:<\/td>/);
+  assert.match(message.html, /Preferred time:<\/td>/);
+  assert.match(message.html, /padding:3px 10px 3px 0/);
   assert.match(message.html, /Can Andrew lead our AI program\?/);
   assert.match(message.text, /Visitor: Can Andrew lead our AI program\?/);
 });
