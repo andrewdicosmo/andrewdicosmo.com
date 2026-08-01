@@ -36,6 +36,11 @@ test('uses the message thread in the complete owner notification', () => {
   assert.match(message.html, /Conversation transcript/);
   assert.match(message.html, /<body bgcolor="#000000"/);
   assert.match(message.html, /background-color:#000000 !important/);
+  assert.match(message.html, /name="viewport" content="width=device-width,initial-scale=1.0"/);
+  assert.match(message.html, /max-width:640px/);
+  assert.match(message.html, /\.email-canvas\{padding:10px 4px !important;/);
+  assert.match(message.html, /class="detail-value"/);
+  assert.match(message.html, /table-layout:fixed/);
   assert.match(message.html, /Name:<\/td>/);
   assert.match(message.html, /Preferred time:<\/td>/);
   assert.match(message.html, /padding:3px 10px 3px 0/);
