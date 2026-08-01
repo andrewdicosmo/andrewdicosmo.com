@@ -39,10 +39,50 @@ function configuredSender() {
   };
 }
 
-function transcriptText(session) {
+function transcriptMessages(session) {
   let messages = [];
   try { messages = JSON.parse(session.transcript || '[]'); } catch {}
-  return messages.map((item) => `${item.role === 'user' ? 'Visitor' : 'AI Assistant'}: ${clean(item.text)}`).join('\n\n').slice(0, 18000);
+  return Array.isArray(messages) ? messages.filter((item) => item && ['user', 'assistant'].includes(item.role)) : [];
+}
+
+function transcriptText(session) {
+  return transcriptMessages(session).map((item) => `${item.role === 'user' ? 'Visitor' : 'AI Assistant'}: ${clean(item.text)}`).join('\n\n').slice(0, 18000);
+}
+
+function messageTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  }).format(date);
+}
+
+function formatTranscriptHtml(session, visitorName = 'Visitor') {
+  const messages = transcriptMessages(session);
+  if (!messages.length) return '<p style="margin:0;color:#66727c;">No conversation messages were recorded.</p>';
+
+  return messages.map((item) => {
+    const assistant = item.role === 'assistant';
+    const alignment = assistant ? 'right' : 'left';
+    const label = assistant ? "Andrew's AI Assistant" : visitorName;
+    const background = assistant ? '#0a84ff' : '#e9e9eb';
+    const color = assistant ? '#ffffff' : '#111111';
+    const radius = assistant ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
+    const timestamp = messageTime(item.at);
+    const message = escapeHtml(clean(item.text)).replace(/\r?\n/g, '<br>');
+
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 14px;"><tr><td align="${alignment}">
+      <div style="max-width:82%;display:inline-block;text-align:left;">
+        <div style="margin:0 6px 4px;color:#7b8790;font-size:10px;line-height:1.3;">${escapeHtml(label)}${timestamp ? ` &middot; ${escapeHtml(timestamp)}` : ''}</div>
+        <div style="display:inline-block;padding:10px 14px;background:${background};color:${color};border-radius:${radius};font-size:14px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;">${message}</div>
+      </div>
+    </td></tr></table>`;
+  }).join('');
 }
 
 function emailShell(title, body) {
@@ -68,13 +108,13 @@ function ownerMessage(session, kind) {
     ['Intent', intent], ['Preferred time', session.preferredTime], ['Timezone', session.timezone],
     ['Conversation ID', session.rowKey]
   ].filter(([, value]) => value).map(([label, value]) => `<tr><td style="padding:8px 12px 8px 0;color:#66727c;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 0;font-weight:700;">${escapeHtml(value)}</td></tr>`).join('');
-  const transcript = escapeHtml(transcriptText(session)).replace(/\n/g, '<br>');
+  const transcript = formatTranscriptHtml(session, name);
   return {
     recipient: process.env.MAIL_TO,
     recipientName: 'Andrew DiCosmo',
     subject,
     text: `${title}\n\nConversation ID: ${session.rowKey}\nName: ${name}\nEmail: ${session.email || ''}\nCompany: ${company}\nRole: ${session.role || ''}\nIntent: ${intent}\nPreferred time: ${session.preferredTime || ''} ${session.timezone || ''}\n\nConversation\n${transcriptText(session)}`,
-    html: emailShell(title, `<table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:20px;">${details}</table><div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;margin-bottom:8px;">Conversation</div><div style="padding:14px 16px;background:#f4f7f9;color:#243540;white-space:normal;">${transcript}</div>`),
+    html: emailShell(title, `<table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:20px;">${details}</table><div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;margin-bottom:12px;">Conversation transcript</div><div style="padding:18px 14px 4px;background:#f7f7f8;border-radius:12px;">${transcript}</div>`),
     replyTo: session.email || process.env.MAIL_REPLY_TO || process.env.MAIL_TO,
     replyToName: name,
     attachments: [logoAttachment()].filter(Boolean)
@@ -152,4 +192,4 @@ async function sendReport(message) {
   return { accepted: result.status === 'accepted', error: result.error };
 }
 
-module.exports = { deliverChatNotifications, emailShell, sendReport, transcriptText };
+module.exports = { deliverChatNotifications, emailShell, formatTranscriptHtml, ownerMessage, sendReport, transcriptText };
