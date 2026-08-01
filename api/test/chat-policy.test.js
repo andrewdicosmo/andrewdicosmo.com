@@ -28,9 +28,24 @@ test('system prompt includes the response behavior playbook', () => {
   assert.match(prompt, /Consulting lead/);
   assert.match(prompt, /Technology leadership lead/);
   assert.match(prompt, /Template explorer/);
+  assert.match(prompt, /Job-description comparison/);
   assert.match(prompt, /Accuracy challenge/);
   assert.match(prompt, /Do not ask for both name and email in the same reply/);
   assert.match(prompt, /Suggestions should be two or three short next-step options/);
+});
+
+test('job description comparison protects interview behavior and explains limits', () => {
+  const prompt = systemPrompt({
+    evidence: [{ id: 'EV-001', title: 'Approved sample', text: 'Andrew has approved public experience.' }],
+    engineeringRequest: false,
+    webEnabled: true
+  });
+  assert.match(prompt, /Do not give hiring managers interview angles/);
+  assert.match(prompt, /Do not provide interview angles/);
+  assert.match(prompt, /only material gaps or unknowns/);
+  assert.match(prompt, /not shown in approved evidence/);
+  assert.match(prompt, /technology may be new, niche, or not widely adopted/);
+  assert.match(prompt, /1,200 characters/);
 });
 
 test('engineering work requests force the scope boundary', () => {
