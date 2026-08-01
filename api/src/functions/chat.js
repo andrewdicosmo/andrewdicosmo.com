@@ -46,10 +46,11 @@ app.http('chat', {
     const session = opened.session;
     const rate = checkRateLimit(session);
     if (!rate.allowed) {
+      const reply = 'This conversation has reached its message limit. Use End conversation to start a fresh chat, or use the inquiry section if you want Andrew to follow up.';
       return {
         status: 429,
         headers: { 'Retry-After': String(rate.retryAfter) },
-        jsonBody: { ok: false, error: 'message limit reached', retryAfter: rate.retryAfter }
+        jsonBody: { ok: false, error: 'message limit reached', retryAfter: rate.retryAfter, reply }
       };
     }
     const gate = accessGate(session, message);

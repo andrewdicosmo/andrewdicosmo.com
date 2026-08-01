@@ -212,7 +212,9 @@
         }catch{}
       }
       if(sendEpoch!==conversationEpoch)return;
-      const reply=data.reply||(templateDemo||response.ok?fallbackReply():'The AI channel is temporarily unavailable. Please try again shortly.');
+      const reply=data.reply||(response.status===429
+        ? 'This conversation has reached its message limit. Use End conversation to start a fresh chat, or use the inquiry section if you want Andrew to follow up.'
+        : (templateDemo||response.ok?fallbackReply():'The AI channel is temporarily unavailable. Please try again shortly.'));
       addMessage('assistant',reply,{evidence:data.evidence,sources:data.sources});
       showChoices(data.suggestions||[]);
       setStatus(data.mode==='mock'||templateDemo?'Template demo mode':'Secure channel ready',false);
