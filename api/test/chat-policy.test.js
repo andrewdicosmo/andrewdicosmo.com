@@ -46,6 +46,7 @@ test('job description comparison protects interview behavior and explains limits
   assert.match(prompt, /not shown in approved evidence/);
   assert.match(prompt, /technology may be new, niche, or not widely adopted/);
   assert.match(prompt, /1,200 characters/);
+  assert.match(prompt, /upload the job requirement in chat/);
 });
 
 test('engineering work requests force the scope boundary', () => {

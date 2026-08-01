@@ -8,12 +8,14 @@
   const form=document.getElementById('chat-form');
   const input=document.getElementById('chat-input');
   const sendButton=form&&form.querySelector('.chat-send');
+  const attachButton=document.getElementById('chat-attach');
+  const fileInput=document.getElementById('chat-file');
   const status=document.getElementById('chat-status');
   const endButton=document.getElementById('chat-end');
   const privacyOpen=document.getElementById('chat-privacy-open');
   const privacyClose=document.getElementById('chat-privacy-close');
   const privacy=document.getElementById('chat-privacy');
-  if(!shell||!launcher||!panel||!messages||!choices||!form||!input||!endButton)return;
+  if(!shell||!launcher||!panel||!messages||!choices||!form||!input||!endButton||!attachButton||!fileInput)return;
 
   const starters=[
     "I'm hiring for a role",
@@ -30,6 +32,7 @@
   let sessionId='';
   let sessionToken='';
   let conversationEpoch=0;
+  let pendingAttachment=null;
   try{
     sessionId=sessionStorage.getItem('ad_chat_session')||'';
     sessionToken=sessionStorage.getItem('ad_chat_token')||'';
@@ -107,6 +110,56 @@
     endButton.hidden=!visible;
   }
 
+  function clearAttachment(){
+    pendingAttachment=null;
+    fileInput.value='';
+    attachButton.classList.remove('has');
+    attachButton.title='Attach job requirement';
+    attachButton.setAttribute('aria-label','Attach job requirement');
+  }
+
+  function fileToBase64(file){
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const value=String(reader.result||'');
+        resolve(value.includes(',')?value.split(',').pop():value);
+      };
+      reader.onerror=()=>reject(reader.error||new Error('file read failed'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function prepareAttachment(file){
+    if(!file)return;
+    const allowed=/\.(txt|md|pdf|docx?|DOCX?|PDF|TXT|MD)$/;
+    if(!allowed.test(file.name||'')){
+      setStatus('Attach TXT, PDF, DOCX, or DOC',false);
+      track('chat_job_req_rejected',{reason:'type'});
+      return;
+    }
+    if(file.size>5*1024*1024){
+      setStatus('Attachment must be under 5 MB',false);
+      track('chat_job_req_rejected',{reason:'size'});
+      return;
+    }
+    setStatus('Preparing job requirement...',true);
+    try{
+      pendingAttachment={name:file.name,type:file.type||'',data:await fileToBase64(file)};
+      attachButton.classList.add('has');
+      attachButton.title=`Job requirement ready: ${file.name}`;
+      attachButton.setAttribute('aria-label',`Job requirement ready: ${file.name}`);
+      setStatus('Job requirement ready',false);
+      track('chat_job_req_selected',{type:file.type||'unknown',size:file.size});
+      if(!input.value.trim())input.value='Please compare Andrew with the attached job requirement.';
+      input.focus({preventScroll:true});
+    }catch{
+      clearAttachment();
+      setStatus('Attachment could not be read',false);
+      track('chat_job_req_rejected',{reason:'read'});
+    }
+  }
+
   function endConversation(){
     const endedTurns=userTurns;
     const hadSession=Boolean(sessionId);
@@ -124,6 +177,7 @@
     messages.replaceChildren();
     input.value='';
     input.style.height='auto';
+    clearAttachment();
     input.disabled=false;
     sendButton.disabled=false;
     setEndVisible(false);
@@ -167,12 +221,16 @@
 
   async function send(raw){
     const message=String(raw||'').trim().slice(0,1200);
-    if(!message||busy)return;
+    if((!message&&!pendingAttachment)||busy)return;
     busy=true;
     const sendEpoch=conversationEpoch;
     userTurns+=1;
     setEndVisible(true);
-    addMessage('user',message);
+    const attachmentForRequest=pendingAttachment;
+    const displayedMessage=attachmentForRequest
+      ? `${message||'Please compare Andrew with this job requirement.'}\n\nAttached: ${attachmentForRequest.name}`
+      : message;
+    addMessage('user',displayedMessage);
     showChoices([]);
     input.value='';
     input.style.height='auto';
@@ -187,7 +245,13 @@
       const requestChat=()=>fetch(endpoint,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({message,sessionId,sessionToken,website:''})
+        body:JSON.stringify({
+          message:message||'Please compare Andrew with this job requirement.',
+          sessionId,
+          sessionToken,
+          website:'',
+          attachment:attachmentForRequest
+        })
       });
       let response=await requestChat();
       let data=await response.json().catch(()=>({}));
@@ -221,6 +285,12 @@
       if(data.resumeSent)track('chat_resume_sent',{resumeSent:true});
       if(data.intent==='job_fit')track('chat_job_fit_analyzed',{analyzed:true});
       if(data.blockedOn)track('chat_information_gate',{field:data.blockedOn,turn:userTurns});
+      if(data.attachmentProcessed||data.attachmentStored||data.attachmentRejected)clearAttachment();
+      if(data.attachmentPending&&attachmentForRequest){
+        pendingAttachment=attachmentForRequest;
+        attachButton.classList.add('has');
+        setStatus('Job requirement ready; contact details needed',false);
+      }
       if(!response.ok)track('chat_request_failed',{status:response.status});
     }catch{
       if(sendEpoch!==conversationEpoch)return;
@@ -239,6 +309,8 @@
   launcher.addEventListener('click',openChat);
   closeButton.addEventListener('click',()=>closeChat());
   endButton.addEventListener('click',endConversation);
+  attachButton.addEventListener('click',()=>fileInput.click());
+  fileInput.addEventListener('change',()=>prepareAttachment(fileInput.files&&fileInput.files[0]));
   privacyOpen.addEventListener('click',()=>privacy.hidden?showPrivacy():hidePrivacy());
   privacyClose.addEventListener('click',hidePrivacy);
   form.addEventListener('submit',event=>{event.preventDefault();send(input.value);});

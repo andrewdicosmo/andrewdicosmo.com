@@ -27,6 +27,10 @@
 
     <form class="chat-composer" id="chat-form">
       <label class="sr-only" for="chat-input">Message Andrew's AI Assistant</label>
+      <input type="file" id="chat-file" accept=".txt,.md,.pdf,.doc,.docx" hidden />
+      <button type="button" class="chat-attach" id="chat-attach" aria-label="Attach job requirement" title="Attach job requirement">
+        <span aria-hidden="true">JD</span>
+      </button>
       <textarea id="chat-input" rows="1" maxlength="1200" placeholder="Ask about Andrew's experience..." required></textarea>
       <button type="submit" class="chat-send" aria-label="Send message" title="Send">
         <span aria-hidden="true">&#8593;</span>

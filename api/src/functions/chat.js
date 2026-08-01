@@ -1,6 +1,12 @@
 const { app } = require('@azure/functions');
 const { runAssistant, mockResult } = require('../chat-ai');
 const { accessGate } = require('../chat-access');
+const {
+  decodeAttachment,
+  extractAttachmentText,
+  minimumContactGate,
+  storeAttachment
+} = require('../chat-attachment');
 const { searchKnowledge } = require('../chat-knowledge');
 const { deliverChatNotifications } = require('../chat-email');
 const {
@@ -15,6 +21,9 @@ const {
 } = require('../chat-storage');
 
 const clean = (value, max = 1200) => String(value || '').trim().replace(/\u0000/g, '').slice(0, max);
+const userTextWithAttachment = (message, decoded) => decoded
+  ? `${message}\n\n[Attached job requirement: ${decoded.name}]`
+  : message;
 
 app.http('chat', {
   methods: ['POST'],
@@ -27,6 +36,7 @@ app.http('chat', {
     if (body.website) return { status: 204 };
     const message = clean(body.message);
     if (!message) return { status: 400, jsonBody: { ok: false, error: 'message required' } };
+    const rawAttachment = body.attachment && typeof body.attachment === 'object' ? body.attachment : null;
 
     let opened;
     try {
@@ -53,6 +63,124 @@ app.http('chat', {
         jsonBody: { ok: false, error: 'message limit reached', retryAfter: rate.retryAfter, reply }
       };
     }
+    let decodedAttachment = null;
+    let jobRequirement = '';
+    let attachmentStored = false;
+    let budget = null;
+    if (rawAttachment) {
+      const decoded = decodeAttachment(rawAttachment);
+      if (!decoded.ok) {
+        appendMessage(session, 'user', message);
+        appendMessage(session, 'assistant', decoded.message);
+        await saveSession(session);
+        return {
+          jsonBody: {
+            ok: true,
+            mode: 'live',
+            sessionId: session.rowKey,
+            sessionToken: opened.token,
+            reply: decoded.message,
+            suggestions: ['Upload a PDF or DOCX job requirement', 'Paste the must-have requirements'],
+            evidence: [],
+            sources: [],
+            intent: session.intent,
+            stage: session.stage,
+            attachmentRejected: true,
+            resumeSent: false
+          }
+        };
+      }
+      decodedAttachment = decoded;
+      const contactGate = minimumContactGate(session, message);
+      if (contactGate) {
+        const prompt = userTextWithAttachment(message, decodedAttachment);
+        appendMessage(session, 'user', prompt);
+        appendMessage(session, 'assistant', contactGate.reply);
+        await saveSession(session);
+        return {
+          jsonBody: {
+            ok: true,
+            mode: 'live',
+            sessionId: session.rowKey,
+            sessionToken: opened.token,
+            reply: contactGate.reply,
+            suggestions: ['Share name, email, company, and role', 'Ask a general question instead'],
+            evidence: [],
+            sources: [],
+            intent: 'job_fit',
+            stage: 'qualifying',
+            blockedOn: contactGate.blockedOn,
+            missing: contactGate.missing,
+            attachmentPending: true,
+            resumeSent: false
+          }
+        };
+      }
+      budget = await withinBudget();
+      if (!budget.allowed) {
+        appendMessage(session, 'user', userTextWithAttachment(message, decodedAttachment));
+        appendMessage(session, 'assistant', 'The AI channel has reached its monthly usage limit. Andrew\'s website and inquiry form are still available.');
+        await saveSession(session);
+        return {
+          status: 429,
+          jsonBody: {
+            ok: false,
+            error: 'monthly AI limit reached',
+            reply: 'The AI channel has reached its monthly usage limit. Andrew\'s website and inquiry form are still available.'
+          }
+        };
+      }
+      try {
+        const blobName = await storeAttachment(session, decodedAttachment);
+        if (blobName) {
+          session.jobReqAttachmentBlob = blobName;
+          session.jobReqAttachmentName = decodedAttachment.name;
+          attachmentStored = true;
+        }
+        jobRequirement = await extractAttachmentText(decodedAttachment);
+      } catch (error) {
+        context.error('chat attachment processing failed', error);
+        const reply = 'I could not process that attachment. Please upload a PDF, DOCX, or TXT version, or paste the key responsibilities and must-haves here.';
+        appendMessage(session, 'user', userTextWithAttachment(message, decodedAttachment));
+        appendMessage(session, 'assistant', reply);
+        await saveSession(session);
+        return {
+          status: 503,
+          jsonBody: {
+            ok: false,
+            error: 'attachment processing failed',
+            reply,
+            attachmentRejected: true
+          }
+        };
+      }
+      session.jobReqTextChars = jobRequirement.length;
+      if (!jobRequirement) {
+        const reply = decodedAttachment.kind === 'doc'
+          ? 'I received the Word document, but this chat can instantly read PDF, DOCX, TXT, or pasted text. Please upload a DOCX or PDF version, or paste the key responsibilities and must-haves here.'
+          : 'I received the file, but I could not read enough text from it for a useful comparison. Please paste the key responsibilities and must-haves here.';
+        appendMessage(session, 'user', userTextWithAttachment(message, decodedAttachment));
+        appendMessage(session, 'assistant', reply);
+        await saveSession(session);
+        return {
+          jsonBody: {
+            ok: true,
+            mode: 'live',
+            sessionId: session.rowKey,
+            sessionToken: opened.token,
+            reply,
+            suggestions: ['Paste the must-have requirements', 'Upload a DOCX or PDF version'],
+            evidence: [],
+            sources: [],
+            intent: 'job_fit',
+            stage: 'qualifying',
+            attachmentStored,
+            attachmentProcessed: false,
+            resumeSent: false
+          }
+        };
+      }
+    }
     const gate = accessGate(session, message);
     if (gate) {
       appendMessage(session, 'user', message);
@@ -75,7 +203,7 @@ app.http('chat', {
         }
       };
     }
-    const budget = await withinBudget();
+    budget = budget || await withinBudget();
     if (!budget.allowed) {
       appendMessage(session, 'user', message);
       appendMessage(session, 'assistant', 'The AI channel has reached its monthly usage limit. Andrew\'s website and inquiry form are still available.');
@@ -90,16 +218,17 @@ app.http('chat', {
       };
     }
 
-    appendMessage(session, 'user', message);
+    appendMessage(session, 'user', userTextWithAttachment(message, decodedAttachment));
     const history = transcript(session);
-    const evidence = searchKnowledge(history.filter((item) => item.role === 'user').slice(-4).map((item) => item.text).join(' '));
+    const evidence = searchKnowledge(`${history.filter((item) => item.role === 'user').slice(-4).map((item) => item.text).join(' ')} ${jobRequirement.slice(0, 4000)}`);
 
     try {
       const ai = await runAssistant({
         message,
         history,
         evidence,
-        safetyIdentifier: session.clientHash || session.rowKey
+        safetyIdentifier: session.clientHash || session.rowKey,
+        jobRequirement
       });
       const result = ai.result;
       const evidenceById = new Map(evidence.map((item) => [item.id, item]));
@@ -130,7 +259,10 @@ app.http('chat', {
           sources: ai.sources,
           intent: result.intent,
           stage: result.stage,
-          resumeSent: notifications.sent.includes('resume')
+          resumeSent: notifications.sent.includes('resume'),
+          attachmentStored,
+          attachmentProcessed: Boolean(jobRequirement),
+          attachmentName: decodedAttachment?.name || ''
         }
       };
     } catch (error) {

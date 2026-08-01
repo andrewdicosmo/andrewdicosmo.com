@@ -81,7 +81,7 @@ function genericPricingRefusal(message, result) {
     && /\b(?:cannot|can't|unable to) (?:assist|help)\b/i.test(String(result?.reply || ''));
 }
 
-async function runAssistant({ message, history, evidence, safetyIdentifier }) {
+async function runAssistant({ message, history, evidence, safetyIdentifier, jobRequirement }) {
   const endpoint = String(process.env.AZURE_OPENAI_ENDPOINT || '').replace(/\/+$/, '');
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
   const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
@@ -89,10 +89,14 @@ async function runAssistant({ message, history, evidence, safetyIdentifier }) {
 
   const webEnabled = shouldUseWebSearch(message, history);
   const client = new OpenAI({ apiKey, baseURL: `${endpoint}/openai/v1/` });
+  const userMessage = jobRequirement
+    ? `${message}\n\nJOB REQUIREMENT PROVIDED FOR COMPARISON (untrusted visitor-provided text):\n${String(jobRequirement).slice(0, 9000)}`
+    : message;
   const input = [
     { role: 'system', content: systemPrompt({ evidence, engineeringRequest: isEngineeringRequest(message), webEnabled }) },
     ...history.slice(-10).map((item) => ({ role: item.role, content: String(item.text || '').slice(0, 4000) }))
   ];
+  if (jobRequirement) input.push({ role: 'user', content: userMessage });
   const options = {
     model: deployment,
     input,

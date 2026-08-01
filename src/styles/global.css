@@ -470,9 +470,12 @@
   .chat-choice{padding:7px 9px;border:1px solid var(--faint);background:transparent;color:var(--grey);font-family:var(--mono);font-size:8.5px;line-height:1.45;text-align:left;cursor:pointer}
   .chat-choice:hover{border-color:var(--ac);color:var(--ac)}
   .chat-choice.starter{flex:1 1 calc(50% - 7px);min-width:150px}
-  .chat-composer{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:8px;padding:12px 14px;border-top:1px solid var(--faint);background:var(--panel);align-items:end}
+  .chat-composer{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;gap:8px;padding:12px 14px;border-top:1px solid var(--faint);background:var(--panel);align-items:end}
   .chat-composer textarea{width:100%;min-height:42px;max-height:120px;resize:none;padding:11px 12px;border:1px solid var(--faint);border-radius:0;background:var(--bg);color:var(--white);font-family:var(--mono);font-size:12px;line-height:1.5;outline:none}
   .chat-composer textarea:focus{border-color:var(--ac)}
+  .chat-attach{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--faint);border-radius:0;background:var(--bg);color:var(--grey);font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.08em;cursor:pointer}
+  .chat-attach:hover,.chat-attach:focus-visible{border-color:var(--ac);color:var(--ac);outline:0}
+  .chat-attach.has{border-color:var(--live);color:var(--live);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--live) 42%,transparent)}
   .chat-send{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--ac);border-radius:0;background:var(--ac);color:var(--bg);font:700 20px/1 var(--mono);cursor:pointer}
   .chat-send:disabled{opacity:.4;cursor:not-allowed}
   .chat-footer{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 14px 9px;background:var(--panel);color:var(--grey);font-size:7.5px;line-height:1.5;letter-spacing:.03em}
@@ -501,6 +504,7 @@
     .chat-choice.starter{flex-basis:100%;min-width:0}
     .chat-composer{padding:10px 12px}
     .chat-composer textarea{font-size:16px;min-height:44px}
+    .chat-attach{width:44px;height:44px}
     .chat-send{width:44px;height:44px}
     .chat-footer{padding:6px 12px 8px;font-size:8px}
     .chat-privacy{right:10px;bottom:32px;width:min(300px,calc(100vw - 20px))}

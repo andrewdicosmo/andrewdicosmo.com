@@ -13,6 +13,8 @@
     "@azure/data-tables": "^13.2.2",
     "@azure/functions": "^4.5.0",
     "@azure/storage-blob": "^12.24.0",
-    "openai": "^7.3.0"
+    "mammoth": "^1.12.0",
+    "openai": "^7.3.0",
+    "pdf-parse": "^2.4.5"
   }
 }
