@@ -10,6 +10,14 @@ const channels = [...(profile.channels || [])].sort(
   (a, b) => channelPriority(a.url) - channelPriority(b.url)
 );
 const subject = (profile.subjectLine || '').replaceAll('&amp;', '&');
+const channelIcon = (channel) => {
+  const value = `${channel.url} ${channel.label}`.toLowerCase();
+  if (value.includes('linkedin')) return 'in';
+  if (value.includes('github')) return 'GH';
+  if (value.includes('instamapp')) return 'IM';
+  if (value.includes('dcosmos')) return 'AD';
+  return 'GO';
+};
 ---
 
 <footer class="site-footer">
@@ -24,7 +32,9 @@ const subject = (profile.subjectLine || '').replaceAll('&amp;', '&');
     </div>
     <nav class="footer-links" aria-label="Social and project links">
       {channels.map(channel => (
-        <a href={channel.url} target="_blank" rel="noopener noreferrer">{channel.label}</a>
+        <a href={channel.url} target="_blank" rel="noopener noreferrer" aria-label={channel.label} title={channel.label}>
+          <span aria-hidden="true">{channelIcon(channel)}</span>
+        </a>
       ))}
     </nav>
   </div>
