@@ -11,3 +11,6 @@ src/data/
 # Generated from injected content during build. Production receives private
 # knowledge; public clones receive only the example persona.
 api/data/chat-knowledge.json
+
+# Private chat behavior notes belong outside the public template repo.
+docs/chat-response-behavior.md
