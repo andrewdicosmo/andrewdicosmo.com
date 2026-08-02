@@ -565,7 +565,7 @@
     // STEP 1: scan sweep
     setStep(0);istate.textContent='SCANNING';
     iscan.style.opacity=1;
-    iscan.animate([{top:'14px'},{top:'168px'},{top:'14px'}],{duration:1800,easing:'ease-in-out'});
+    iscan.animate([{top:'62px'},{top:'196px'},{top:'62px'}],{duration:1800,easing:'ease-in-out'});
     setTimeout(()=>{
       // STEP 2: recognize
       iscan.style.opacity=0;setStep(1);istate.textContent='RECOGNIZING';
