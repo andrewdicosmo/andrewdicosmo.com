@@ -43,7 +43,8 @@ app.http('chat-report', {
   authLevel: 'anonymous',
   handler: async (request, context) => {
     const secret = process.env.CHAT_REPORT_SECRET || '';
-    const supplied = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    const supplied = request.headers.get('x-chat-report-secret')
+      || (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
     if (!secret || supplied !== secret) return { status: 401, jsonBody: { ok: false } };
 
     let body = {};

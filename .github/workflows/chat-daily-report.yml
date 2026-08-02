@@ -21,7 +21,7 @@ jobs:
           test -n "$CHAT_REPORT_SECRET"
           curl --fail-with-body --silent --show-error \
             --request POST \
-            --header "Authorization: Bearer ${CHAT_REPORT_SECRET}" \
+            --header "x-chat-report-secret: ${CHAT_REPORT_SECRET}" \
             --header "Content-Type: application/json" \
             --data '{}' \
             "$CHAT_REPORT_URL"
