@@ -30,6 +30,8 @@
     }
     const sid=sessionId();
     const vid=visitorId();
+    const pageStartedAt=Date.now();
+    let lastDurationSent=0;
     const pageContext={
       sessionId:sid,
       visitorId:vid,
@@ -88,6 +90,19 @@
       thirdParty(event,props);
     };
     window.__track('page_view',{path:window.location.pathname});
+    function sendSessionEnd(){
+      const durationSeconds=Math.max(1,Math.round((Date.now()-pageStartedAt)/1000));
+      if(durationSeconds<=lastDurationSent)return;
+      lastDurationSent=durationSeconds;
+      window.__track('site_session_end',{
+        path:window.location.pathname,
+        durationSeconds
+      });
+    }
+    window.addEventListener('pagehide',sendSessionEnd);
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='hidden')sendSessionEnd();
+    });
   })();
 
   // Open every off-site destination, including the canonical site domain, in a separate tab.

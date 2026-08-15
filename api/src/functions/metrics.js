@@ -22,6 +22,39 @@ function dayStamp(date) {
   return date.toISOString().slice(0, 10).replace(/-/g, '');
 }
 
+function clientIp(request) {
+  const forwarded = request.headers.get('x-forwarded-for') || request.headers.get('x-client-ip') || '';
+  return forwarded.split(',').map((item) => item.trim()).find(Boolean) || '';
+}
+
+function headerLocation(request) {
+  return {
+    city: clean(request.headers.get('x-ms-client-city') || request.headers.get('x-azure-clientip-city'), 120),
+    region: clean(request.headers.get('x-ms-client-region') || request.headers.get('x-azure-clientip-region'), 120),
+    country: clean(request.headers.get('x-ms-client-country') || request.headers.get('x-azure-clientip-country'), 80)
+  };
+}
+
+async function geoLookup(ip, context) {
+  if (!ip || /^(10\.|127\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|::1|fc|fd)/i.test(ip)) return {};
+  try {
+    const response = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
+      headers: { 'User-Agent': 'andrewdicosmo.com analytics' },
+      signal: AbortSignal.timeout(1200)
+    });
+    if (!response.ok) return {};
+    const data = await response.json();
+    return {
+      city: clean(data.city, 120),
+      region: clean(data.region || data.region_code, 120),
+      country: clean(data.country_name || data.country, 80)
+    };
+  } catch (error) {
+    context.warn('geo lookup skipped', error.message);
+    return {};
+  }
+}
+
 app.http('metrics', {
   methods: ['POST'],
   authLevel: 'anonymous',
@@ -45,6 +78,13 @@ app.http('metrics', {
     const page = body.page && typeof body.page === 'object' ? body.page : {};
     const utm = page.utm && typeof page.utm === 'object' ? page.utm : {};
     const now = new Date();
+    const fromHeaders = headerLocation(request);
+    const fromGeo = fromHeaders.city || fromHeaders.region || fromHeaders.country ? {} : await geoLookup(clientIp(request), context);
+    const location = {
+      city: fromHeaders.city || fromGeo.city || '',
+      region: fromHeaders.region || fromGeo.region || '',
+      country: fromHeaders.country || fromGeo.country || ''
+    };
     const entity = {
       partitionKey: `event-${dayStamp(now)}`,
       rowKey: `${now.getTime()}-${Math.random().toString(36).slice(2, 10)}`,
@@ -58,6 +98,9 @@ app.http('metrics', {
       clientTime: clean(body.clientTime, 80),
       serverTime: now.toISOString(),
       userAgent: clean(request.headers.get('user-agent'), 500),
+      city: location.city,
+      region: location.region,
+      country: location.country,
       utmSource: clean(utm.source, 180),
       utmMedium: clean(utm.medium, 180),
       utmCampaign: clean(utm.campaign, 180),

@@ -38,6 +38,92 @@ function percent(numerator, denominator) {
   return denominator ? `${Math.round(numerator / denominator * 100)}%` : '0%';
 }
 
+function parseProps(value) {
+  try { return JSON.parse(value || '{}') || {}; } catch { return {}; }
+}
+
+function parseUserAgent(value = '') {
+  const ua = String(value || '');
+  const lower = ua.toLowerCase();
+  let device = 'Desktop';
+  if (/bot|crawler|spider|preview|slurp/.test(lower)) device = 'Bot';
+  else if (/ipad|tablet/.test(lower)) device = 'Tablet';
+  else if (/mobile|iphone|android/.test(lower)) device = 'Mobile';
+
+  let os = 'Unknown OS';
+  if (/iphone|ipad|ipod/.test(lower)) os = 'iOS';
+  else if (/android/.test(lower)) os = 'Android';
+  else if (/windows nt/.test(lower)) os = 'Windows';
+  else if (/mac os x|macintosh/.test(lower)) os = 'macOS';
+  else if (/linux/.test(lower)) os = 'Linux';
+
+  let browser = 'Unknown browser';
+  if (/edg\//.test(lower)) browser = 'Microsoft Edge';
+  else if (/opr\/|opera/.test(lower)) browser = 'Opera';
+  else if (/samsungbrowser/.test(lower)) browser = 'Samsung Internet';
+  else if (/chrome|crios/.test(lower) && !/edg\//.test(lower)) browser = 'Chrome';
+  else if (/firefox|fxios/.test(lower)) browser = 'Firefox';
+  else if (/safari/.test(lower) && !/chrome|crios|android/.test(lower)) browser = 'Safari';
+  return { device, os, browser };
+}
+
+function formatDuration(seconds) {
+  const total = Math.max(0, Math.round(Number(seconds || 0)));
+  if (!total) return 'Unknown';
+  const minutes = Math.floor(total / 60);
+  const remaining = total % 60;
+  if (!minutes) return `${remaining}s`;
+  if (minutes < 60) return `${minutes}m ${remaining}s`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ${minutes % 60}m`;
+}
+
+function locationLabel(event) {
+  return [event.city, event.region, event.country].filter(Boolean).join(', ') || 'Unknown';
+}
+
+function visitorSummaries(events) {
+  const bySession = new Map();
+  for (const event of events) {
+    const key = event.sessionId || event.visitorId || event.rowKey;
+    if (!key) continue;
+    const props = parseProps(event.props);
+    const current = bySession.get(key) || {
+      sessionId: key,
+      visitorId: event.visitorId || '',
+      start: null,
+      end: null,
+      durationSeconds: 0,
+      pages: new Set(),
+      events: 0,
+      location: '',
+      userAgent: ''
+    };
+    const when = new Date(event.serverTime || event.clientTime || 0);
+    if (!Number.isNaN(when.valueOf())) {
+      current.start = current.start && current.start < when ? current.start : when;
+      current.end = current.end && current.end > when ? current.end : when;
+    }
+    current.events += 1;
+    if (event.path) current.pages.add(event.path);
+    if (!current.location || current.location === 'Unknown') current.location = locationLabel(event);
+    if (!current.userAgent && event.userAgent) current.userAgent = event.userAgent;
+    if (event.event === 'site_session_end' && Number(props.durationSeconds) > current.durationSeconds) {
+      current.durationSeconds = Number(props.durationSeconds);
+    }
+    bySession.set(key, current);
+  }
+  return [...bySession.values()].map((item) => {
+    const fallbackDuration = item.start && item.end ? Math.round((item.end - item.start) / 1000) : 0;
+    return {
+      ...item,
+      durationSeconds: Math.max(item.durationSeconds, fallbackDuration),
+      pages: [...item.pages],
+      ...parseUserAgent(item.userAgent)
+    };
+  }).sort((a, b) => b.durationSeconds - a.durationSeconds || b.events - a.events);
+}
+
 app.http('chat-report', {
   methods: ['POST'],
   authLevel: 'anonymous',
@@ -65,6 +151,7 @@ app.http('chat-report', {
 
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const [sessions, events] = await Promise.all([recentSessions(since), siteEventsSince(since)]);
+    const visitors = visitorSummaries(events);
     const uniqueVisitors = new Set(events.map((event) => event.visitorId).filter(Boolean)).size;
     const eventCount = (name) => events.filter((event) => event.event === name).length;
     const started = sessions.filter((session) => Number(session.questionCount || 0) > 0).length;
@@ -98,13 +185,16 @@ app.http('chat-report', {
     const metricHtml = rows.map(([label, value]) => `<tr><td style="padding:8px 12px 8px 0;color:#66727c;border-bottom:1px solid #e7edf2;">${escapeHtml(label)}</td><td style="padding:8px 0;text-align:right;font-weight:800;border-bottom:1px solid #e7edf2;">${escapeHtml(value)}</td></tr>`).join('');
     const topicHtml = intents.length ? intents.map(([intent, count]) => `<li>${escapeHtml(intent)}: ${count}</li>`).join('') : '<li>No conversations</li>';
     const spamHtml = spam.slice(0, 5).map((session) => `<li><strong>${escapeHtml(session.rowKey)}</strong>: ${escapeHtml(firstVisitorMessage(session).slice(0, 180))}</li>`).join('') || '<li>No likely spam conversations</li>';
+    const visitorRows = visitors.slice(0, 20).map((visitor) => `<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #e7edf2;">${escapeHtml(visitor.location || 'Unknown')}</td><td style="padding:8px 10px;border-bottom:1px solid #e7edf2;">${escapeHtml(visitor.device)}</td><td style="padding:8px 10px;border-bottom:1px solid #e7edf2;">${escapeHtml(visitor.os)}</td><td style="padding:8px 10px;border-bottom:1px solid #e7edf2;">${escapeHtml(visitor.browser)}</td><td style="padding:8px 0;text-align:right;border-bottom:1px solid #e7edf2;">${escapeHtml(formatDuration(visitor.durationSeconds))}</td></tr>`).join('');
+    const visitorHtml = visitorRows || '<tr><td colspan="5" style="padding:8px 0;color:#66727c;">No visitor sessions captured.</td></tr>';
+    const visitorText = visitors.slice(0, 20).map((visitor) => `- ${visitor.location || 'Unknown'} | ${visitor.device} | ${visitor.os} | ${visitor.browser} | ${formatDuration(visitor.durationSeconds)} | pages: ${visitor.pages.join(', ') || 'unknown'}`).join('\n') || '- No visitor sessions captured.';
     const reportText = rows.map(([label, value]) => `${label}: ${value}`).join('\n');
     const message = {
       recipient: process.env.MAIL_TO,
       recipientName: 'Andrew DiCosmo',
       subject: `AndrewDiCosmo.com | Daily conversion report | ${chicago.date}`,
-      text: `${reportText}\n\nTop topics\n${intents.map(([intent, count]) => `- ${intent}: ${count}`).join('\n')}\n\nPotential spam (${spam.length})\n${spam.slice(0, 5).map((session) => `- ${session.rowKey}: ${firstVisitorMessage(session).slice(0, 180)}`).join('\n')}\n\nAsk Codex for a conversation by its ID when you want the full transcript.`,
-      html: emailShell('Daily conversion report', `<div style="margin-bottom:16px;color:#66727c;">Reporting window: previous 24 hours · ${escapeHtml(chicago.date)}</div><table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:24px;">${metricHtml}</table><h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;">Top conversation topics</h3><ul>${topicHtml}</ul><h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;">Potential spam (${spam.length})</h3><ol>${spamHtml}</ol><p style="color:#66727c;font-size:12px;">Ask Codex for a conversation by its ID when you want the full transcript.</p>`),
+      text: `${reportText}\n\nVisitor sessions\n${visitorText}\n\nTop topics\n${intents.map(([intent, count]) => `- ${intent}: ${count}`).join('\n')}\n\nPotential spam (${spam.length})\n${spam.slice(0, 5).map((session) => `- ${session.rowKey}: ${firstVisitorMessage(session).slice(0, 180)}`).join('\n')}\n\nAsk Codex for a conversation by its ID when you want the full transcript.`,
+      html: emailShell('Daily conversion report', `<div style="margin-bottom:16px;color:#66727c;">Reporting window: previous 24 hours · ${escapeHtml(chicago.date)}</div><table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:24px;">${metricHtml}</table><h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;">Visitor sessions</h3><table role="presentation" width="100%" style="border-top:3px solid #1e6f8f;margin-bottom:24px;font-size:12px;"><tr><th align="left" style="padding:8px 10px 8px 0;color:#66727c;">Location</th><th align="left" style="padding:8px 10px;color:#66727c;">Device</th><th align="left" style="padding:8px 10px;color:#66727c;">OS</th><th align="left" style="padding:8px 10px;color:#66727c;">Browser</th><th align="right" style="padding:8px 0;color:#66727c;">Time on site</th></tr>${visitorHtml}</table><h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;">Top conversation topics</h3><ul>${topicHtml}</ul><h3 style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;">Potential spam (${spam.length})</h3><ol>${spamHtml}</ol><p style="color:#66727c;font-size:12px;">Ask Codex for a conversation by its ID when you want the full transcript.</p>`),
       attachments: []
     };
     const delivery = await sendReport(message);
