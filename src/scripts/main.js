@@ -39,7 +39,8 @@
       title:document.title,
       referrer:document.referrer||'',
       search:window.location.search||'',
-      utm
+      utm,
+      geo:{}
     };
     function cleanProps(props){
       const out={};
@@ -90,6 +91,26 @@
       thirdParty(event,props);
     };
     window.__track('page_view',{path:window.location.pathname});
+    function captureGeo(){
+      if(!analytics.firstPartyEnabled||!site.metricsEndpoint||!window.fetch)return;
+      const controller=window.AbortController?new AbortController():null;
+      const timer=controller?setTimeout(()=>controller.abort(),1500):null;
+      fetch('https://ipapi.co/json/',{
+        cache:'no-store',
+        signal:controller&&controller.signal
+      }).then(response=>response.ok?response.json():null).then(data=>{
+        if(!data)return;
+        const geo={
+          city:String(data.city||'').slice(0,120),
+          region:String(data.region||data.region_code||'').slice(0,120),
+          country:String(data.country_name||data.country||'').slice(0,80)
+        };
+        if(!geo.city&&!geo.region&&!geo.country)return;
+        pageContext.geo=geo;
+        window.__track('visitor_geo',geo);
+      }).catch(()=>{}).finally(()=>{if(timer)clearTimeout(timer);});
+    }
+    captureGeo();
     function sendSessionEnd(){
       const durationSeconds=Math.max(1,Math.round((Date.now()-pageStartedAt)/1000));
       if(durationSeconds<=lastDurationSent)return;

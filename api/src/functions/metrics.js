@@ -77,13 +77,14 @@ app.http('metrics', {
 
     const page = body.page && typeof body.page === 'object' ? body.page : {};
     const utm = page.utm && typeof page.utm === 'object' ? page.utm : {};
+    const bodyGeo = page.geo && typeof page.geo === 'object' ? page.geo : {};
     const now = new Date();
     const fromHeaders = headerLocation(request);
     const fromGeo = fromHeaders.city || fromHeaders.region || fromHeaders.country ? {} : await geoLookup(clientIp(request), context);
     const location = {
-      city: fromHeaders.city || fromGeo.city || '',
-      region: fromHeaders.region || fromGeo.region || '',
-      country: fromHeaders.country || fromGeo.country || ''
+      city: clean(bodyGeo.city, 120) || fromHeaders.city || fromGeo.city || '',
+      region: clean(bodyGeo.region, 120) || fromHeaders.region || fromGeo.region || '',
+      country: clean(bodyGeo.country, 80) || fromHeaders.country || fromGeo.country || ''
     };
     const entity = {
       partitionKey: `event-${dayStamp(now)}`,
