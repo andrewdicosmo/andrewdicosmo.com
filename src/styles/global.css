@@ -337,6 +337,8 @@
   .engagement-note{max-width:860px;margin:-22px 0 24px;font-size:11px;line-height:1.8;letter-spacing:.06em;color:var(--grey)}
   .engagement-note b{color:var(--ac);font-weight:600}
   .engagement-note span{color:var(--ac-dim);margin:0 5px}
+  .pathcard p a{color:var(--ac);text-decoration:none}
+  .pathcard p a:hover{text-decoration:underline}
   .path-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 16px}
   .pathcard{border:1px solid var(--faint);background:var(--bg);padding:18px 20px;cursor:pointer;user-select:none;display:flex;flex-direction:column;min-width:0;min-height:238px;transition:border-color .18s ease,background .18s ease,transform .18s ease}
   .pathcard:hover{border-color:var(--ac-dim)}
@@ -431,6 +433,8 @@
   .footer-links img{object-fit:contain}
   .footer-links a:hover,.footer-links a:focus-visible{border-color:var(--ac-dim);background:rgba(83,215,255,.08);color:var(--ac);outline:0}
   .footer-meta{display:flex;justify-content:space-between;gap:20px;max-width:1100px;margin-top:24px;padding-top:14px;border-top:1px solid var(--faint);color:var(--grey);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase}
+  .footer-meta a{color:var(--ac);text-decoration:none}
+  .footer-meta a:hover{text-decoration:underline}
 
   /* ============ AI ASSISTANT ============ */
   .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}

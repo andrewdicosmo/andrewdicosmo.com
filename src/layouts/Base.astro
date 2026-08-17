@@ -27,14 +27,36 @@ const description = (profile.metaDescription || profile.subjectLine || '').repla
 // og.png is a static 1200x630 card checked into public/. If the name or subject
 // line changes, regenerate it from scripts/og-card.html (instructions in that file).
 const ogImage = siteUrl + '/og.png?v=ad-logo';
-const person = {
+const personId = siteUrl + '/#person';
+const organizationId = profile.firm?.url ? profile.firm.url.replace(/\/$/, '') + '/#organization' : '';
+const schema = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: profile.name,
-  url: siteUrl,
-  jobTitle: (profile.subjectLine || '').replace(/&amp;/g, '&'),
-  sameAs: (profile.channels || []).map(c => c.url),
-  ...(profile.firm?.name ? { worksFor: { '@type': 'Organization', name: profile.firm.name, url: profile.firm.url } } : {})
+  '@graph': [
+    {
+      '@type': 'ProfilePage',
+      '@id': siteUrl + '/#profilepage',
+      url: siteUrl + '/',
+      name: profile.name + ' - Technology Leader and Hands-On Builder',
+      mainEntity: { '@id': personId }
+    },
+    {
+      '@type': 'Person',
+      '@id': personId,
+      name: profile.name,
+      url: siteUrl,
+      jobTitle: (profile.subjectLine || '').replace(/&amp;/g, '&'),
+      sameAs: (profile.channels || []).map(c => c.url),
+      ...(organizationId ? { worksFor: { '@id': organizationId } } : {})
+    },
+    ...(organizationId ? [{
+      '@type': 'Organization',
+      '@id': organizationId,
+      name: profile.firm.name,
+      alternateName: 'CloudTect',
+      url: profile.firm.url,
+      founder: { '@id': personId }
+    }] : [])
+  ]
 };
 ---
 <!DOCTYPE html>
@@ -58,7 +80,7 @@ const person = {
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content={ogImage}>
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(person)}></script>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)}></script>
   {site.analytics.googleAnalyticsId && (
     <>
       <script async src={`https://www.googletagmanager.com/gtag/js?id=${site.analytics.googleAnalyticsId}`}></script>
