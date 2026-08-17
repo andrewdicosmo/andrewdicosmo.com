@@ -17,7 +17,7 @@ const site = {
     clarityProjectId: import.meta.env.PUBLIC_MICROSOFT_CLARITY_ID || ''
   }
 };
-const { title = profile.name + ' · The Build Log' } = Astro.props;
+const { title = profile.name + ' | Engineering Leadership Portfolio' } = Astro.props;
 
 // All SEO/social meta derives from profile.json so a fork gets correct tags by
 // swapping content, never touching the layout. metaDescription is optional and
@@ -26,7 +26,7 @@ const siteUrl = 'https://' + (profile.domain || 'example.com');
 const description = (profile.metaDescription || profile.subjectLine || '').replace(/&amp;/g, '&');
 // og.png is a static 1200x630 card checked into public/. If the name or subject
 // line changes, regenerate it from scripts/og-card.html (instructions in that file).
-const ogImage = siteUrl + '/og.png?v=ad-logo';
+const ogImage = siteUrl + '/og.png?v=engineering-portfolio';
 const person = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -54,10 +54,12 @@ const person = {
   <meta property="og:image" content={ogImage}>
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content={`${profile.name} engineering leadership portfolio`}>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content={ogImage}>
+  <meta name="twitter:image:alt" content={`${profile.name} engineering leadership portfolio`}>
   <script is:inline type="application/ld+json" set:html={JSON.stringify(person)}></script>
   {site.analytics.googleAnalyticsId && (
     <>
