@@ -19,7 +19,15 @@ const phases = data.items.filter(item => item.type === 'phase');
             {item.ops.map(op => (
               <div class="op" data-aud={op.aud}>
                 <div class="op-head"><span class="op-code">{displayCode(op.code)}</span><span class="aud">{op.audLabel}</span>{op.engagement && <span class="engagement-type">{op.engagement}</span>}<span class="op-name"><Fragment set:html={op.name} /></span><span class={op.live ? 'op-status live' : 'op-status'}>{op.status}</span></div>
-                <div class="op-body"><p><Fragment set:html={op.body} /></p><div class="chips">{op.chips.map(c => <span class="chip"><Fragment set:html={c} /></span>)}</div></div>
+                <div class="op-body">
+                  <p><Fragment set:html={op.body} /></p>
+                  {'sourceUrl' in op && op.sourceUrl && (
+                    <a class="op-source" href={op.sourceUrl} target="_blank" rel="noopener noreferrer">
+                      Read the award coverage <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                  <div class="chips">{op.chips.map(c => <span class="chip"><Fragment set:html={c} /></span>)}</div>
+                </div>
               </div>
             ))}
           </div>

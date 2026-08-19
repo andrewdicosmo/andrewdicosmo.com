@@ -196,6 +196,8 @@
   .op.open .op-body{display:block;animation:rise .25s ease}
   @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .op-body p{font-size:12.5px;line-height:1.8;color:var(--grey);padding-top:12px}
+  .op-source{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac-dim);padding-bottom:3px}
+  .op-source:hover{border-bottom-color:var(--ac);color:var(--white)}
   .chips{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
   .chip{font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--faint);padding:4px 9px;color:var(--grey)}
   /* historical context markers */
