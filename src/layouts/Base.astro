@@ -17,7 +17,7 @@ const site = {
     clarityProjectId: import.meta.env.PUBLIC_MICROSOFT_CLARITY_ID || ''
   }
 };
-const { title = profile.name + ' · The Build Log' } = Astro.props;
+const { title = profile.seoTitle || profile.name + ' · The Build Log' } = Astro.props;
 
 // All SEO/social meta derives from profile.json so a fork gets correct tags by
 // swapping content, never touching the layout. metaDescription is optional and
@@ -26,7 +26,7 @@ const siteUrl = 'https://' + (profile.domain || 'example.com');
 const description = (profile.metaDescription || profile.subjectLine || '').replace(/&amp;/g, '&');
 // og.png is a static 1200x630 card checked into public/. If the name or subject
 // line changes, regenerate it from scripts/og-card.html (instructions in that file).
-const ogImage = siteUrl + '/og.png?v=ad-logo';
+const ogImage = siteUrl + '/og.png?v=2026-08';
 const personId = siteUrl + '/#person';
 const organizationId = profile.firm?.url ? profile.firm.url.replace(/\/$/, '') + '/#organization' : '';
 const schema = {
@@ -36,7 +36,8 @@ const schema = {
       '@type': 'ProfilePage',
       '@id': siteUrl + '/#profilepage',
       url: siteUrl + '/',
-      name: profile.name + ' - Technology Leader and Hands-On Builder',
+      name: profile.name + ' - ' + (profile.subjectLine || 'Technology Leader').replace(/&amp;/g, '&'),
+      description,
       mainEntity: { '@id': personId }
     },
     {
@@ -45,6 +46,7 @@ const schema = {
       name: profile.name,
       url: siteUrl,
       jobTitle: (profile.subjectLine || '').replace(/&amp;/g, '&'),
+      description,
       sameAs: (profile.channels || []).map(c => c.url),
       ...(organizationId ? { worksFor: { '@id': organizationId } } : {})
     },
