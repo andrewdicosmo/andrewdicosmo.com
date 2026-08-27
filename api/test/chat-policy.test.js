@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { isEngineeringRequest, shouldUseWebSearch, systemPrompt } = require('../src/chat-policy');
+const { isEngineeringRequest, responseSchema, shouldUseWebSearch, systemPrompt } = require('../src/chat-policy');
 
 test('engineering work requests are detected without blocking concept questions', () => {
   assert.equal(isEngineeringRequest('Can you debug my Python API?'), true);
@@ -32,6 +32,13 @@ test('system prompt includes the response behavior playbook', () => {
   assert.match(prompt, /Accuracy challenge/);
   assert.match(prompt, /Do not ask for both name and email in the same reply/);
   assert.match(prompt, /Suggestions should be two or three short next-step options/);
+});
+
+test('assistant policy uses the three tier resume routing rule', () => {
+  const prompt = systemPrompt({ evidence: [], engineeringRequest: false, webEnabled: false });
+  assert.deepEqual(responseSchema.properties.resumeKind.enum, ['standard', 'leadership', 'executive', 'none']);
+  assert.match(prompt, /Use leadership for manager, senior manager, director/);
+  assert.match(prompt, /Use executive only for CTO, CIO, VP, Head/);
 });
 
 test('job description comparison protects interview behavior and explains limits', () => {

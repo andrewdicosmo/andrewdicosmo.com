@@ -16,29 +16,38 @@ const firm = profile.firm;
     <div class="path-row">
       <div class="pathcard" id="door-hire" onclick="toggleDoor('w2')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('w2')}" role="button" tabindex="0" aria-pressed="false">
         <div class="pathcard-head">
-          <div class="pc-tag">Path 01 · Full-Time Role</div>
+          <div class="pc-tag">Path 01 · Full Time Role</div>
           <span class="dsel" id="dsel-w2">Select</span>
         </div>
-        <h4>Hire Me Full-Time</h4>
-        <p>For a permanent role in AI engineering, cloud, security, architecture, or hands-on technology delivery.</p>
+        <h4>Engineering or Architecture</h4>
+        <p>For an individual contributor role in AI engineering, cloud, security, architecture, or hands on technology delivery.</p>
         <div class="path-resume"><span>Resume</span><b>Engineering &amp; Delivery</b></div>
+      </div>
+      <div class="pathcard" id="door-management" onclick="toggleDoor('leadership')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('leadership')}" role="button" tabindex="0" aria-pressed="false">
+        <div class="pathcard-head">
+          <div class="pc-tag">Path 02 · Management Role</div>
+          <span class="dsel" id="dsel-leadership">Select</span>
+        </div>
+        <h4>Manager or Director</h4>
+        <p>For a people, platform, engineering, architecture, or technology management role with delivery ownership.</p>
+        <div class="path-resume"><span>Resume</span><b>Architecture &amp; Leadership</b></div>
       </div>
       <div class="pathcard" id="door-firm" onclick="toggleDoor('c2c')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('c2c')}" role="button" tabindex="0" aria-pressed="false">
         <div class="pathcard-head">
-          <div class="pc-tag">Path 02 · Consulting Project</div>
+          <div class="pc-tag">Path 03 · Consulting Project</div>
           <span class="dsel" id="dsel-c2c">Select</span>
         </div>
         <h4>Engage My Firm</h4>
         <p>For a project or ongoing consulting engagement delivered directly through <a href={firm.url} target="_blank" rel="noopener noreferrer">{firm.name.split(',')[0]}</a>.</p>
         <div class="path-resume"><span>Resume</span><b>Engineering &amp; Delivery</b></div>
       </div>
-      <div class="pathcard" id="door-leadership" onclick="toggleDoor('cto')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('cto')}" role="button" tabindex="0" aria-pressed="false">
+      <div class="pathcard" id="door-executive" onclick="toggleDoor('cto')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDoor('cto')}" role="button" tabindex="0" aria-pressed="false">
         <div class="pathcard-head">
-          <div class="pc-tag">Path 03 · Technology Leadership</div>
+          <div class="pc-tag">Path 04 · Executive Leadership</div>
           <span class="dsel" id="dsel-cto">Select</span>
         </div>
-        <h4>CTO / Technology Leadership</h4>
-        <p>For full-time, fractional, or interim leadership to set strategy, guide teams, strengthen governance, and improve delivery.</p>
+        <h4>Executive or Fractional</h4>
+        <p>For CTO, CIO, VP, Head, Chief Architect, fractional, or interim mandates with enterprise authority.</p>
         <div class="path-resume"><span>Resume</span><b>Technology Executive</b></div>
       </div>
     </div>
@@ -47,7 +56,7 @@ const firm = profile.firm;
     <div class="cform" id="brief-form" style="display:none">
       <div class="step-lbl" style="margin-top:2px">02 · Opportunity details</div>
       <div class="fs" id="fs-w2">
-        <div class="form-path-title">Full-Time Role</div>
+        <div class="form-path-title">Full Time Role</div>
         <div class="f2" style="margin-bottom:10px">
           <div><label>Expected annual salary</label>
           <select>{brief.salary.map(o => <option>{o}</option>)}</select></div>
@@ -58,6 +67,11 @@ const firm = profile.firm;
             <button type="button" class="fbtn" id="jrbtn" onclick="document.getElementById('jrfile').click()">Attach job description</button>
           </div></div>
         </div>
+      </div>
+      <div class="fs" id="fs-leadership">
+        <div class="form-path-title">Manager or Director Role</div>
+        <div style="max-width:440px;margin-bottom:10px"><label>Preferred management arrangement</label>
+        <select>{brief.leadershipArrangement.map(o => <option>{o}</option>)}</select></div>
       </div>
       <div class="fs" id="fs-c2c">
         <div class="form-path-title">Consulting Project</div>
@@ -75,8 +89,8 @@ const firm = profile.firm;
         <select>{brief.stage.map(o => <option>{o}</option>)}</select></div>
       </div>
       <div class="fs" id="fs-cto">
-        <div class="form-path-title">Technology Leadership</div>
-        <div style="max-width:440px;margin-bottom:10px"><label>Preferred leadership arrangement</label>
+        <div class="form-path-title">Executive Leadership</div>
+        <div style="max-width:440px;margin-bottom:10px"><label>Preferred executive arrangement</label>
         <select>{brief.leadershipArrangement.map(o => <option>{o}</option>)}</select></div>
       </div>
       <div class="step-lbl">03 · About you</div>

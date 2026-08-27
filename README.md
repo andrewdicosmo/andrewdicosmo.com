@@ -272,7 +272,9 @@ Set these values in Azure Static Web Apps, never in this repository:
 | `STORAGE_CONNECTION_STRING` | Connects the function to Azure Storage. |
 | `LEADS_TABLE` | The table where contact requests are saved. |
 | `ATTACH_CONTAINER` | The container for uploaded job description files. |
-| `RESUME_BLOB_URL` | The protected web address of the resume PDF sent to the visitor. |
+| `RESUME_BLOB_URL` | The protected web address of the Engineering and Delivery resume PDF. |
+| `RESUME_LEADERSHIP_BLOB_URL` | The protected web address of the Architecture and Leadership resume PDF. |
+| `RESUME_EXECUTIVE_BLOB_URL` | The protected web address of the Technology Executive resume PDF. |
 | `BOOKINGS_URL` | The booking link returned after a complete request. |
 | `MAIL_TO` | The address that receives the owner notification. |
 | `MAIL_REPLY_TO` | Optional reply address for visitor emails. Defaults to `MAIL_TO`, then the sending address. |

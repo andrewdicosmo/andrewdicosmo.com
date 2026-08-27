@@ -341,8 +341,8 @@
   .engagement-note span{color:var(--ac-dim);margin:0 5px}
   .pathcard p a{color:var(--ac);text-decoration:none}
   .pathcard p a:hover{text-decoration:underline}
-  .path-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 16px}
-  .pathcard{border:1px solid var(--faint);background:var(--bg);padding:18px 20px;cursor:pointer;user-select:none;display:flex;flex-direction:column;min-width:0;min-height:238px;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+  .path-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 16px}
+  .pathcard{border:1px solid var(--faint);background:var(--bg);padding:18px 20px;cursor:pointer;user-select:none;display:flex;flex-direction:column;min-width:0;min-height:220px;transition:border-color .18s ease,background .18s ease,transform .18s ease}
   .pathcard:hover{border-color:var(--ac-dim)}
   .pathcard:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
   .pathcard.sel{border-color:var(--ac);background:color-mix(in srgb, var(--ac) 6%, var(--bg))}

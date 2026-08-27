@@ -139,7 +139,12 @@ function ownerMessage(session, kind) {
 }
 
 async function resumeMessage(session, kind) {
-  const paths = { cto: kind === 'executive', w2: kind !== 'executive', c2c: false };
+  const paths = {
+    cto: kind === 'executive',
+    leadership: kind === 'leadership',
+    w2: kind === 'standard',
+    c2c: false
+  };
   const selection = selectResume(paths, process.env);
   const attachments = [logoAttachment()].filter(Boolean);
   if (selection.url) {
@@ -154,17 +159,27 @@ async function resumeMessage(session, kind) {
     }
   }
   const name = clean(session.name, 100) || 'there';
-  const summary = kind === 'executive'
-    ? 'I selected the Technology Executive resume based on your interest in technology leadership.'
-    : 'I selected the Engineering & Delivery resume based on what you discussed.';
+  const resumeCopy = {
+    standard: {
+      subject: 'Andrew DiCosmo | Engineering & Delivery resume',
+      summary: 'I selected the Engineering & Delivery resume based on what you discussed.'
+    },
+    leadership: {
+      subject: 'Andrew DiCosmo | Architecture & Leadership resume',
+      summary: 'I selected the Architecture & Leadership resume based on your interest in a manager or director role.'
+    },
+    executive: {
+      subject: 'Andrew DiCosmo | Technology Executive resume',
+      summary: 'I selected the Technology Executive resume based on your interest in an executive mandate.'
+    }
+  };
+  const copy = resumeCopy[kind] || resumeCopy.standard;
   return {
     recipient: session.email,
     recipientName: clean(session.name, 100),
-    subject: kind === 'executive'
-      ? 'Andrew DiCosmo | Technology Executive resume'
-      : 'Andrew DiCosmo | Engineering & Delivery resume',
-    text: `Hi ${name},\n\nThanks for speaking with my AI Assistant. ${summary}\n\nThe resume is attached for your review and to share if helpful. I will review the conversation and follow up personally when a response is needed.\n\nThanks,\nAndrew DiCosmo\nhttps://andrewdicosmo.com`,
-    html: emailShell('Resume requested', `<p style="margin:0 0 15px;">Hi ${escapeHtml(name)},</p><p style="margin:0 0 15px;">Thanks for speaking with my AI Assistant. ${escapeHtml(summary)}</p><p style="margin:0 0 20px;">The resume is attached for your review and to share if helpful. I will review the conversation and follow up personally when a response is needed.</p><p style="margin:0;">Thanks,<br><strong>Andrew DiCosmo</strong><br><a href="https://andrewdicosmo.com" style="color:#1e6f8f;">AndrewDiCosmo.com</a></p>`),
+    subject: copy.subject,
+    text: `Hi ${name},\n\nThanks for speaking with my AI Assistant. ${copy.summary}\n\nThe resume is attached for your review and to share if helpful. I will review the conversation and follow up personally when a response is needed.\n\nThanks,\nAndrew DiCosmo\nhttps://andrewdicosmo.com`,
+    html: emailShell('Resume requested', `<p style="margin:0 0 15px;">Hi ${escapeHtml(name)},</p><p style="margin:0 0 15px;">Thanks for speaking with my AI Assistant. ${escapeHtml(copy.summary)}</p><p style="margin:0 0 20px;">The resume is attached for your review and to share if helpful. I will review the conversation and follow up personally when a response is needed.</p><p style="margin:0;">Thanks,<br><strong>Andrew DiCosmo</strong><br><a href="https://andrewdicosmo.com" style="color:#1e6f8f;">AndrewDiCosmo.com</a></p>`),
     replyTo: process.env.MAIL_REPLY_TO || process.env.MAIL_TO,
     replyToName: 'Andrew DiCosmo',
     attachments
@@ -183,7 +198,8 @@ async function deliverChatNotifications(session, result, context) {
     messages.push({ key: 'owner', message: ownerMessage(session, 'lead') });
   }
   if (result.resumeRequested && hasContact && !session.resumeSent) {
-    messages.push({ key: 'resume', message: await resumeMessage(session, result.resumeKind === 'executive' ? 'executive' : 'standard') });
+    const kind = ['standard', 'leadership', 'executive'].includes(result.resumeKind) ? result.resumeKind : 'standard';
+    messages.push({ key: 'resume', message: await resumeMessage(session, kind) });
   }
   if (!messages.length) return { sent: [] };
 

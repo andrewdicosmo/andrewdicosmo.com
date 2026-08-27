@@ -67,9 +67,10 @@ function getEmailLogoAttachment() {
 
 function formatPath(paths = {}) {
   const selected = compact([
-    paths.w2 ? 'W-2 role' : '',
+    paths.w2 ? 'Full time role' : '',
+    paths.leadership ? 'Manager or director role' : '',
     paths.c2c ? 'C2C consulting' : '',
-    paths.cto ? 'Technology leadership' : ''
+    paths.cto ? 'Executive leadership' : ''
   ]);
   return selected.length ? selected.join(' + ') : '';
 }
@@ -81,9 +82,10 @@ function cleanSubjectPart(value) {
 function formatOwnerSubject(lead, body) {
   const paths = body.paths || {};
   const engagement = compact([
-    paths.w2 ? 'W-2' : '',
+    paths.w2 ? 'Full time' : '',
+    paths.leadership ? 'Management' : '',
     paths.c2c ? 'C2C' : '',
-    paths.cto ? 'Technology leadership' : ''
+    paths.cto ? 'Executive leadership' : ''
   ]).join(' + ');
   const inquiryType = engagement ? `${engagement} inquiry` : 'New inquiry';
   const name = cleanSubjectPart(lead.name);
@@ -102,7 +104,8 @@ function formatFields(fields = [], paths = {}) {
       const label = field.label.toLowerCase();
       if (!paths.w2 && label.includes('w-2')) return false;
       if (!paths.c2c && (label.includes('budget') || label === 'term' || label.includes('project stands'))) return false;
-      if (!paths.cto && label.includes('leadership arrangement')) return false;
+      if (!paths.leadership && label.includes('management arrangement')) return false;
+      if (!paths.cto && label.includes('executive arrangement')) return false;
       return true;
     });
 }
@@ -266,10 +269,13 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   const selectedPath = formatPath(paths);
   const company = clean(lead.company);
   const role = clean(lead.role);
-  const selectedPathCount = Number(paths.w2) + Number(paths.c2c) + Number(paths.cto);
+  const selectedPathCount = Number(paths.w2) + Number(paths.leadership) + Number(paths.c2c) + Number(paths.cto);
   const executiveResume = options.resumeLabel === 'Technology Executive Resume';
+  const leadershipResume = options.resumeLabel === 'Architecture & Leadership Resume';
   const attachmentMessage = executiveResume
-    ? "I've attached my Technology Executive resume for background on my leadership and hands-on delivery experience."
+    ? "I've attached my Technology Executive resume for background on my leadership and hands on delivery experience."
+    : leadershipResume
+      ? "I've attached my Architecture & Leadership resume for background on my management, architecture, and delivery experience."
     : paths.w2 && selectedPathCount === 1
     ? "I've attached my resume for your review and to share with the hiring team if helpful."
     : paths.c2c && selectedPathCount === 1
@@ -291,7 +297,9 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   if (selectedPathCount > 1) {
     nextStep = 'I will review the role and scope and respond personally within one business day.';
   } else if (paths.cto) {
-    nextStep = 'I will review the leadership mandate and respond personally within one business day.';
+    nextStep = 'I will review the executive mandate and respond personally within one business day.';
+  } else if (paths.leadership) {
+    nextStep = 'I will review the management scope and respond personally within one business day.';
   } else if (paths.w2) {
     nextStep = 'I will review the role details and respond personally within one business day.';
   } else if (paths.c2c) {
@@ -542,7 +550,9 @@ app.http('brief', {
           recipientName: name,
           subject: resumeSelection.kind === 'executive'
             ? 'Andrew DiCosmo | Technology Executive resume and next steps'
-            : 'Andrew DiCosmo | Resume and next steps',
+            : resumeSelection.kind === 'leadership'
+              ? 'Andrew DiCosmo | Architecture & Leadership resume and next steps'
+              : 'Andrew DiCosmo | Engineering & Delivery resume and next steps',
           text: formatSubmitterReplyText(lead, body, submitterReplyOptions),
           html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
           replyTo,

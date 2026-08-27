@@ -112,7 +112,7 @@ test('requires context for a technology leadership inquiry', () => {
   });
 
   assert.equal(result.valid, false);
-  assert.ok(result.missing.includes('Please describe the leadership need in at least 40 characters.'));
+  assert.ok(result.missing.includes('Please describe the executive mandate in at least 40 characters.'));
 });
 
 test('accepts a complete technology leadership inquiry', () => {
@@ -123,5 +123,27 @@ test('accepts a complete technology leadership inquiry', () => {
   });
 
   assert.equal(result.valid, true);
-  assert.deepEqual(result.normalized.paths, { w2: false, c2c: false, cto: true });
+  assert.deepEqual(result.normalized.paths, { w2: false, leadership: false, c2c: false, cto: true });
+});
+
+test('requires context for a management inquiry', () => {
+  const result = validateInquiry({
+    ...common,
+    paths: { leadership: true },
+    brief: 'Too short'
+  });
+
+  assert.equal(result.valid, false);
+  assert.ok(result.missing.includes('Please describe the management role in at least 40 characters.'));
+});
+
+test('accepts a complete management inquiry', () => {
+  const result = validateInquiry({
+    ...common,
+    paths: { leadership: true },
+    brief: 'We need a director to guide enterprise architecture and improve engineering delivery.'
+  });
+
+  assert.equal(result.valid, true);
+  assert.equal(result.normalized.paths.leadership, true);
 });

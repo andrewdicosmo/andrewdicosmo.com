@@ -20,6 +20,7 @@ function validJobUrl(value) {
 function validateInquiry(body = {}) {
   const paths = {
     w2: body.paths?.w2 === true,
+    leadership: body.paths?.leadership === true,
     c2c: body.paths?.c2c === true,
     cto: body.paths?.cto === true
   };
@@ -36,7 +37,7 @@ function validateInquiry(body = {}) {
   const hasContext = brief.length >= MIN_CONTEXT_LENGTH;
   const missing = [];
 
-  if (!paths.w2 && !paths.c2c && !paths.cto) {
+  if (!paths.w2 && !paths.leadership && !paths.c2c && !paths.cto) {
     missing.push('Select at least one way you would like to work together.');
   }
   if (!name) missing.push('Enter your name.');
@@ -48,14 +49,16 @@ function validateInquiry(body = {}) {
     missing.push('Keep the job description attachment under 5 MB.');
   }
 
-  const selectedPathCount = Number(paths.w2) + Number(paths.c2c) + Number(paths.cto);
+  const selectedPathCount = Number(paths.w2) + Number(paths.leadership) + Number(paths.c2c) + Number(paths.cto);
   if (paths.w2 && selectedPathCount === 1 && !hasContext) {
     missing.push('Please describe the role in at least 40 characters.');
+  } else if (paths.leadership && selectedPathCount === 1 && !hasContext) {
+    missing.push('Please describe the management role in at least 40 characters.');
   } else if (paths.c2c && selectedPathCount === 1) {
     if (!specificChips.length) missing.push('Select at least one type of help you need.');
     if (!hasContext) missing.push('Please describe the project in at least 40 characters.');
   } else if (paths.cto && selectedPathCount === 1 && !hasContext) {
-    missing.push('Please describe the leadership need in at least 40 characters.');
+    missing.push('Please describe the executive mandate in at least 40 characters.');
   } else if (selectedPathCount > 1 && !hasContext) {
     missing.push('Please describe the opportunity in at least 40 characters.');
   }

@@ -11,11 +11,12 @@ const lead = {
 };
 
 const body = {
-  paths: { w2: true, c2c: true, cto: true },
+  paths: { w2: true, leadership: true, c2c: true, cto: true },
   fields: [
     { label: 'W-2 compensation range', value: '$300,000 or more · Executive' },
     { label: 'Project budget', value: '$100,000 or more' },
-    { label: 'Leadership arrangement', value: 'Fractional CTO' }
+    { label: 'Preferred management arrangement', value: 'Full time' },
+    { label: 'Preferred executive arrangement', value: 'Fractional CTO' }
   ],
   chips: ['Technology strategy and roadmap'],
   brief: 'We need technology leadership across strategy, delivery, and governance.'
@@ -25,7 +26,17 @@ test('renders owner email for all engagement paths with preference fields', () =
   const html = formatOwnerInquiryHtml(lead, body);
   assert.match(html, /W-2 compensation range/);
   assert.match(html, /Project budget/);
-  assert.match(html, /Leadership arrangement/);
+  assert.match(html, /Preferred management arrangement/);
+  assert.match(html, /Preferred executive arrangement/);
+});
+
+test('renders leadership resume language for manager and director inquiries', () => {
+  const html = formatSubmitterReplyHtml(lead, {
+    ...body,
+    paths: { w2: false, leadership: true, c2c: false, cto: false }
+  }, { resumeLabel: 'Architecture & Leadership Resume' });
+  assert.match(html, /Architecture &amp; Leadership resume/);
+  assert.match(html, /management, architecture, and delivery experience/);
 });
 
 test('renders submitter email for all engagement paths with preference fields', () => {

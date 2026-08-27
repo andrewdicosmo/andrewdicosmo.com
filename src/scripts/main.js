@@ -203,36 +203,38 @@
     el.classList.remove('hl');void el.offsetWidth;el.classList.add('hl');
   }
   window.goDoor=goDoor;
-  const paths={w2:false,c2c:false,cto:false};
+  const paths={w2:false,leadership:false,c2c:false,cto:false};
   function toggleDoor(k){
     if(!(k in paths))return;
     paths[k]=!paths[k];
-    const ids={w2:'door-hire',c2c:'door-firm',cto:'door-leadership'};
+    const ids={w2:'door-hire',leadership:'door-management',c2c:'door-firm',cto:'door-executive'};
     const d=document.getElementById(ids[k]);
     d.classList.toggle('sel',paths[k]);
     d.setAttribute('aria-pressed',paths[k]);
     document.getElementById('dsel-'+k).textContent=paths[k]?'Selected':'Select';
-    if(window.__track)window.__track('engagement_path_toggle',{path:k,selected:paths[k],w2:paths.w2,c2c:paths.c2c,cto:paths.cto});
+    if(window.__track)window.__track('engagement_path_toggle',{path:k,selected:paths[k],w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto});
     buildBrief();
   }
   window.toggleDoor=toggleDoor;
   function buildBrief(){
-    const any=paths.w2||paths.c2c||paths.cto;
+    const any=paths.w2||paths.leadership||paths.c2c||paths.cto;
     document.getElementById('brief-empty').style.display=any?'none':'block';
     document.getElementById('brief-form').style.display=any?'flex':'none';
     document.getElementById('fs-w2').classList.toggle('show',paths.w2);
+    document.getElementById('fs-leadership').classList.toggle('show',paths.leadership);
     document.getElementById('fs-c2c').classList.toggle('show',paths.c2c);
     document.getElementById('fs-cto').classList.toggle('show',paths.cto);
     const t=document.getElementById('brief-title');
     const m=document.getElementById('bmsg');
     const ml=document.getElementById('bmsg-label');
     const resumeMatch=document.getElementById('resume-match-name');
-    const selected=[paths.w2?'Full-Time Role':'',paths.c2c?'Consulting Project':'',paths.cto?'Technology Leadership':''].filter(Boolean);
-    if(resumeMatch)resumeMatch.textContent=paths.cto?'Technology Executive Resume':'Engineering & Delivery Resume';
+    const selected=[paths.w2?'Engineering or Architecture Role':'',paths.leadership?'Manager or Director Role':'',paths.c2c?'Consulting Project':'',paths.cto?'Executive Leadership':''].filter(Boolean);
+    if(resumeMatch)resumeMatch.textContent=paths.cto?'Technology Executive Resume':paths.leadership?'Architecture & Leadership Resume':'Engineering & Delivery Resume';
     if(selected.length>1){t.textContent='Your Inquiry \u00b7 '+selected.join(' + ');m.placeholder='Tell me what you need, your priorities, timing, and what a successful outcome would look like.';if(ml)ml.textContent='Tell me about the opportunity \u00b7 required';}
-    else if(paths.w2){t.textContent='Your Inquiry \u00b7 Full-Time Role';m.placeholder='Tell me about the role, team, timing, and what success would look like.';if(ml)ml.textContent='Tell me about the role \u00b7 required';}
+    else if(paths.w2){t.textContent='Your Inquiry \u00b7 Engineering or Architecture Role';m.placeholder='Tell me about the role, team, timing, and what success would look like.';if(ml)ml.textContent='Tell me about the role \u00b7 required';}
+    else if(paths.leadership){t.textContent='Your Inquiry \u00b7 Manager or Director Role';m.placeholder='Tell me about the team, leadership scope, delivery priorities, and timing.';if(ml)ml.textContent='Tell me about the management role \u00b7 required';}
     else if(paths.c2c){t.textContent='Your Inquiry \u00b7 Consulting Project';m.placeholder='Tell me about the problem, desired outcome, timing, and any important constraints.';if(ml)ml.textContent='Tell me about the project \u00b7 required';}
-    else if(paths.cto){t.textContent='Your Inquiry \u00b7 Technology Leadership';m.placeholder='Tell me about the organization, leadership need, priorities, team, and timing.';if(ml)ml.textContent='Tell me about the leadership need \u00b7 required';}
+    else if(paths.cto){t.textContent='Your Inquiry \u00b7 Executive Leadership';m.placeholder='Tell me about the organization, executive mandate, priorities, team, and timing.';if(ml)ml.textContent='Tell me about the executive mandate \u00b7 required';}
     else{t.textContent='How Would You Like to Work Together?';}
   }
   function startBrief(type){
@@ -257,7 +259,7 @@
   const inquiryForm=document.getElementById('brief-form');
   if(inquiryForm){
     inquiryForm.addEventListener('focusin',()=>{
-      if(window.__track)window.__track('inquiry_form_started',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto});
+      if(window.__track)window.__track('inquiry_form_started',{w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto});
     },{once:true});
   }
   function showBriefErrors(messages){
@@ -302,7 +304,7 @@
     }
     const hasContext=context.length>=40;
 
-    if(!paths.w2&&!paths.c2c&&!paths.cto)add('Select at least one way you would like to work together.');
+    if(!paths.w2&&!paths.leadership&&!paths.c2c&&!paths.cto)add('Select at least one way you would like to work together.');
     if(!name.value.trim())add('Enter your name.',name);
     if(!validEmail)add('Enter a valid email address.',email);
     if(!company.value.trim())add('Enter your company or organization.',company);
@@ -310,20 +312,22 @@
     if(fileTooLarge)add('Keep the job description attachment under 5 MB.',reqWrap);
     if(!validLink)add('Enter a valid link to the job posting.',jrLink);
 
-    const selectedPathCount=Number(paths.w2)+Number(paths.c2c)+Number(paths.cto);
+    const selectedPathCount=Number(paths.w2)+Number(paths.leadership)+Number(paths.c2c)+Number(paths.cto);
     if(paths.w2&&selectedPathCount===1&&!hasContext){
       add('Please describe the role in at least 40 characters.',msg);
+    }else if(paths.leadership&&selectedPathCount===1&&!hasContext){
+      add('Please describe the management role in at least 40 characters.',msg);
     }else if(paths.c2c&&selectedPathCount===1){
       if(!specificChips.length)add('Select at least one type of help you need.',workAreas);
       if(!hasContext)add('Please describe the project in at least 40 characters.',msg);
     }else if(paths.cto&&selectedPathCount===1&&!hasContext){
-      add('Please describe the leadership need in at least 40 characters.',msg);
+      add('Please describe the executive mandate in at least 40 characters.',msg);
     }else if(selectedPathCount>1&&!hasContext){
       add('Please describe the opportunity in at least 40 characters.',msg);
     }
 
     showBriefErrors(errors);
-    if(errors.length&&window.__track)window.__track('inquiry_validation_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,errorCount:errors.length});
+    if(errors.length&&window.__track)window.__track('inquiry_validation_failed',{w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto,errorCount:errors.length});
     if(firstTarget){
       if(typeof firstTarget.focus==='function')firstTarget.focus({preventScroll:true});
       firstTarget.scrollIntoView({behavior:'smooth',block:'center'});
@@ -343,7 +347,7 @@
       })
       .map(sel=>({label:sel.closest('div')?.querySelector('label')?.textContent||'',value:sel.value}));
     const payload={
-      paths:{w2:paths.w2,c2c:paths.c2c,cto:paths.cto},
+      paths:{w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto},
       fields,
       chips:selectedChips,
       name:name.value.trim(), email:email.value.trim(),
@@ -353,7 +357,12 @@
     };
     const finish=(bookingsUrl,resumeType,emailAccepted,contactEmail)=>{
       const sw=document.getElementById('sched-wrap');
-      const executiveResume=resumeType==='executive';
+      const resumeMessages={
+        standard:{title:'Engineering & Delivery Resume Sent',copy:'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'},
+        leadership:{title:'Architecture & Leadership Resume Sent',copy:'Check your inbox. The Architecture & Leadership resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'},
+        executive:{title:'Technology Executive Resume Sent',copy:'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'}
+      };
+      const resumeMessage=resumeMessages[resumeType]||resumeMessages.standard;
       const successTitle=document.getElementById('brief-success-title');
       const successCopy=document.getElementById('brief-success-copy');
       // only offer the scheduler when a bookings page actually exists;
@@ -370,22 +379,20 @@
         }
       }
       if(successTitle)successTitle.textContent=emailAccepted
-        ?(executiveResume?'Technology Executive Resume Sent':'Engineering & Delivery Resume Sent')
+        ?resumeMessage.title
         :'Inquiry Received';
       if(successCopy)successCopy.textContent=emailAccepted
-        ?(executiveResume
-          ?'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'
-          :'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.')
+        ?resumeMessage.copy
         :`Your inquiry was saved, but the resume email could not be sent.${contactEmail?` Please email ${contactEmail} directly.`:' Please contact Andrew directly.'}`;
       form.style.display='none';
       document.getElementById('brief-done').style.display='block';
-      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,resumeType:resumeType||'standard',hasBookingUrl:!!bookingsUrl});
+      if(window.__track)window.__track('inquiry_submit_success',{w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto,resumeType:resumeType||'standard',hasBookingUrl:!!bookingsUrl});
       goDoor('brief');
     };
     const send=(fileB64,fileName)=>{
       if(fileB64){payload.attachment={name:fileName,data:fileB64};}
       setBriefSending(true);
-      if(window.__track)window.__track('inquiry_submit_attempt',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasAttachment:!!fileB64,hasJobLink:!!payload.reqLink});
+      if(window.__track)window.__track('inquiry_submit_attempt',{w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto,hasAttachment:!!fileB64,hasJobLink:!!payload.reqLink});
       fetch((window.__SITE&&window.__SITE.apiEndpoint)||'/api/brief',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
         .then(async r=>{
           const data=await r.json().catch(()=>({}));
@@ -394,7 +401,7 @@
         })
         .then(d=>finish(d&&d.bookingsUrl,d&&d.resumeType,d&&d.emailAccepted,d&&d.contactEmail))
         .catch(error=>{
-          if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,c2c:paths.c2c,cto:paths.cto,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
+          if(window.__track)window.__track('inquiry_submit_failed',{w2:paths.w2,leadership:paths.leadership,c2c:paths.c2c,cto:paths.cto,hasServerMessages:Array.isArray(error.messages)&&error.messages.length>0});
           showBriefErrors(Array.isArray(error.messages)&&error.messages.length
             ?error.messages
             :[Number(error.status)>=500||!error.status
