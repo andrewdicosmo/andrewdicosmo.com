@@ -161,12 +161,12 @@ async function resumeMessage(session, kind) {
   const name = clean(session.name, 100) || 'there';
   const resumeCopy = {
     standard: {
-      subject: 'Andrew DiCosmo | Engineering & Delivery resume',
-      summary: 'I selected the Engineering & Delivery resume based on what you discussed.'
+      subject: 'Andrew DiCosmo | AI, Cloud Security & Platform Engineering resume',
+      summary: 'I selected the AI, Cloud Security & Platform Engineering resume based on what you discussed.'
     },
     leadership: {
-      subject: 'Andrew DiCosmo | Architecture & Leadership resume',
-      summary: 'I selected the Architecture & Leadership resume based on your interest in a manager or director role.'
+      subject: 'Andrew DiCosmo | Architecture & Engineering Leadership resume',
+      summary: 'I selected the Architecture & Engineering Leadership resume based on your interest in a manager or director role.'
     },
     executive: {
       subject: 'Andrew DiCosmo | Technology Executive resume',

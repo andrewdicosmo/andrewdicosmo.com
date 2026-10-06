@@ -229,7 +229,7 @@
     const ml=document.getElementById('bmsg-label');
     const resumeMatch=document.getElementById('resume-match-name');
     const selected=[paths.w2?'Engineering or Architecture Role':'',paths.leadership?'Manager or Director Role':'',paths.c2c?'Consulting Project':'',paths.cto?'Executive Leadership':''].filter(Boolean);
-    if(resumeMatch)resumeMatch.textContent=paths.cto?'Technology Executive Resume':paths.leadership?'Architecture & Leadership Resume':'Engineering & Delivery Resume';
+    if(resumeMatch)resumeMatch.textContent=paths.cto?'Technology Executive Resume':paths.leadership?'Architecture & Engineering Leadership Resume':'AI, Cloud Security & Platform Engineering Resume';
     if(selected.length>1){t.textContent='Your Inquiry \u00b7 '+selected.join(' + ');m.placeholder='Tell me what you need, your priorities, timing, and what a successful outcome would look like.';if(ml)ml.textContent='Tell me about the opportunity \u00b7 required';}
     else if(paths.w2){t.textContent='Your Inquiry \u00b7 Engineering or Architecture Role';m.placeholder='Tell me about the role, team, timing, and what success would look like.';if(ml)ml.textContent='Tell me about the role \u00b7 required';}
     else if(paths.leadership){t.textContent='Your Inquiry \u00b7 Manager or Director Role';m.placeholder='Tell me about the team, leadership scope, delivery priorities, and timing.';if(ml)ml.textContent='Tell me about the management role \u00b7 required';}
@@ -358,8 +358,8 @@
     const finish=(bookingsUrl,resumeType,emailAccepted,contactEmail)=>{
       const sw=document.getElementById('sched-wrap');
       const resumeMessages={
-        standard:{title:'Engineering & Delivery Resume Sent',copy:'Check your inbox. The Engineering & Delivery resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'},
-        leadership:{title:'Architecture & Leadership Resume Sent',copy:'Check your inbox. The Architecture & Leadership resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'},
+        standard:{title:'AI, Cloud Security & Platform Engineering Resume Sent',copy:'Check your inbox. The AI, Cloud Security & Platform Engineering resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'},
+        leadership:{title:'Architecture & Engineering Leadership Resume Sent',copy:'Check your inbox. The Architecture & Engineering Leadership resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'},
         executive:{title:'Technology Executive Resume Sent',copy:'Check your inbox. The Technology Executive resume is on its way, and I will follow up within one business day. If it does not arrive, check spam or write me directly.'}
       };
       const resumeMessage=resumeMessages[resumeType]||resumeMessages.standard;
@@ -588,7 +588,7 @@
     xlog.innerHTML='<div>&gt; 5 TARGETS · 1 OBSCURED BY CLOUD → RE-COLLECT · <span class="ok">OK</span></div>';
   }
 
-  // ---- InstaMapp pipeline state machine ----
+  // ---- InstaMap pipeline state machine ----
   const iscan=document.getElementById('iscan'),ibrk=document.getElementById('ibrk'),itag=document.getElementById('itag');
   const ifields=document.getElementById('ifields'),istate=document.getElementById('istate'),iverdict=document.getElementById('iverdict');
   const mrows=[...document.querySelectorAll('.m-row')];

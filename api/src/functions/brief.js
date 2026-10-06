@@ -271,11 +271,11 @@ function getSubmitterReplyModel(lead, body, options = {}) {
   const role = clean(lead.role);
   const selectedPathCount = Number(paths.w2) + Number(paths.leadership) + Number(paths.c2c) + Number(paths.cto);
   const executiveResume = options.resumeLabel === 'Technology Executive Resume';
-  const leadershipResume = options.resumeLabel === 'Architecture & Leadership Resume';
+  const leadershipResume = options.resumeLabel === 'Architecture & Engineering Leadership Resume';
   const attachmentMessage = executiveResume
     ? "I've attached my Technology Executive resume for background on my leadership and hands on delivery experience."
     : leadershipResume
-      ? "I've attached my Architecture & Leadership resume for background on my management, architecture, and delivery experience."
+      ? "I've attached my Architecture & Engineering Leadership resume for background on my management, architecture, and delivery experience."
     : paths.w2 && selectedPathCount === 1
     ? "I've attached my resume for your review and to share with the hiring team if helpful."
     : paths.c2c && selectedPathCount === 1
@@ -451,7 +451,7 @@ function formatSubmitterReplyHtml(lead, body, options = {}) {
 // POST /api/brief
 // Stores the lead, uploads any job-req attachment, emails the resume to the
 // submitter, notifies the owner, and returns the scheduler URL for validated
-// inquiries. Email prefers Azure Communication Services, matching InstaMapp's
+// inquiries. Email prefers Azure Communication Services, matching InstaMap's
 // production pattern, with SendGrid retained as a fallback. Every external
 // dependency is env-driven; missing config degrades gracefully instead of
 // failing the visitor.
@@ -551,8 +551,8 @@ app.http('brief', {
           subject: resumeSelection.kind === 'executive'
             ? 'Andrew DiCosmo | Technology Executive resume and next steps'
             : resumeSelection.kind === 'leadership'
-              ? 'Andrew DiCosmo | Architecture & Leadership resume and next steps'
-              : 'Andrew DiCosmo | Engineering & Delivery resume and next steps',
+              ? 'Andrew DiCosmo | Architecture & Engineering Leadership resume and next steps'
+              : 'Andrew DiCosmo | AI, Cloud Security & Platform Engineering resume and next steps',
           text: formatSubmitterReplyText(lead, body, submitterReplyOptions),
           html: formatSubmitterReplyHtml(lead, body, submitterReplyOptions),
           replyTo,

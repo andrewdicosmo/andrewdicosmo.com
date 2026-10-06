@@ -34,8 +34,8 @@ test('renders leadership resume language for manager and director inquiries', ()
   const html = formatSubmitterReplyHtml(lead, {
     ...body,
     paths: { w2: false, leadership: true, c2c: false, cto: false }
-  }, { resumeLabel: 'Architecture & Leadership Resume' });
-  assert.match(html, /Architecture &amp; Leadership resume/);
+  }, { resumeLabel: 'Architecture & Engineering Leadership Resume' });
+  assert.match(html, /Architecture &amp; Engineering Leadership resume/);
   assert.match(html, /management, architecture, and delivery experience/);
 });
 

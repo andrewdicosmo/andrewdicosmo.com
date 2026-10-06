@@ -40,7 +40,7 @@ test('selects the leadership resume for manager and director inquiries', () => {
   );
 
   assert.equal(resume.kind, 'leadership');
-  assert.equal(resume.label, 'Architecture & Leadership Resume');
+  assert.equal(resume.label, 'Architecture & Engineering Leadership Resume');
   assert.equal(resume.url, 'https://example.com/leadership.pdf');
 });
 

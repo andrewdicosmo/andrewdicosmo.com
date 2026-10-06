@@ -1,13 +1,13 @@
 const STANDARD_RESUME = {
   kind: 'standard',
-  label: 'Engineering & Delivery Resume',
-  filename: 'Andrew_DiCosmo_Engineering.pdf'
+  label: 'AI, Cloud Security & Platform Engineering Resume',
+  filename: 'Andrew_DiCosmo_AI_Cloud_Security_Platform_Engineering.pdf'
 };
 
 const LEADERSHIP_RESUME = {
   kind: 'leadership',
-  label: 'Architecture & Leadership Resume',
-  filename: 'Andrew_DiCosmo_Leadership.pdf'
+  label: 'Architecture & Engineering Leadership Resume',
+  filename: 'Andrew_DiCosmo_Architecture_Engineering_Leadership.pdf'
 };
 
 const EXECUTIVE_RESUME = {
