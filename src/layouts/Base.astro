@@ -26,7 +26,7 @@ const siteUrl = 'https://' + (profile.domain || 'example.com');
 const description = (profile.metaDescription || profile.subjectLine || '').replace(/&amp;/g, '&');
 // og.png is a static 1200x630 card checked into public/. If the name or subject
 // line changes, regenerate it from scripts/og-card.html (instructions in that file).
-const ogImage = siteUrl + '/og.png?v=2026-08';
+const ogImage = siteUrl + '/og.png?v=2026-10';
 const personId = siteUrl + '/#person';
 const organizationId = profile.firm?.url ? profile.firm.url.replace(/\/$/, '') + '/#organization' : '';
 const schema = {

@@ -556,6 +556,7 @@
     .brief-line{font-size:10px;line-height:1.7}
     .name{font-size:46px;margin:16px 0 12px}
     .dossier-row{gap:14px;align-items:center}
+    .dossier-row .dossier{flex:1;min-width:0}
     .subject{width:96px;padding:7px}
     .dossier{font-size:12px;line-height:1.75;letter-spacing:.02em}
     .availability-module{width:100%;align-items:stretch;flex-direction:column;gap:8px;margin-top:12px}
